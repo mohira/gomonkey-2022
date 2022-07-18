@@ -79,6 +79,32 @@ func (l *Lexer) NextToken() token.Token {
 	return tok
 }
 
+func (l *Lexer) skipWhitespace() {
+	// ホワイトスペースに該当する 文字 であるかぎり、読み進める
+	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
+		l.readChar()
+	}
+}
+
+func isDigit(ch byte) bool {
+	return '0' <= ch && ch <= '9'
+}
+
+func (l *Lexer) readNumber() string {
+	// readIdentifier と同じ発想
+	position := l.position // 最初の位置を覚えておく
+
+	for isDigit(l.ch) {
+		l.readChar()
+	}
+
+	return l.input[position:l.position]
+}
+
+func isLetter(ch byte) bool {
+	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
+}
+
 func (l *Lexer) readIdentifier() string {
 	position := l.position // 最初の位置を覚えておく
 
@@ -88,17 +114,6 @@ func (l *Lexer) readIdentifier() string {
 	}
 
 	return l.input[position:l.position]
-}
-
-func (l *Lexer) skipWhitespace() {
-	// ホワイトスペースに該当する 文字 であるかぎり、読み進める
-	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
-		l.readChar()
-	}
-}
-
-func isLetter(ch byte) bool {
-	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
 }
 
 func newToken(tokenType token.TokenType, ch byte) token.Token {
