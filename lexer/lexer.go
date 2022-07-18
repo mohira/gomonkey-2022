@@ -58,10 +58,17 @@ func (l *Lexer) NextToken() token.Token {
 		tok.Literal = ""
 		tok.Type = token.EOF
 	default:
-		// 記号トークン(？) 出ない場合は 文字(letter)かそれ以外かで区別する
+		// 記号トークン(？) 出ない場合は
+		// 	文字(letter)か
+		//  数値(number)か
+		//	それ以外かで区別する
 		if isLetter(l.ch) {
 			tok.Literal = l.readIdentifier()
 			tok.Type = token.LookupIdent(tok.Literal)
+			return tok
+		} else if isDigit(l.ch) {
+			tok.Literal = l.readNumber()
+			tok.Type = token.INT
 			return tok
 		} else {
 			tok = newToken(token.ILLEGAL, l.ch)
