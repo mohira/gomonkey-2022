@@ -7,22 +7,18 @@ import (
 
 func TestNextToken(t *testing.T) {
 	input := `
-let five = 5;
-
-let ten = 10;
-
-let add = fn(x, y) {
-	x + y;
-};
-
-let result = add(five, ten);
+let five =
 `
 
 	tests := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
 	}{
+		// let five =
 		{token.LET, "let"},
+		{token.IDENT, "five"},
+		{token.ASSIGN, "="},
+
 		{token.EOF, ""},
 	}
 
