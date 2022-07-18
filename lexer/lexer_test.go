@@ -21,6 +21,7 @@ let result = add(five, ten);
 5 < 10 > 5;
 
 if (5 < 10) {
+	return true;
 `
 
 	tests := []struct {
@@ -95,6 +96,11 @@ if (5 < 10) {
 		{token.INT, "10"},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
+
+		// return true;
+		{token.RETURN, "return"},
+		{token.TRUE, "true"},
+		{token.SEMICOLON, ";"},
 
 		// EOF
 		{token.EOF, ""},
