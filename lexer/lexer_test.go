@@ -66,7 +66,7 @@ let result = add(five, ten);
 		{token.RPAREN, ")"},
 		{token.SEMICOLON, ";"},
 
-		// EFO
+		// EOF
 		{token.EOF, ""},
 	}
 
