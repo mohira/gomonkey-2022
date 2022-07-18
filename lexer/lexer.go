@@ -52,6 +52,8 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.COMMA, l.ch)
 	case ';':
 		tok = newToken(token.SEMICOLON, l.ch)
+	case '!':
+		tok = newToken(token.BANG, l.ch)
 	case 0:
 		// newToken は 第2引数が byte なので使えない
 		// l.ch は '\x00' が入っているので tok.Literal に代入してもダメ
