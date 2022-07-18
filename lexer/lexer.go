@@ -32,6 +32,9 @@ func (l *Lexer) readChar() {
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
+	// ホワイトスペースは食べ尽くす
+	l.skipWhitespace()
+
 	switch l.ch {
 	case '=':
 		tok = newToken(token.ASSIGN, l.ch)
@@ -78,6 +81,13 @@ func (l *Lexer) readIdentifier() string {
 	}
 
 	return l.input[position:l.position]
+}
+
+func (l *Lexer) skipWhitespace() {
+	// ホワイトスペースに該当する 文字 であるかぎり、読み進める
+	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
+		l.readChar()
+	}
 }
 
 func isLetter(ch byte) bool {
