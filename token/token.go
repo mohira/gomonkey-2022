@@ -20,6 +20,9 @@ const (
 	ASTERISK = "*"
 	SLASH    = "/"
 
+	LT = "<"
+	GT = ">"
+
 	COMMA     = ","
 	SEMICOLON = ";"
 
