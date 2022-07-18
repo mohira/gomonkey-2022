@@ -120,7 +120,7 @@ if (5 < 10) {
 
 		// 10 == 10;
 		{token.INT, "10"},
-		{token.EQUAL, "=="},
+		{token.EQ, "=="},
 		{token.INT, "10"},
 		{token.SEMICOLON, ";"},
 

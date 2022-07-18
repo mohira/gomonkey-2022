@@ -23,6 +23,8 @@ const (
 	LT = "<"
 	GT = ">"
 
+	EQ = "=="
+
 	COMMA     = ","
 	SEMICOLON = ";"
 
