@@ -33,6 +33,7 @@ const (
 
 	FUNCTION = "FUNCTION"
 	LET      = "LET"
+	IF       = "IF"
 
 	BANG = "!"
 )
@@ -40,6 +41,7 @@ const (
 var keywords = map[string]TokenType{
 	"fn":  FUNCTION,
 	"let": LET,
+	"if":  IF,
 }
 
 func LookupIdent(ident string) TokenType {
