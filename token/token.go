@@ -27,6 +27,8 @@ const (
 
 	FUNCTION = "FUNCTION"
 	LET      = "LET"
+
+	BANG = "!"
 )
 
 var keywords = map[string]TokenType{
