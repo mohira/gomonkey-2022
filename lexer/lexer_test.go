@@ -8,6 +8,8 @@ import (
 func TestNextToken(t *testing.T) {
 	input := `
 let five = 5;
+
+let ten = 10;
 `
 
 	tests := []struct {
@@ -19,6 +21,13 @@ let five = 5;
 		{token.IDENT, "five"},
 		{token.ASSIGN, "="},
 		{token.INT, "5"},
+		{token.SEMICOLON, ";"},
+
+		// let ten = 10;
+		{token.LET, "let"},
+		{token.IDENT, "ten"},
+		{token.ASSIGN, "="},
+		{token.INT, "10"},
 		{token.SEMICOLON, ";"},
 
 		{token.EOF, ""},
