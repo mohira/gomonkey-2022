@@ -17,7 +17,7 @@ let add = fn(x, y) {
 
 let result = add(five, ten);
 
-!
+!-/*5;
 `
 
 	tests := []struct {
@@ -68,8 +68,13 @@ let result = add(five, ten);
 		{token.RPAREN, ")"},
 		{token.SEMICOLON, ";"},
 
-		// !
+		// !-/*5;
 		{token.BANG, "!"},
+		{token.MINUS, "-"},
+		{token.SLASH, "/"},
+		{token.ASTERISK, "*"},
+		{token.INT, "5"},
+		{token.SEMICOLON, ";"},
 
 		// EOF
 		{token.EOF, ""},

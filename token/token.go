@@ -14,8 +14,11 @@ const (
 	IDENT = "IDENT" // 識別子: add, foobar, x, y, ...
 	INT   = "INT"   // 整数: 3, 314
 
-	ASSIGN = "="
-	PLUS   = "+"
+	ASSIGN   = "="
+	PLUS     = "+"
+	MINUS    = "-"
+	ASTERISK = "*"
+	SLASH    = "/"
 
 	COMMA     = ","
 	SEMICOLON = ";"
