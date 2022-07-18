@@ -54,6 +54,14 @@ func (l *Lexer) NextToken() token.Token {
 		// l.ch は '\x00' が入っているので tok.Literal に代入してもダメ
 		tok.Literal = ""
 		tok.Type = token.EOF
+	default:
+		// 記号トークン(？) 出ない場合は 文字(letter)かそれ以外かで区別する
+		if isLetter(l.ch) {
+			tok.Literal = l.readIdentifier()
+			return tok
+		} else {
+			tok = newToken(token.ILLEGAL, l.ch)
+		}
 	}
 
 	l.readChar()
