@@ -1,0 +1,44 @@
+package lexer
+
+import "gomonkey/token"
+
+type Lexer struct {
+	input        string
+	position     int  // 入力における現在の位置。現在の文字を指し示す。常に最後に読み込んだ場所を表す。
+	readPosition int  // これから読み込む位置。現在の文字の"次"の文字を指し示す
+	ch           byte // 現在検査中の文字
+}
+
+func New(input string) *Lexer {
+	l := &Lexer{input: input}
+	l.readChar() // Lexer初期化時に最初の文字にセットしておく
+	return l
+}
+
+// 文字を1つ進める
+func (l *Lexer) readChar() {
+	if l.readPosition >= len(l.input) {
+		l.ch = 0 // Q. 「0 は 何を意味する？」 → A. 0 は 終端(ASCIIコードの NUL文字)を表す
+	} else {
+		l.ch = l.input[l.readPosition] // 検査中の文字 を 次の文字 に移動する
+	}
+	l.position = l.readPosition // 現在の位置 を 次の位置 にずらす
+	l.readPosition += 1         // 次の位置 を その次に ずらす
+
+}
+
+func (l *Lexer) NextToken() token.Token {
+	var tok token.Token
+
+	switch l.ch {
+	case '=':
+		tok = newToken(token.ASSIGN, l.ch)
+
+	}
+
+	return tok
+}
+
+func newToken(tokenType token.TokenType, ch byte) token.Token {
+	return token.Token{Type: tokenType, Literal: string(ch)}
+}
