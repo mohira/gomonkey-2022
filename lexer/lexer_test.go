@@ -25,6 +25,8 @@ if (5 < 10) {
 } else {
 	return false;
 }
+
+10 == 10;
 `
 
 	tests := []struct {
@@ -115,6 +117,12 @@ if (5 < 10) {
 		{token.FALSE, "false"},
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
+
+		// 10 == 10;
+		{token.INT, "10"},
+		{token.EQUAL, "=="},
+		{token.INT, "10"},
+		{token.SEMICOLON, ";"},
 
 		// EOF
 		{token.EOF, ""},
