@@ -29,6 +29,15 @@ func (l *Lexer) readChar() {
 
 }
 
+func (l *Lexer) peekChar() byte {
+	// 1文字覗き見るだけで、positionはずらさない。readCharとかなり似ている
+	if l.readPosition >= len(l.input) {
+		return 0
+	} else {
+		return l.input[l.readPosition]
+	}
+}
+
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
