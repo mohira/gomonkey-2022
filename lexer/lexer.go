@@ -78,8 +78,15 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.COMMA, l.ch)
 	case ';':
 		tok = newToken(token.SEMICOLON, l.ch)
-	case '!':
-		tok = newToken(token.BANG, l.ch)
+	case '!': // != の可能性もあるわけよ
+		if l.peekChar() == '=' {
+			ch := l.ch   // 読み進めるまえに保存
+			l.readChar() // ! → = なので読み進めちゃう
+			literal := string(ch) + string(l.ch)
+			tok = token.Token{Type: token.NOT_EQ, Literal: literal}
+		} else {
+			tok = newToken(token.BANG, l.ch)
+		}
 	case 0:
 		// newToken は 第2引数が byte なので使えない
 		// l.ch は '\x00' が入っているので tok.Literal に代入してもダメ
