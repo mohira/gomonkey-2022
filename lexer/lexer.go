@@ -58,6 +58,7 @@ func (l *Lexer) NextToken() token.Token {
 		// 記号トークン(？) 出ない場合は 文字(letter)かそれ以外かで区別する
 		if isLetter(l.ch) {
 			tok.Literal = l.readIdentifier()
+			tok.Type = token.LookupIdent(tok.Literal)
 			return tok
 		} else {
 			tok = newToken(token.ILLEGAL, l.ch)
