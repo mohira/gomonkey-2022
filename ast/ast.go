@@ -26,3 +26,17 @@ type Expression interface {
 	Node
 	expressionNode()
 }
+
+// Program プログラム は 複数の 文 から構成されるって感じ。
+// Programノードは、ルートノードですよ
+type Program struct {
+	Statements []Statement
+}
+
+func (p *Program) TokenLiteral() string {
+	if len(p.Statements) > 0 {
+		return p.Statements[0].TokenLiteral()
+	} else {
+		return ""
+	}
+}
