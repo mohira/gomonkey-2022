@@ -15,7 +15,7 @@ type Parser struct {
 	peekToken token.Token
 }
 
-func NewParser(l *lexer.Lexer) *Parser {
+func New(l *lexer.Lexer) *Parser {
 	p := &Parser{l: l}
 
 	// 2つトークンを読み込む。トークンの読み込みの雰囲気はLexerと同じだね。
