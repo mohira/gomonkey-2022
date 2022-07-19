@@ -12,8 +12,6 @@ let x = 5;
 let y = 10;
 let foobar = 838383;
 `
-	// あとで追加
-
 	l := lexer.New(input)
 	p := New(l)
 
@@ -32,6 +30,7 @@ let foobar = 838383;
 		expectedIdentifier string
 	}{
 		// let文の左辺である <identifier> だけチェックする。 右辺の<expression>はいつかやるんでしょうね。
+		// なぜ整数リテラル（ 5 、 10 など）が正しく構文解析されているかを確認し か？ 答えは、「あとでやる」だ。まずはlet文が正しく構文解析できるかを確かめる必要があるので、 Value には目をつぶる。
 		{"x"},
 		{"y"},
 		{"foobar"},
