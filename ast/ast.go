@@ -60,7 +60,7 @@ func (ls *LetStatement) TokenLiteral() string {
 	return ls.Token.Literal
 }
 
-func (ls *LetStatement) statementNoda() {
+func (ls *LetStatement) statementNode() {
 	// let文 は Statement でもあるので、 statementNode() を実装しないといけないよね
 	panic("implement me")
 }

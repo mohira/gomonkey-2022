@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"gomonkey/ast"
 	"gomonkey/lexer"
 	"testing"
 )
@@ -44,4 +45,43 @@ let foobar = 838383;
 			return
 		}
 	}
+}
+
+func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
+	// let <identifier> = <expression>;
+
+	// type LetStatement struct {
+	//	Token token.Token // token.LET っていうトークンが入るだけじゃんね。
+	//	Name  *Identifier // 要は、左辺の<識別子>
+	//	Value Expression  // こっちは、右辺の<式>
+	// }
+	t.Helper()
+
+	if s.TokenLiteral() != "let" {
+		t.Errorf("s.TokenLiteral not 'let'. got=%q", s.TokenLiteral())
+		return false
+	}
+
+	letStmt, ok := s.(*ast.LetStatement)
+	if !ok {
+		t.Errorf("s not *ast.LetStatement. got=%T", s)
+	}
+
+	// LetStatement.Name は <identifier> であり、型でいうと ast.Identifier
+	// type Identifier struct {
+	//	    Token token.Token // 何かしらのトークンでもあるよね
+	//		Value string      // <識別子> の "実際の値" とでも言えばいいかな。
+	//	}
+	if letStmt.Name.Value != name {
+		t.Errorf("letStmt.Name.Value not '%s'. got=%s", name, letStmt.Name.Value)
+		return false
+	}
+
+	// <identifier> チェックね。
+	if letStmt.Name.TokenLiteral() != name {
+		t.Errorf("letStmt.Name.Value not '%s'. got=%s", name, letStmt.Name.TokenLiteral())
+		return false
+	}
+
+	return true
 }
