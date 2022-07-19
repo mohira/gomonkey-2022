@@ -76,5 +76,6 @@ func (i *Identifier) TokenLiteral() string {
 }
 
 func (i *Identifier) expressionNode() {
-	// <Identifier> は <式> でもあるよね
+	// <Identifier> は <式> でもあることにしている
+	// Monkeyプログラムの他の部分では識 別子は値を生成する！
 }
