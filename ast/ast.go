@@ -1,6 +1,8 @@
 package ast
 
-import "gomonkey/token"
+import (
+	"gomonkey/token"
+)
 
 /*
 NodeはTokenLiteral()が必要。ノードが関連付けられているトークンのリテラル値がわからないとダメ。
@@ -61,4 +63,18 @@ func (ls *LetStatement) TokenLiteral() string {
 func (ls *LetStatement) statementNoda() {
 	// let文 は Statement でもあるので、 statementNode() を実装しないといけないよね
 	panic("implement me")
+}
+
+type Identifier struct {
+	Token token.Token // 何かしらのトークンでもあるよね
+	Value string      // 識別子の"実際の値"とでも言えばいいかな。
+}
+
+func (i *Identifier) TokenLiteral() string {
+	// <identifier> は Node だよね。
+	return i.Token.Literal
+}
+
+func (i *Identifier) expressionNode() {
+	// <Identifier> は <式> でもあるよね
 }
