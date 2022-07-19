@@ -26,4 +26,22 @@ let foobar = 838383;
 		t.Fatalf("👺 program.Statements は 3つの Statement が含まれているべきだよ。でも、 got=%q", len(program.Statements))
 	}
 
+	// こっからParser本編って感じ
+	tests := []struct {
+		expectedIdentifier string
+	}{
+		// let文の左辺である <identifier> だけチェックする。 右辺の<expression>はいつかやるんでしょうね。
+		{"x"},
+		{"y"},
+		{"foobar"},
+	}
+
+	for i, tt := range tests {
+		stmt := program.Statements[i]
+
+		// ヘルパーメソッドを使って、今見ている <文> が let文 かどうかをチェックする
+		if !testLetStatement(t, stmt, tt.expectedIdentifier) {
+			return
+		}
+	}
 }
