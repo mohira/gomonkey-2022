@@ -9,6 +9,8 @@ import (
 type Parser struct {
 	l *lexer.Lexer
 
+	// Lexer  は 1文字ずつ    見ていく
+	// Parser は 1トークンずつ 見ていく。Parserはトークン単位で見ている。
 	curToken  token.Token
 	peekToken token.Token
 }
