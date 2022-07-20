@@ -46,7 +46,8 @@ func (p *Parser) ParseProgram() *ast.Program {
 }
 
 func (p *Parser) parseStatement() ast.Statement {
-	if p.curToken.Type == token.LET {
+	switch p.curToken.Type {
+	case token.LET:
 		return &ast.LetStatement{}
 	}
 	return nil
