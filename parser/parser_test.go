@@ -54,6 +54,7 @@ let foobar = 838383
 }
 
 func testLetStatement(t *testing.T, stmt ast.Statement, expectedName string) bool {
+	// <expression> つまり LetStatement.Value の検証はムズいので後回しだよ
 	t.Helper()
 
 	// まずは LETトークンかどうかをちゃんと調べる
