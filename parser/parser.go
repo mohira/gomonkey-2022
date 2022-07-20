@@ -82,8 +82,9 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 }
 
 func (p *Parser) expectPeek(t token.TokenType) bool {
+	// チラ見して、期待通りならトークンを1つ読みすすめる。そうでなければ、何もしない。
+	// 構文解析器のよくある動作らしいね
 	if p.peekTokenIs(t) {
-		// 期待通りならトークンを1つ読みすすめる
 		p.nextToken()
 		return true
 	} else {
