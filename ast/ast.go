@@ -43,3 +43,17 @@ func (ls *LetStatement) TokenLiteral() string {
 func (ls *LetStatement) statementNode() {
 	panic("implement me")
 }
+
+// Identifier は Node です。さらに、monkeyの仕様では、 Identifier は Expression なのです！ もちろん Statement ではありません。
+type Identifier struct {
+	Token token.Token // token.IDENT トークン
+	Value string
+}
+
+func (i *Identifier) TokenLiteral() string {
+	return i.Token.Literal
+}
+
+func (i *Identifier) expressionNode() {
+	panic("implement me")
+}
