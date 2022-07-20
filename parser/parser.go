@@ -48,6 +48,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 }
 
 func (p *Parser) parseStatement() ast.Statement {
+	// Statement の Parse の エントリーポイント ってかんじだね
 	switch p.curToken.Type {
 	case token.LET:
 		return p.parseLetStatement()
