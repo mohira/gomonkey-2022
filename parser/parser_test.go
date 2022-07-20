@@ -17,4 +17,18 @@ let foobar = 838383
 	l := lexer.New(input)
 	p := New(l)
 
+	// それぞれの let文 をパースする前に
+	// 1. ast.Programノードが作れているかを確認する
+	// 2. このProgram は 3つの(何かしらの)Statement からなることを確認する
+
+	program := p.ParseProgram()
+
+	if program == nil {
+		t.Fatalf("ParseProgram() returned nil なのはおかしいよね'")
+	}
+
+	if len(program.Statements) != 3 {
+		t.Fatalf("3つのStatementからなるProgramじゃないのはおかしいよね。got = %q", len(program.Statements))
+	}
+
 }
