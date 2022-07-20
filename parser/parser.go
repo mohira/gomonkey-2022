@@ -81,6 +81,7 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	if !p.expectPeek(token.IDENT) {
 		return nil // いまんところErrorじゃなくてnilで
 	}
+
 	// <identifier> を 登録(？)すればいい
 	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 
