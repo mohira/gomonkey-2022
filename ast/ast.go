@@ -1,5 +1,7 @@
 package ast
 
+import "gomonkey/token"
+
 type Node interface {
 	TokenLiteral() string
 }
@@ -25,4 +27,19 @@ func (p *Program) TokenLiteral() string {
 	} else {
 		return "" // ルートノードしかない場合ってこと(文が一切ない"プログラム"のとき)
 	}
+}
+
+// LetStatement は 当然、Nodeだし、Statementですね。Expressionではないですね。
+type LetStatement struct {
+	Token token.Token // token.LET
+	Name  *Identifier // <identifier>
+	Value Expression  // <expression>
+}
+
+func (ls *LetStatement) TokenLiteral() string {
+	return ls.Token.Literal
+}
+
+func (ls *LetStatement) statementNode() {
+	panic("implement me")
 }
