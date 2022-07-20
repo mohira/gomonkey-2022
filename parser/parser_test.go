@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestParseLetStatement(t *testing.T) {
+func TestParseLetStatements(t *testing.T) {
 	// let文の <expression> 以外のところをパースする。<expression>のパースはあとでやるよ。ムズいんでね。
 
 	// 3つの let文 だけが含まれる正しいプログラムですね。
@@ -14,6 +14,12 @@ func TestParseLetStatement(t *testing.T) {
 let x = 5;
 let y = 10;
 let foobar = 838383;
+`
+	// エラーを確かめるための実験(あとで消してね)
+	input = `
+let x 5;
+let = 10;
+let 838383;
 `
 	l := lexer.New(input)
 	p := New(l)
@@ -23,6 +29,7 @@ let foobar = 838383;
 	// 2. このProgram は 3つの(何かしらの)Statement からなることを確認する
 
 	program := p.ParseProgram()
+	checkParserErrors(t, p)
 
 	if program == nil {
 		t.Fatalf("ParseProgram() returned nil なのはおかしいよね'")
@@ -50,6 +57,22 @@ let foobar = 838383;
 		}
 	}
 
+}
+
+func checkParserErrors(t *testing.T, p *Parser) {
+	errors := p.Errors()
+
+	if len(errors) == 0 {
+		return
+	}
+
+	t.Errorf("parser has %d errors", len(errors))
+
+	for _, msg := range errors {
+		t.Errorf("parser error: %q", msg)
+	}
+
+	t.FailNow()
 }
 
 func testLetStatement(t *testing.T, stmt ast.Statement, expectedName string) bool {

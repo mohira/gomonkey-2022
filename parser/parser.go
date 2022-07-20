@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"gomonkey/ast"
 	"gomonkey/lexer"
 	"gomonkey/token"
@@ -12,15 +13,30 @@ type Parser struct {
 	// Lexerのときと同じ作戦。Lexerは「1文字」単位で、Parserは「1トークン」単位ですね。
 	curToken  token.Token
 	peekToken token.Token
+
+	// デバッグを楽にするため error を記録しておく
+	errors []string // stringが楽で良さげ
 }
 
 func New(l *lexer.Lexer) *Parser {
-	p := &Parser{l: l}
+	p := &Parser{
+		l:      l,
+		errors: []string{},
+	}
 
 	// 初期化時に2回読み進めておく
 	p.nextToken()
 	p.nextToken()
 	return p
+}
+
+func (p *Parser) Errors() []string {
+	return p.errors
+}
+
+func (p *Parser) peekError(t token.TokenType) {
+	msg := fmt.Sprintf("👺 次のトークンは %s になってほしいけど、いまんところ %s になっちゃってるよ", t, p.peekToken.Type)
+	p.errors = append(p.errors, msg)
 }
 
 func (p *Parser) nextToken() {
@@ -88,6 +104,7 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 		p.nextToken()
 		return true
 	} else {
+		p.peekError(t)
 		return false
 	}
 }
