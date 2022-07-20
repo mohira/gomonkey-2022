@@ -75,5 +75,11 @@ func testLetStatement(t *testing.T, stmt ast.Statement, expectedName string) boo
 		return false
 	}
 
+	// よくわからんけど、LetStatement.Name.Value だけじゃなくて LetStatement.Name.TokenLiteral()もしらべてる
+	if letStmt.Name.TokenLiteral() != expectedName {
+		t.Errorf("letStmt.Name.TokenLiteral() が %q じゃないよ。got=%q", letStmt.Name.TokenLiteral(), expectedName)
+		return false
+	}
+
 	return true
 }
