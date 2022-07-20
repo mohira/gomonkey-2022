@@ -58,6 +58,7 @@ func (p *Parser) parseStatement() ast.Statement {
 }
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {
+	// let文 という Node を構築していく感じ。
 	stmt := &ast.LetStatement{Token: p.curToken}
 
 	// 次のトークンは <identifier> であってほしいからね。
