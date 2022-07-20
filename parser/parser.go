@@ -32,9 +32,11 @@ func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 	program.Statements = []ast.Statement{}
 
+	// ここらへん、擬似コードまんま！
 	for p.curToken.Type != token.EOF {
 		stmt := p.parseStatement()
 
+		// 文が来るとは限らないからね。式だったり、ILLEGALだったりするからね
 		if stmt != nil {
 			program.Statements = append(program.Statements, stmt)
 		}
