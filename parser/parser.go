@@ -55,5 +55,42 @@ func (p *Parser) parseStatement() ast.Statement {
 }
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {
-	return &ast.LetStatement{}
+	stmt := &ast.LetStatement{Token: p.curToken}
+
+	// 次のトークンは <identifier> であってほしいからね。
+	if !p.expectPeek(token.IDENT) {
+		return nil // いまんところErrorじゃなくてnilで
+	}
+	// <identifier> を 登録(？)すればいい
+	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+
+	// let文なら、つぎのトークンは 「=」 だよね
+	if !p.expectPeek(token.ASSIGN) {
+		return nil // いまんところErrorじゃなくてnilで
+	}
+
+	// TOのDO: <expression>のパースを後回しにするので、セミコロンがくるまで読み飛ばしている。
+	for !p.curTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+func (p *Parser) expectPeek(t token.TokenType) bool {
+	if p.peekTokenIs(t) {
+		// 期待通りならトークンを1つ読みすすめる
+		p.nextToken()
+		return true
+	} else {
+		return false
+	}
+}
+
+func (p *Parser) curTokenIs(t token.TokenType) bool {
+	return p.curToken.Type == t
+}
+
+func (p *Parser) peekTokenIs(t token.TokenType) bool {
+	return p.peekToken.Type == t
 }

@@ -3,7 +3,6 @@ package parser
 import (
 	"gomonkey/ast"
 	"gomonkey/lexer"
-	"gomonkey/token"
 	"testing"
 )
 
@@ -14,7 +13,7 @@ func TestParseLetStatement(t *testing.T) {
 	input := `
 let x = 5;
 let y = 10;
-let foobar = 838383
+let foobar = 838383;
 `
 	l := lexer.New(input)
 	p := New(l)
@@ -58,7 +57,7 @@ func testLetStatement(t *testing.T, stmt ast.Statement, expectedName string) boo
 	t.Helper()
 
 	// まずは LETトークンかどうかをちゃんと調べる
-	if stmt.TokenLiteral() != token.LET {
+	if stmt.TokenLiteral() != "let" {
 		t.Errorf("stmt.TokenLiteral() が 'let` じゃないよ。 got = %q", stmt.TokenLiteral())
 		return false
 	}
