@@ -118,8 +118,8 @@ return 993322
 
 	program := p.ParseProgram()
 	checkParserErrors(t, p)
-	// それぞれのreturn文をParseする前に Statement が 3つある ことを確認する
 
+	// それぞれのreturn文をParseする前に Statement が 3つある ことを確認する
 	if len(program.Statements) != 3 {
 		t.Fatalf("Statementは3つじゃないとおかしいね. got=%q", len(program.Statements))
 	}
