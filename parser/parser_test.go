@@ -132,5 +132,10 @@ return 993322
 			t.Errorf("stmt not *ast.ReturnStatement. got=%T", returnStmt)
 			continue
 		}
+
+		// returnStmtがちゃんと "return"トークンを持っているかを調べる
+		if returnStmt.TokenLiteral() != "return" {
+			t.Errorf("returnStmt.TokenLiteral() が 'return' になっていない。got=%q", returnStmt.TokenLiteral())
+		}
 	}
 }
