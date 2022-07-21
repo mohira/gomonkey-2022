@@ -16,11 +16,11 @@ let y = 10;
 let foobar = 838383;
 `
 	// エラーを確かめるための実験(あとで消してね)
-	input = `
-let x 5;
-let = 10;
-let 838383;
-`
+	//	input = `
+	//let x 5;
+	//let = 10;
+	//let 838383;
+	//`
 	l := lexer.New(input)
 	p := New(l)
 
