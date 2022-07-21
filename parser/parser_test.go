@@ -123,4 +123,14 @@ return 993322
 	if len(program.Statements) != 3 {
 		t.Fatalf("Statementは3つじゃないとおかしいね. got=%q", len(program.Statements))
 	}
+
+	// ここから1文ずつ検証する
+	for _, stmt := range program.Statements {
+		// まず、return文 なのかを確かめる
+		returnStmt, ok := stmt.(*ast.ReturnStatement)
+		if !ok {
+			t.Errorf("stmt not *ast.ReturnStatement. got=%T", returnStmt)
+			continue
+		}
+	}
 }
