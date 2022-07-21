@@ -106,3 +106,21 @@ func testLetStatement(t *testing.T, stmt ast.Statement, expectedName string) boo
 
 	return true
 }
+
+func TestParseReturnStatements(t *testing.T) {
+	input := `
+return 5;
+return 10;
+return 993322
+`
+	l := lexer.New(input)
+	p := New(l)
+
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+	// それぞれのreturn文をParseする前に Statement が 3つある ことを確認する
+
+	if len(program.Statements) != 3 {
+		t.Fatalf("Statementは3つじゃないとおかしいね. got=%q", len(program.Statements))
+	}
+}
