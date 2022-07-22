@@ -70,3 +70,16 @@ func (r *ReturnStatement) TokenLiteral() string {
 func (r *ReturnStatement) statementNode() {
 	panic("implement me")
 }
+
+type ExpressionStatement struct {
+	Token      token.Token // <式>の最初のトークンを持つらしい。謎。
+	Expression Expression
+}
+
+func (es *ExpressionStatement) TokenLiteral() string {
+	return es.Token.Literal
+}
+
+func (es *ExpressionStatement) statementNode() {
+	panic("implement me")
+}
