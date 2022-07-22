@@ -1,6 +1,9 @@
 package ast
 
-import "gomonkey/token"
+import (
+	"bytes"
+	"gomonkey/token"
+)
 
 type Node interface {
 	TokenLiteral() string
@@ -20,6 +23,16 @@ type Expression interface {
 // Program ノードは、Statementでもないし、Expressionでもないですね。
 type Program struct {
 	Statements []Statement
+}
+
+func (p *Program) String() string {
+	var out bytes.Buffer // 今なら strings.Builder かも
+
+	for _, stmt := range p.Statements {
+		out.WriteString(stmt.String())
+	}
+
+	return out.String()
 }
 
 func (p *Program) TokenLiteral() string {
