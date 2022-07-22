@@ -17,14 +17,14 @@ func TestString(t *testing.T) {
 			Name: &Identifier{
 				Token: token.Token{
 					Type:    token.IDENT,
-					Literal: "IDENT",
+					Literal: "myVar",
 				},
 				Value: "myVar",
 			},
 			Value: &Identifier{
 				Token: token.Token{
 					Type:    token.IDENT,
-					Literal: "IDENT",
+					Literal: "anotherVar",
 				},
 				Value: "anotherVar",
 			},
@@ -35,5 +35,31 @@ func TestString(t *testing.T) {
 	want := "let myVar = anotherVar;"
 	if program.String() != want {
 		t.Errorf("program.String() wrong. got=%q, want=%q ", program.String(), want)
+	}
+}
+
+func TestString2(t *testing.T) {
+	// 自力でASTを組み立てる練習
+	// return result;
+	program := &Program{Statements: []Statement{
+		&ReturnStatement{
+			Token: token.Token{
+				Type:    token.RETURN,
+				Literal: "return",
+			},
+			ReturnValue: &Identifier{
+				Token: token.Token{
+					Type:    token.IDENT,
+					Literal: "result",
+				},
+				Value: "result",
+			},
+		},
+	},
+	}
+
+	want := "return result;"
+	if program.String() != want {
+		t.Errorf("program.String()！ got=%q, want=%q", program.String(), want)
 	}
 }
