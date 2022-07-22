@@ -50,6 +50,23 @@ type LetStatement struct {
 	Value Expression  // <expression>
 }
 
+func (ls *LetStatement) String() string {
+	// ex: "let x = 5;" みたいな文字列が手に入るよ
+	var out bytes.Buffer
+
+	out.WriteString(ls.Token.Literal + " ")
+	out.WriteString(ls.Name.String())
+	out.WriteString(" = ")
+
+	if ls.Value != nil {
+		out.WriteString(ls.Value.String())
+	}
+
+	out.WriteString(";")
+
+	return out.String()
+}
+
 func (ls *LetStatement) TokenLiteral() string {
 	return ls.Token.Literal
 }
@@ -62,6 +79,10 @@ func (ls *LetStatement) statementNode() {
 type Identifier struct {
 	Token token.Token // token.IDENT トークン
 	Value string
+}
+
+func (i *Identifier) String() string {
+	return i.Value
 }
 
 func (i *Identifier) TokenLiteral() string {
@@ -77,11 +98,27 @@ type ReturnStatement struct {
 	ReturnValue Expression
 }
 
-func (r *ReturnStatement) TokenLiteral() string {
-	return r.Token.Literal
+func (rs *ReturnStatement) String() string {
+	// ex: "return 5;" みたいな文字列が手に入るよ
+
+	var out bytes.Buffer
+
+	out.WriteString(rs.TokenLiteral() + " ")
+
+	if rs.ReturnValue != nil {
+		out.WriteString(rs.ReturnValue.String())
+	}
+
+	out.WriteString(";")
+
+	return out.String()
 }
 
-func (r *ReturnStatement) statementNode() {
+func (rs *ReturnStatement) TokenLiteral() string {
+	return rs.Token.Literal
+}
+
+func (rs *ReturnStatement) statementNode() {
 	panic("implement me")
 }
 
