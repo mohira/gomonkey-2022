@@ -3,6 +3,7 @@ package parser
 import (
 	"gomonkey/ast"
 	"gomonkey/lexer"
+	"gomonkey/token"
 	"testing"
 )
 
@@ -152,4 +153,22 @@ func TestParseIdentifier(t *testing.T) {
 		t.Fatalf("program.Statements が 1文のみになってないよ！ got=%d", len(program.Statements))
 	}
 
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("その<文> は ast.ExpressionStatement <式文> になってないぞ！ got=%T", program.Statements[0])
+	}
+
+	ident, ok := exprStmt.Expression.(*ast.Identifier)
+	if !ok {
+		t.Fatalf("その<式文> は <IDENT> になってないよ！ got=%T", exprStmt.Expression)
+	}
+
+	// フィールド検証
+	if ident.TokenLiteral() != token.IDENT {
+		t.Errorf("ident.TokenLiteral() not %s, got %s", "foobar", ident.TokenLiteral())
+	}
+
+	if ident.Value != "foobar" {
+		t.Errorf("ident.Value not %s, got %s", "foobar", ident.Value)
+	}
 }
