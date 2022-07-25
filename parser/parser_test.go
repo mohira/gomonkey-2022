@@ -139,3 +139,17 @@ return 993322;
 		}
 	}
 }
+
+func TestParseIdentifier(t *testing.T) {
+	input := "foobar;"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Statements が 1文のみになってないよ！ got=%d", len(program.Statements))
+	}
+
+}
