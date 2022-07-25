@@ -3,7 +3,6 @@ package parser
 import (
 	"gomonkey/ast"
 	"gomonkey/lexer"
-	"gomonkey/token"
 	"testing"
 )
 
@@ -164,7 +163,7 @@ func TestParseIdentifier(t *testing.T) {
 	}
 
 	// フィールド検証
-	if ident.TokenLiteral() != token.IDENT {
+	if ident.TokenLiteral() != "foobar" {
 		t.Errorf("ident.TokenLiteral() not %s, got %s", "foobar", ident.TokenLiteral())
 	}
 

@@ -7,6 +7,17 @@ import (
 	"gomonkey/token"
 )
 
+const (
+	_ int = iota
+	LOWEST
+	EQUALS      // =
+	LESSGREATER // > または <
+	SUM         // +
+	PRODUCT     // *
+	PREFIX      // -X または !X
+	CALL        // myFunction(X)
+)
+
 type Parser struct {
 	l *lexer.Lexer
 
@@ -31,6 +42,12 @@ func New(l *lexer.Lexer) *Parser {
 	// 初期化時に2回読み進めておく
 	p.nextToken()
 	p.nextToken()
+
+	// 前置の構文解析関数のmap初期化
+	p.prefixFns = make(map[token.TokenType]parsePrefixFn)
+
+	p.registerPrefixFn(token.IDENT, p.parseIdentifier)
+
 	return p
 }
 
@@ -74,9 +91,8 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseLetStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
-
 	default:
-		return nil
+		return p.parseExpressionStatement()
 	}
 }
 
@@ -151,4 +167,36 @@ func (p Parser) registerPrefixFn(tokenType token.TokenType, fn parsePrefixFn) {
 
 func (p Parser) registerInfixFn(tokenType token.TokenType, fn parseInfixFn) {
 	p.infixFns[tokenType] = fn
+}
+
+func (p *Parser) parseExpressionStatement() ast.Statement {
+	exprStmt := &ast.ExpressionStatement{Token: p.curToken}
+
+	exprStmt.Expression = p.parseExpression(LOWEST)
+
+	// トークンの読み進めもお忘れなく ← 構文解析関数では読み進めない仕様にしている！
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+	return exprStmt
+}
+
+func (p *Parser) parseExpression(precedence int) ast.Expression {
+	prefixFn := p.prefixFns[p.curToken.Type]
+
+	if prefixFn == nil {
+		return nil
+	}
+
+	leftExpr := prefixFn()
+
+	return leftExpr
+}
+
+func (p *Parser) parseIdentifier() ast.Expression {
+	ident := &ast.Identifier{
+		Token: p.curToken,
+		Value: p.curToken.Literal,
+	}
+	return ident
 }
