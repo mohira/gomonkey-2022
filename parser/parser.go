@@ -5,6 +5,7 @@ import (
 	"gomonkey/ast"
 	"gomonkey/lexer"
 	"gomonkey/token"
+	"strconv"
 )
 
 const (
@@ -47,7 +48,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.prefixFns = make(map[token.TokenType]parsePrefixFn)
 
 	p.registerPrefixFn(token.IDENT, p.parseIdentifier)
-
+	p.registerPrefixFn(token.INT, p.parseIntegerLiteral)
 	return p
 }
 
@@ -199,4 +200,21 @@ func (p *Parser) parseIdentifier() ast.Expression {
 		Value: p.curToken.Literal,
 	}
 	return ident
+}
+
+func (p *Parser) parseIntegerLiteral() ast.Expression {
+	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
+	if err != nil {
+		msg := fmt.Sprintf("colud not parse %q as integer", p.curToken.Literal)
+		p.errors = append(p.errors, msg)
+		return nil
+	}
+
+	intLit := &ast.IntegerLiteral{
+		Token: p.curToken,
+		Value: value,
+	}
+
+	return intLit
+
 }

@@ -196,7 +196,7 @@ func TestParseIntegerLiteral(t *testing.T) {
 
 	// フィールドの検証
 	if intLit.TokenLiteral() != "5" {
-		t.Errorf("intLit.TokenLiteral() not %d, got=%d", 5, intLit)
+		t.Errorf("intLit.TokenLiteral() not %s, got=%s", "5", intLit.TokenLiteral())
 	}
 
 	if intLit.Value != 5 {
