@@ -171,3 +171,35 @@ func TestParseIdentifier(t *testing.T) {
 		t.Errorf("ident.Value not %s, got %s", "foobar", ident.Value)
 	}
 }
+
+func TestParseIntegerLiteral(t *testing.T) {
+	input := "5;"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Statements が 1文のみになってないよ！ got=%d", len(program.Statements))
+	}
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("その<文> は ast.ExpressionStatement <式文> になってないぞ！ got=%T", program.Statements[0])
+	}
+
+	intLit, ok := exprStmt.Expression.(*ast.IntegerLiteral)
+	if !ok {
+		t.Fatalf("ast.IntegerLiteral に変換できてないよ. got=%T", exprStmt.Expression)
+	}
+
+	// フィールドの検証
+	if intLit.TokenLiteral() != "5" {
+		t.Errorf("intLit.TokenLiteral() not %d, got=%d", 5, intLit)
+	}
+
+	if intLit.Value != 5 {
+		t.Errorf("intLit.Value not %d, got=%d", 5, intLit.Value)
+	}
+}
