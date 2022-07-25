@@ -16,6 +16,10 @@ type Parser struct {
 
 	// デバッグを楽にするため error を記録しておく
 	errors []string // stringが楽で良さげ
+
+	// トークンタイプごとの構文解析関数をもっておくmap
+	prefixFns map[token.TokenType]parsePrefixFn
+	infixFns  map[token.TokenType]parseInfixFn
 }
 
 func New(l *lexer.Lexer) *Parser {
@@ -133,4 +137,18 @@ func (p *Parser) parseReturnStatement() ast.Statement {
 	}
 
 	return stmt
+}
+
+type (
+	parsePrefixFn func() ast.Expression
+	// <left> <op> <right> の <left> が引数な
+	parseInfixFn func(ast.Expression) ast.Expression
+)
+
+func (p Parser) registerPrefixFn(tokenType token.TokenType, fn parsePrefixFn) {
+	p.prefixFns[tokenType] = fn
+}
+
+func (p Parser) registerInfixFn(tokenType token.TokenType, fn parseInfixFn) {
+	p.infixFns[tokenType] = fn
 }
