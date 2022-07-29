@@ -52,6 +52,18 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefixFn(token.BANG, p.parsePrefixExpression)
 	p.registerPrefixFn(token.MINUS, p.parsePrefixExpression)
 
+	// 中置演算式用の構文解析関数の用意
+	p.infixFns = make(map[token.TokenType]parseInfixFn)
+
+	p.registerInfixFn(token.EQ, p.parseInfixExpression)
+	p.registerInfixFn(token.NOT_EQ, p.parseInfixExpression)
+	p.registerInfixFn(token.LT, p.parseInfixExpression)
+	p.registerInfixFn(token.GT, p.parseInfixExpression)
+	p.registerInfixFn(token.PLUS, p.parseInfixExpression)
+	p.registerInfixFn(token.MINUS, p.parseInfixExpression)
+	p.registerInfixFn(token.ASTERISK, p.parseInfixExpression)
+	p.registerInfixFn(token.SLASH, p.parseInfixExpression)
+
 	return p
 }
 
@@ -195,6 +207,21 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 
 	leftExpr := prefixFn()
 
+	for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence() {
+		// 「今の演算子の優先順位」が、「次の演算子の優先順位」より「小さい」なら、
+		//
+
+		infixFn := p.infixFns[p.peekToken.Type]
+
+		if infixFn == nil {
+			return leftExpr
+		}
+
+		p.nextToken()
+
+		leftExpr = infixFn(leftExpr)
+	}
+
 	return leftExpr
 }
 
@@ -272,4 +299,20 @@ func (p *Parser) peekPrecedence() int {
 	}
 
 	return LOWEST
+}
+
+func (p *Parser) parseInfixExpression(leftExpr ast.Expression) ast.Expression {
+	infixExpr := &ast.InfixExpression{
+		Token:    p.curToken,
+		Left:     leftExpr,
+		Operator: p.curToken.Literal,
+		Right:    nil,
+	}
+
+	precedence := p.curPrecedence() // この時点ではcurTokenは何かしらの演算子トークンのはず
+	p.nextToken()                   // だから、1つ読み進める
+
+	infixExpr.Right = p.parseExpression(precedence)
+
+	return infixExpr
 }
