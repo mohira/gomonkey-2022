@@ -49,6 +49,9 @@ func New(l *lexer.Lexer) *Parser {
 
 	p.registerPrefixFn(token.IDENT, p.parseIdentifier)
 	p.registerPrefixFn(token.INT, p.parseIntegerLiteral)
+	p.registerPrefixFn(token.BANG, p.parsePrefixExpression)
+	p.registerPrefixFn(token.MINUS, p.parsePrefixExpression)
+
 	return p
 }
 
@@ -186,6 +189,7 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 	prefixFn := p.prefixFns[p.curToken.Type]
 
 	if prefixFn == nil {
+		p.noPrefixParseFnError(p.curToken.Type)
 		return nil
 	}
 
@@ -217,4 +221,24 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 
 	return intLit
 
+}
+
+func (p *Parser) noPrefixParseFnError(t token.TokenType) {
+	// 適応する前置用の構文解析関数が見つからないときにエラー情報を格納するやつ
+	msg := fmt.Sprintf("トークンタイプ '%s' 用のPrefixParseFnがありませんよ？", t)
+	p.errors = append(p.errors, msg)
+}
+
+func (p *Parser) parsePrefixExpression() ast.Expression {
+	prefixExpr := &ast.PrefixExpression{
+		Token:    p.curToken,
+		Operator: p.curToken.Literal,
+	}
+	// この関数が呼ばれている次点で、 token.BANG または token.MINUS なので(そう指定したから)
+	// そのままトークンを読み進めればおk
+	p.nextToken()
+
+	prefixExpr.Right = p.parseExpression(PREFIX)
+
+	return prefixExpr
 }

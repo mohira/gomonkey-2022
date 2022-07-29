@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"gomonkey/ast"
 	"gomonkey/lexer"
 	"testing"
@@ -202,4 +203,67 @@ func TestParseIntegerLiteral(t *testing.T) {
 	if intLit.Value != 5 {
 		t.Errorf("intLit.Value not %d, got=%d", 5, intLit.Value)
 	}
+}
+
+func TestParsingPrefixExpressions(t *testing.T) {
+	prefixTests := []struct {
+		input        string
+		operator     string
+		integerValue int64 // ← !5; とか -3; みたいに、<expression>が<integer_literal>限定のテストってこと
+	}{
+		{"!5;", "!", 5}, // !5 が何を返すかは多分決めてないと思う。あくまで前置演算式って構造だけ。
+		{"-15;", "-", 15},
+	}
+
+	for _, tt := range prefixTests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("1 Statement になってないのはおかしいよ, got=%d", len(program.Statements))
+		}
+
+		exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("ast.ExpressionStatmentに変換できないよ, got=%T", program.Statements[0])
+		}
+
+		prefixExpr, ok := exprStmt.Expression.(*ast.PrefixExpression)
+		if !ok {
+			t.Fatalf("ast.PrefixExrepssionに変換できないよ, got=%T", exprStmt.Expression)
+		}
+
+		// ast.PrefixExpressionのフィールド検証
+		if prefixExpr.Operator != tt.operator {
+			t.Errorf("Opeartorが違うよ. got=%s, want=%s", prefixExpr.Operator, tt.operator)
+		}
+
+		if testIntegerLiteral(t, prefixExpr.Right, tt.integerValue) {
+			return
+		}
+
+	}
+
+}
+
+func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
+	integerLiteral, ok := il.(*ast.IntegerLiteral)
+	if !ok {
+		t.Errorf("il not *ast.IntegerLitearl, got=%T", il)
+		return false
+	}
+
+	if integerLiteral.Value != value {
+		t.Errorf("integerLiteral not %d, got=%d", integerLiteral.Value, value)
+		return false
+	}
+
+	if integerLiteral.TokenLiteral() != fmt.Sprintf("%d", value) {
+		t.Errorf("integerLiteral.TokenLiteral not %d, got=%s", value, integerLiteral.TokenLiteral())
+		return false
+	}
+
+	return true
 }

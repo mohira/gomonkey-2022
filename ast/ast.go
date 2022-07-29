@@ -159,3 +159,27 @@ func (i *IntegerLiteral) expressionNode() {
 func (i *IntegerLiteral) String() string {
 	return i.Token.Literal
 }
+
+type PrefixExpression struct {
+	Token    token.Token // 演算を意味する前置トークン: 「!」とか「-」とか
+	Operator string
+	Right    Expression // <operator><expression> だから、位置関係的に「右」
+}
+
+func (pe *PrefixExpression) TokenLiteral() string {
+	return pe.Token.Literal
+}
+
+func (pe *PrefixExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("(")
+	out.WriteString(pe.Operator)
+	out.WriteString(pe.Right.String())
+	out.WriteString(")")
+	return out.String()
+}
+
+func (pe *PrefixExpression) expressionNode() {
+	panic("implement me")
+}
