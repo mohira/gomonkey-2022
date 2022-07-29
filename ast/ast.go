@@ -183,3 +183,28 @@ func (pe *PrefixExpression) String() string {
 func (pe *PrefixExpression) expressionNode() {
 	panic("implement me")
 }
+
+type InfixExpression struct {
+	Token    token.Token // どの演算かを表す情報
+	Left     Expression
+	Operator string
+	Right    Expression
+}
+
+func (ie *InfixExpression) TokenLiteral() string {
+	return ie.Token.Literal
+}
+
+func (ie *InfixExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("(")
+	out.WriteString(ie.Left.String() + " " + ie.Operator + " " + ie.Right.String())
+	out.WriteString(")")
+
+	return out.String()
+}
+
+func (ie *InfixExpression) expressionNode() {
+	panic("implement me")
+}
