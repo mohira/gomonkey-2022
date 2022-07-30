@@ -356,3 +356,19 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 
 	}
 }
+
+func TestOperatorPrecedenceParsing確認用(t *testing.T) {
+	// ASTの文字列表現が優先順位を含んだカッコの感じになっているかチェック。LISP感。
+	input := "1 + 2 + 3"
+	want := "((1 + 2) + 3)"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	actual := program.String()
+	if actual != want {
+		t.Errorf("expected=%q, got=%q", want, actual)
+	}
+}
