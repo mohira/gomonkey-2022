@@ -271,9 +271,9 @@ func TestParsingInfixExpressions(t *testing.T) {
 	// このテストにおける <expr> は、具体的には、IntegerLiteralのみ
 	infixTests := []struct {
 		input             string
-		LeftIntegerValue  int64
+		LeftIntegerValue  any
 		Operator          string
-		RightIntegerValue int64
+		RightIntegerValue any
 	}{
 		{"3 + 4;", 3, "+", 4},
 		{"3 - 4;", 3, "-", 4},
@@ -283,6 +283,11 @@ func TestParsingInfixExpressions(t *testing.T) {
 		{"3 < 4;", 3, "<", 4},
 		{"3 == 4;", 3, "==", 4},
 		{"3 != 4;", 3, "!=", 4},
+
+		// BooleanLiteralあり
+		{"true == true", true, "==", true},
+		{"true != false", true, "!=", false},
+		{"false == false", false, "==", false},
 	}
 
 	for _, tt := range infixTests {
@@ -392,6 +397,8 @@ func testLiteralExpression(t *testing.T, expr ast.Expression, expected any) bool
 		return testIntegerLiteral(t, expr, v)
 	case string:
 		return testIdentifier(t, expr, v)
+	case bool:
+		return testBooleanLiteral(t, expr, v)
 	}
 
 	t.Errorf("type of expr not handled. まだ対応できないんだわ。got=%T", expr)
@@ -456,4 +463,24 @@ func TestBooleanExpression(t *testing.T) {
 			t.Errorf("boolean.Value not %t got=%t", tt.expectedValue, boolean.Value)
 		}
 	}
+}
+
+func testBooleanLiteral(t *testing.T, expr ast.Expression, value bool) bool {
+	b, ok := expr.(*ast.Boolean)
+	if !ok {
+		t.Errorf("expr not *ast.Boolean got=%T", expr)
+		return false
+	}
+
+	if b.Value != value {
+		t.Errorf("b.Value not %t. got=%t", value, b.Value)
+		return false
+	}
+
+	if b.TokenLiteral() != fmt.Sprintf("%t", value) {
+		t.Errorf("b.TokenLiteral not %t got %s", value, b.TokenLiteral())
+		return false
+	}
+
+	return true
 }
