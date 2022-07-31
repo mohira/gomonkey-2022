@@ -240,12 +240,10 @@ func TestParsingPrefixExpressions(t *testing.T) {
 			t.Errorf("Opeartorが違うよ. got=%s, want=%s", prefixExpr.Operator, tt.operator)
 		}
 
-		if testIntegerLiteral(t, prefixExpr.Right, tt.integerValue) {
+		if testLiteralExpression(t, prefixExpr.Right, tt.integerValue) {
 			return
 		}
-
 	}
-
 }
 
 func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
@@ -302,21 +300,7 @@ func TestParsingInfixExpressions(t *testing.T) {
 			t.Fatalf("おかしいよ. got=%T", program.Statements[0])
 		}
 
-		infixExpr, ok := exprStmt.Expression.(*ast.InfixExpression)
-		if !ok {
-			t.Fatalf("おかしいよ. got=%T", exprStmt.Expression)
-		}
-
-		// フィールド検証
-		if !testIntegerLiteral(t, infixExpr.Left, tt.LeftIntegerValue) {
-			return
-		}
-
-		if infixExpr.Operator != tt.Operator {
-			t.Errorf("おかしいよ")
-		}
-
-		if !testIntegerLiteral(t, infixExpr.Right, tt.RightIntegerValue) {
+		if !testInfixExpression(t, exprStmt.Expression, tt.LeftIntegerValue, tt.Operator, tt.RightIntegerValue) {
 			return
 		}
 	}
