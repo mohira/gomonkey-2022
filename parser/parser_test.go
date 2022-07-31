@@ -393,3 +393,41 @@ func testIdentifier(t *testing.T, expr ast.Expression, value string) bool {
 	}
 	return true
 }
+
+func testLiteralExpression(t *testing.T, expr ast.Expression, expected any) bool {
+	switch v := expected.(type) {
+	case int:
+		return testIntegerLiteral(t, expr, int64(v))
+	case int64:
+		return testIntegerLiteral(t, expr, v)
+	case string:
+		return testIdentifier(t, expr, v)
+	}
+
+	t.Errorf("type of expr not handled. まだ対応できないんだわ。got=%T", expr)
+
+	return true
+}
+
+func testInfixExpression(t *testing.T, expr ast.Expression, left any, operator string, right any) bool {
+	infixExpr, ok := expr.(*ast.InfixExpression)
+	if !ok {
+		t.Errorf("expr is not ast.InfixExpression. got=%T(%s)", expr, expr)
+		return false
+	}
+
+	if !testLiteralExpression(t, infixExpr.Left, left) {
+		return false
+	}
+
+	if infixExpr.Operator != operator {
+		t.Errorf("expr.Operator is not %s. got=%s", operator, infixExpr.Operator)
+		return false
+	}
+
+	if !testLiteralExpression(t, infixExpr.Right, right) {
+		return false
+	}
+
+	return true
+}
