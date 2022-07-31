@@ -209,10 +209,13 @@ func TestParsingPrefixExpressions(t *testing.T) {
 	prefixTests := []struct {
 		input        string
 		operator     string
-		integerValue int64 // ← !5; とか -3; みたいに、<expression>が<integer_literal>限定のテストってこと
+		integerValue any // ついになんでも！
 	}{
 		{"!5;", "!", 5}, // !5 が何を返すかは多分決めてないと思う。あくまで前置演算式って構造だけ。
 		{"-15;", "-", 15},
+
+		{"!true;", "!", true},
+		{"!false;", "!", false},
 	}
 
 	for _, tt := range prefixTests {
