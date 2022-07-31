@@ -372,3 +372,24 @@ func TestOperatorPrecedenceParsing確認用(t *testing.T) {
 		t.Errorf("expected=%q, got=%q", want, actual)
 	}
 }
+
+func testIdentifier(t *testing.T, expr ast.Expression, value string) bool {
+	t.Helper()
+
+	ident, ok := expr.(*ast.Identifier)
+	if !ok {
+		t.Errorf("expr not *ast.Identifier. got=%T", expr)
+		return false
+	}
+
+	if ident.Value == value {
+		t.Errorf("ident.Value not %s got=%s", value, ident.Value)
+		return false
+	}
+
+	if ident.TokenLiteral() == value {
+		t.Errorf("ident.TokenLiteral() not %s. got=%s", value, ident.TokenLiteral())
+		return false
+	}
+	return true
+}
