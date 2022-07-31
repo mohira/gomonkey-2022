@@ -55,6 +55,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefixFn(token.TRUE, p.parseBoolean)
 	p.registerPrefixFn(token.FALSE, p.parseBoolean)
 
+	p.registerPrefixFn(token.LPAREN, p.parseGroupedExpression)
+
 	// 中置演算式用の構文解析関数の用意
 	p.infixFns = make(map[token.TokenType]parseInfixFn)
 
@@ -332,4 +334,18 @@ func (p *Parser) parseBoolean() ast.Expression {
 	}
 
 	return b
+}
+
+func (p *Parser) parseGroupedExpression() ast.Expression {
+	// 「グループ化された式」は  `(<expression>)` という構造。
+	// だから、 ( を見つけたらパース開始して、1つ飛ばして、expr解析して、次に)が来るはずってやるだけ。
+	// まじで手品すぎる。
+	p.nextToken() // `(` だから読み飛ばしていいよね。
+
+	expr := p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+	return expr
 }
