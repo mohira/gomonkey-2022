@@ -387,12 +387,12 @@ func testIdentifier(t *testing.T, expr ast.Expression, value string) bool {
 		return false
 	}
 
-	if ident.Value == value {
+	if ident.Value != value {
 		t.Errorf("ident.Value not %s got=%s", value, ident.Value)
 		return false
 	}
 
-	if ident.TokenLiteral() == value {
+	if ident.TokenLiteral() != value {
 		t.Errorf("ident.TokenLiteral() not %s. got=%s", value, ident.TokenLiteral())
 		return false
 	}
@@ -519,6 +519,7 @@ func TestIfExpression(t *testing.T) {
 
 	// フィールド検証
 	// input は `if (x < y) { x }` なので、 <condition> は x < y という中置演算式
+
 	if !testInfixExpression(t, ifExpr.Condition, "x", "<", "y") {
 		return
 	}
@@ -535,7 +536,7 @@ func TestIfExpression(t *testing.T) {
 		t.Fatalf("ifExpr.Consequence.Statements[0] not *aset.ExpressionStatement.got=%T", ifExpr.Consequence.Statements[0])
 	}
 
-	if testIdentifier(t, consequenceExprStmt.Expression, "x") {
+	if !testIdentifier(t, consequenceExprStmt.Expression, "x") {
 		return
 	}
 

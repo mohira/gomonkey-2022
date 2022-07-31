@@ -57,6 +57,8 @@ func New(l *lexer.Lexer) *Parser {
 
 	p.registerPrefixFn(token.LPAREN, p.parseGroupedExpression)
 
+	p.registerPrefixFn(token.IF, p.parseIfExpression)
+
 	// 中置演算式用の構文解析関数の用意
 	p.infixFns = make(map[token.TokenType]parseInfixFn)
 
@@ -348,4 +350,67 @@ func (p *Parser) parseGroupedExpression() ast.Expression {
 		return nil
 	}
 	return expr
+}
+
+func (p *Parser) parseIfExpression() ast.Expression {
+	// if ( <condition> ) { <consequence> }
+	// if ( <condition> ) { <consequence> } else { <alternative> }
+	ifExpr := &ast.IfExpression{
+		Token:       p.curToken,
+		Condition:   nil,
+		Consequence: nil,
+		Alternative: nil,
+	}
+
+	// curTokenが IF のはずだから、次に来るのは ( のはず(LPARENね)
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+
+	p.nextToken() // LPAREN を 読み飛ばして <condition> へ。
+	ifExpr.Condition = p.parseExpression(LOWEST)
+
+	// expectPeek は トークン が期待通りなら進めるぞ！
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	// expectPeek は トークン が期待通りなら進めるぞ！
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	ifExpr.Consequence = p.parseBlockStatement()
+
+	if p.peekTokenIs(token.ELSE) {
+		p.nextToken()
+
+		if !p.expectPeek(token.LBRACE) {
+			return nil
+		}
+
+		ifExpr.Alternative = p.parseBlockStatement()
+	}
+	return ifExpr
+}
+
+func (p *Parser) parseBlockStatement() *ast.BlockStatement {
+	blockStmt := &ast.BlockStatement{
+		Token: p.curToken,
+	}
+	blockStmt.Statements = []ast.Statement{}
+
+	// この時点では、curTokenは LBRACE のはずだからね
+	p.nextToken()
+
+	// Blockの終端、つまり、 RBRACE が くるまでStatementを探せばいい(あとはEOF)
+	// ここの構造は、 p.ParseProgram() と 一緒！ どちらも、複数のStatementを持つからね。
+	for !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.EOF) {
+		stmt := p.parseStatement()
+		if stmt != nil {
+			blockStmt.Statements = append(blockStmt.Statements, stmt)
+		}
+		p.nextToken()
+	}
+	return blockStmt
 }
