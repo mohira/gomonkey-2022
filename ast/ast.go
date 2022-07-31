@@ -208,3 +208,20 @@ func (ie *InfixExpression) String() string {
 func (ie *InfixExpression) expressionNode() {
 	panic("implement me")
 }
+
+type Boolean struct {
+	Token token.Token // token.TRUE | token.FALSE
+	Value bool
+}
+
+func (b *Boolean) TokenLiteral() string {
+	return b.Token.Literal
+}
+
+func (b *Boolean) expressionNode() {
+	panic("implement me")
+}
+
+func (b *Boolean) String() string {
+	return b.Token.Literal
+}

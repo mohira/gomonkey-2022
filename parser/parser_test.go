@@ -415,3 +415,39 @@ func testInfixExpression(t *testing.T, expr ast.Expression, left any, operator s
 
 	return true
 }
+
+func TestBooleanLiteral(t *testing.T) {
+	tests := []struct {
+		input         string
+		expectedValue bool
+	}{
+		{"true;", true},
+		{"false;", false},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("1 Statementじゃないぞ！ got=%d", len(program.Statements))
+		}
+
+		exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("*ast.ExpressionStatementに変換できないぞ。got=%T", program.Statements[0])
+		}
+
+		boolean, ok := exprStmt.Expression.(*ast.Boolean)
+		if !ok {
+			t.Fatalf("*ast.BooleanLiteralに変換できないぞ。got=%T", exprStmt.Expression)
+		}
+
+		// フィールド検証
+		if boolean.Value != tt.expectedValue {
+			t.Errorf("boolean.Value not %t got=%t", tt.expectedValue, boolean.Value)
+		}
+	}
+}
