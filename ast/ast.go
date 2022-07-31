@@ -225,3 +225,60 @@ func (b *Boolean) expressionNode() {
 func (b *Boolean) String() string {
 	return b.Token.Literal
 }
+
+type IfExpression struct {
+	// GoはIf<文>だからちょっと違うね。
+	Token       token.Token // token.IF
+	Condition   Expression
+	Consequence *BlockStatement
+	Alternative *BlockStatement
+}
+
+func (ie *IfExpression) TokenLiteral() string {
+	return ie.Token.Literal
+}
+
+func (ie *IfExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("if")
+	out.WriteString(ie.Condition.String())
+	out.WriteString(" ")
+	out.WriteString(ie.Consequence.String())
+
+	if ie.Alternative != nil {
+		out.WriteString("else ")
+		out.WriteString(ie.Alternative.String())
+	}
+
+	return out.String()
+}
+
+func (ie *IfExpression) expressionNode() {
+	panic("implement me")
+}
+
+// BlockStatement は単数形だけど、複数のStatementを持っているっていう構造
+// https://pkg.go.dev/go/ast#BlockStmt と同じ
+type BlockStatement struct {
+	Token      token.Token // { トークン が入るらしい
+	Statements []Statement
+}
+
+func (bs *BlockStatement) TokenLiteral() string {
+	return bs.Token.Literal
+}
+
+func (bs *BlockStatement) String() string {
+	var out bytes.Buffer
+
+	for _, stmt := range bs.Statements {
+		out.WriteString(stmt.String())
+	}
+
+	return out.String()
+}
+
+func (bs *BlockStatement) statementNode() {
+	panic("implement me")
+}
