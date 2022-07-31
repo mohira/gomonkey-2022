@@ -52,6 +52,9 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefixFn(token.BANG, p.parsePrefixExpression)
 	p.registerPrefixFn(token.MINUS, p.parsePrefixExpression)
 
+	p.registerPrefixFn(token.TRUE, p.parseBoolean)
+	p.registerPrefixFn(token.FALSE, p.parseBoolean)
+
 	// 中置演算式用の構文解析関数の用意
 	p.infixFns = make(map[token.TokenType]parseInfixFn)
 
@@ -320,4 +323,13 @@ func (p *Parser) parseInfixExpression(leftExpr ast.Expression) ast.Expression {
 	infixExpr.Right = p.parseExpression(precedence)
 
 	return infixExpr
+}
+
+func (p *Parser) parseBoolean() ast.Expression {
+	b := &ast.Boolean{
+		Token: p.curToken,
+		Value: p.curTokenIs(token.TRUE), // TRUEトークンかどうか調べればいいのか！ なるほど！
+	}
+
+	return b
 }
