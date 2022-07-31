@@ -416,7 +416,7 @@ func testInfixExpression(t *testing.T, expr ast.Expression, left any, operator s
 	return true
 }
 
-func TestBooleanLiteral(t *testing.T) {
+func TestBooleanExpression(t *testing.T) {
 	tests := []struct {
 		input         string
 		expectedValue bool
