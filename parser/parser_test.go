@@ -494,3 +494,107 @@ func testBooleanLiteral(t *testing.T, expr ast.Expression, value bool) bool {
 
 	return true
 }
+
+func TestIfExpression(t *testing.T) {
+	input := `if (x < y) { x }`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("1 Statement じゃないぞ！ got=%d", len(program.Statements))
+	}
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("*ast.ExpressionStatementに変換できないぞ。got=%T", program.Statements[0])
+	}
+
+	ifExpr, ok := exprStmt.Expression.(*ast.IfExpression)
+	if !ok {
+		t.Fatalf("*ast.IfExpressonに変換できないぞ。got=%T", exprStmt.Expression)
+	}
+
+	// フィールド検証
+	// input は `if (x < y) { x }` なので、 <condition> は x < y という中置演算式
+	if !testInfixExpression(t, ifExpr.Condition, "x", "<", "y") {
+		return
+	}
+
+	// 1つ目のBlockの<文>の数も数えないとね
+	if len(ifExpr.Consequence.Statements) != 1 {
+		t.Errorf("<consequence> が 1 じゃないのはおかしい。got=%d", len(ifExpr.Consequence.Statements))
+	}
+
+	//  `if (x < y) { x }` における BlockStmtは 1つであると決めているからね。
+	// consequenceExprStmt は 1つ目の<式文>ってこと。BlockStatement型じゃないから注意ね。名前がややこしい。
+	consequenceExprStmt, ok := ifExpr.Consequence.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("ifExpr.Consequence.Statements[0] not *aset.ExpressionStatement.got=%T", ifExpr.Consequence.Statements[0])
+	}
+
+	if testIdentifier(t, consequenceExprStmt.Expression, "x") {
+		return
+	}
+
+	if ifExpr.Alternative != nil {
+		t.Errorf("elseないんだから ifExpr.Alternative は nil になってもらわんと困る.got=%+v", ifExpr.Alternative)
+	}
+}
+
+func TestIfElseExpression(t *testing.T) {
+	input := `if (x < y) { x } else { y }`
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("1 Statement じゃないぞ！ got=%d", len(program.Statements))
+	}
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("*ast.ExpressionStatementに変換できないぞ。got=%T", program.Statements[0])
+	}
+
+	ifExpr, ok := exprStmt.Expression.(*ast.IfExpression)
+	if !ok {
+		t.Fatalf("*ast.IfExpressonに変換できないぞ。got=%T", exprStmt.Expression)
+	}
+
+	// <condition> が x < y という 中置演算式であることを確認する
+	if !testInfixExpression(t, ifExpr.Condition, "x", "<", "y") {
+		return
+	}
+
+	// <consequence>が 1文 で構成されていることを確認する
+	if len(ifExpr.Consequence.Statements) != 1 {
+		t.Fatalf("ifExpr.Consequence.Statements[0] not *aset.ExpressionStatement.got=%T", ifExpr.Consequence.Statements[0])
+	}
+
+	// <consequence>の 1文目 が x という ast.Identifier であることを確認する
+	consequenceExprStmt, ok := ifExpr.Consequence.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("")
+	}
+	if !testIdentifier(t, consequenceExprStmt.Expression, "x") {
+		return
+	}
+
+	// <alternative> が 1文 で構成されていることを確認する
+	if len(ifExpr.Alternative.Statements) != 1 {
+		t.Fatalf("")
+	}
+
+	// <alternative>の 1文目 が y という ast.Identifier であることを確認する
+	alternativeExprStmt, ok := ifExpr.Alternative.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("Statements[0] is not ast.ExpressionStatement. got=%T", ifExpr.Alternative.Statements[0])
+	}
+	if !testIdentifier(t, alternativeExprStmt.Expression, "y") {
+		return
+	}
+}
