@@ -651,3 +651,33 @@ func TestFunctionLiteralParsing(t *testing.T) {
 		t.Errorf("")
 	}
 }
+
+func TestFunctionParameters(t *testing.T) {
+	tests := []struct {
+		input          string
+		expectedParams []string
+	}{
+		{"fn() {};", []string{}},
+		{"fn(x) {};", []string{"x"}},
+		{"fn(x, y) {};", []string{"x", "y"}},
+		{"fn(x, y, z) {};", []string{"x", "y", "z"}},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		exprStmt := program.Statements[0].(*ast.ExpressionStatement)
+		fnLit := exprStmt.Expression.(*ast.FunctionLiteral)
+
+		if len(fnLit.Parameters) != len(tt.expectedParams) {
+			t.Errorf("FunctionLitearl.Parmetersの数がおかしいよ。got=%d want=%d", len(tt.expectedParams), len(fnLit.Parameters))
+		}
+
+		for i, ident := range tt.expectedParams {
+			testIdentifier(t, fnLit.Parameters[i], ident)
+		}
+	}
+}
