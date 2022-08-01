@@ -599,3 +599,55 @@ func TestIfElseExpression(t *testing.T) {
 		return
 	}
 }
+
+func TestFunctionLiteralParsing(t *testing.T) {
+	input := `fn(x, y) { x + y; }`
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("1 Statement じゃないのはおかしいね？ got=%d", len(program.Statements))
+	}
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("*ast.ExpressionStatement じゃないのはおかしいね？ got=%T", program.Statements[0])
+	}
+
+	fnLit, ok := exprStmt.Expression.(*ast.FunctionLiteral)
+	if !ok {
+		t.Fatalf("*ast.FunctionLiteral じゃないのはおかしいね？ got=%T", exprStmt.Expression)
+	}
+
+	// フィールド検証
+	// Token検証;
+	if fnLit.TokenLiteral() != "fn" {
+		t.Errorf("")
+	}
+
+	// 引数検証; fn(x, y) { x + y; }
+	if len(fnLit.Parameters) != 2 {
+		t.Fatalf("Parameteters は 2個 じゃないとおかしいよ。got=%d", len(fnLit.Parameters))
+	}
+	if !testIdentifier(t, fnLit.Parameters[0], "x") {
+		t.Errorf("第1引数は x じゃないとおかしいね。got=%v", fnLit.Parameters[0])
+	}
+	if !testIdentifier(t, fnLit.Parameters[1], "y") {
+		t.Errorf("第1引数は y じゃないとおかしいね。got=%v", fnLit.Parameters[1])
+	}
+
+	// Body検証; fn(x, y) { x + y; }
+	if len(fnLit.Body.Statements) != 1 {
+		t.Fatalf("関数のBodyは 1 Statementじゃないとおかしいよ.got=%d", len(fnLit.Body.Statements))
+	}
+
+	bodyStmt, ok := fnLit.Body.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("")
+	}
+	if !testInfixExpression(t, bodyStmt.Expression, "x", "+", "y") {
+		t.Errorf("")
+	}
+}

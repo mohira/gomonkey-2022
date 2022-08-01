@@ -59,6 +59,8 @@ func New(l *lexer.Lexer) *Parser {
 
 	p.registerPrefixFn(token.IF, p.parseIfExpression)
 
+	p.registerPrefixFn(token.FUNCTION, p.parseFunctionLiteral)
+
 	// 中置演算式用の構文解析関数の用意
 	p.infixFns = make(map[token.TokenType]parseInfixFn)
 
@@ -184,11 +186,11 @@ type (
 	parseInfixFn func(ast.Expression) ast.Expression
 )
 
-func (p Parser) registerPrefixFn(tokenType token.TokenType, fn parsePrefixFn) {
+func (p *Parser) registerPrefixFn(tokenType token.TokenType, fn parsePrefixFn) {
 	p.prefixFns[tokenType] = fn
 }
 
-func (p Parser) registerInfixFn(tokenType token.TokenType, fn parseInfixFn) {
+func (p *Parser) registerInfixFn(tokenType token.TokenType, fn parseInfixFn) {
 	p.infixFns[tokenType] = fn
 }
 
@@ -413,4 +415,61 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 		p.nextToken()
 	}
 	return blockStmt
+}
+
+func (p *Parser) parseFunctionLiteral() ast.Expression {
+	// fn(x, y) { x + y; }
+	// fn ( <parameters> ) { <block statement> }
+	fnLit := &ast.FunctionLiteral{
+		Token:      p.curToken,
+		Parameters: nil,
+		Body:       nil,
+	}
+
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+
+	fnLit.Parameters = p.parseFunctionParameters()
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	fnLit.Body = p.parseBlockStatement()
+
+	return fnLit
+}
+
+func (p *Parser) parseFunctionParameters() []*ast.Identifier {
+	var identifiers []*ast.Identifier
+
+	// 引数がない場合もある
+	if p.peekTokenIs(token.RPAREN) {
+		p.nextToken()
+		return identifiers
+	}
+
+	p.nextToken()
+
+	// 1個めの引数
+	ident := &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+	identifiers = append(identifiers, ident)
+
+	// 2個目以降があるときは、必ず「,」COMMAがあるはず！
+	// 次に「,」が来る限り、それは引数だよね
+	for p.peekTokenIs(token.COMMA) {
+		p.nextToken() // 今見ている識別子を読み飛ばして、
+		p.nextToken() // 「,」も読み飛ばして、ようやく次の識別子だね
+
+		ident := &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+		identifiers = append(identifiers, ident)
+	}
+
+	// 引数は、 ) で終わらないと文法おかしいからね
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	return identifiers
 }
