@@ -160,8 +160,11 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 		return nil // いまんところErrorじゃなくてnilで
 	}
 
-	// TODO: <expression>のパースを後回しにするので、セミコロンがくるまで読み飛ばしている。
-	for !p.curTokenIs(token.SEMICOLON) {
+	p.nextToken()
+
+	stmt.Value = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 
@@ -173,6 +176,8 @@ func (p *Parser) parseReturnStatement() ast.Statement {
 	stmt := &ast.ReturnStatement{Token: p.curToken}
 
 	p.nextToken()
+
+	stmt.ReturnValue = p.parseExpression(LOWEST)
 
 	// TODO: <expression>のパースは後回しなので、セミコロンがくるで読み飛ばしている
 	for !p.curTokenIs(token.SEMICOLON) {

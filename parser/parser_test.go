@@ -725,3 +725,41 @@ func TestCallExpressionParsing(t *testing.T) {
 	testInfixExpression(t, callExpr.Arguments[2], 4, "+", 5)
 
 }
+
+func TestLetStatements(t *testing.T) {
+	// MEMO: 面倒だから新しくテストケースをまるまる追加(2.8.6)
+	tests := []struct {
+		input              string
+		expectedIdentifier string
+		expectedValue      any
+	}{
+		{"let x = 5;", "x", 5},
+		{"let y = true;", "y", true},
+		{"let foobar = y;", "foobar", "y"},
+	}
+
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			l := lexer.New(tt.input)
+			p := New(l)
+			program := p.ParseProgram()
+			checkParserErrors(t, p)
+
+			if len(program.Statements) != 1 {
+				t.Fatalf("1 Statement じゃないのはおかしいよ。got=%d", len(program.Statements))
+			}
+
+			stmt := program.Statements[0]
+			if !testLetStatement(t, stmt, tt.expectedIdentifier) {
+				return
+			}
+
+			value := stmt.(*ast.LetStatement).Value
+			if !testLiteralExpression(t, value, tt.expectedValue) {
+				return
+			}
+
+		})
+	}
+
+}
