@@ -40,6 +40,9 @@ const (
 	RETURN   = "return"
 	TRUE     = "true"
 	FALSE    = "false"
+
+	EQ     = "=="
+	NOT_EQ = "!="
 )
 
 var keywords = map[string]Type{
