@@ -11,6 +11,7 @@ https://interpreterbook.com/waiig_code_1.4.zip
   - エラーメッセージにこだわる
   - bytes.Bufferじゃなくてstrings.Builderを使う
   - 理解するのが目標だから日本語をバンバン使う
+  - traceはデバッグモードみたいなのをいれる
 
 ## コツ
 

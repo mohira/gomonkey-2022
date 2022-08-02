@@ -202,7 +202,8 @@ func (p *Parser) registerInfixFn(tokenType token.TokenType, fn parseInfixFn) {
 }
 
 func (p *Parser) parseExpressionStatement() ast.Statement {
-	defer untrace(trace("parseExpressionStatement <式文>"))
+	// MEMO: traceがちょっとうるさいし、うるさいから見ないのでOFFにしとく。Debugモードが有ると良いっぽい
+	// defer untrace(trace("parseExpressionStatement <式文>"))
 	exprStmt := &ast.ExpressionStatement{Token: p.curToken}
 
 	exprStmt.Expression = p.parseExpression(LOWEST)
@@ -215,7 +216,8 @@ func (p *Parser) parseExpressionStatement() ast.Statement {
 }
 
 func (p *Parser) parseExpression(precedence int) ast.Expression {
-	defer untrace(trace("parseExpression <式>"))
+	// MEMO: traceがちょっとうるさいし、うるさいから見ないのでOFFにしとく。Debugモードが有ると良いっぽい
+	// defer untrace(trace("parseExpression <式>"))
 	prefixFn := p.prefixFns[p.curToken.Type]
 
 	if prefixFn == nil {
@@ -252,7 +254,8 @@ func (p *Parser) parseIdentifier() ast.Expression {
 }
 
 func (p *Parser) parseIntegerLiteral() ast.Expression {
-	defer untrace(trace("parseIntegerLiteral <INT>"))
+	// MEMO: traceがちょっとうるさいし、うるさいから見ないのでOFFにしとく。Debugモードが有ると良いっぽい
+	// defer untrace(trace("parseIntegerLiteral <INT>"))
 	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
 	if err != nil {
 		msg := fmt.Sprintf("colud not parse %q as integer", p.curToken.Literal)
@@ -276,7 +279,8 @@ func (p *Parser) noPrefixParseFnError(t token.TokenType) {
 }
 
 func (p *Parser) parsePrefixExpression() ast.Expression {
-	defer untrace(trace("parsePrefixExpression <前置式>"))
+	// MEMO: traceがちょっとうるさいし、うるさいから見ないのでOFFにしとく。Debugモードが有ると良いっぽい
+	// defer untrace(trace("parsePrefixExpression <前置式>"))
 	prefixExpr := &ast.PrefixExpression{
 		Token:    p.curToken,
 		Operator: p.curToken.Literal,
@@ -324,7 +328,8 @@ func (p *Parser) peekPrecedence() int {
 }
 
 func (p *Parser) parseInfixExpression(leftExpr ast.Expression) ast.Expression {
-	defer untrace(trace("parseInfixExpression <中置演算式>"))
+	// MEMO: traceがちょっとうるさいし、うるさいから見ないのでOFFにしとく。Debugモードが有ると良いっぽい
+	// defer untrace(trace("parseInfixExpression <中置演算式>"))
 	infixExpr := &ast.InfixExpression{
 		Token:    p.curToken,
 		Left:     leftExpr,
