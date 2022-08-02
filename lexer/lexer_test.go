@@ -5,7 +5,6 @@ import (
 	"testing"
 )
 
-// hoge
 func TestNextToken(t *testing.T) {
 	input := `=+(){},;`
 
