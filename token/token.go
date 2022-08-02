@@ -35,15 +35,25 @@ const (
 
 	FUNCTION = "function"
 	LET      = "let"
+	IF       = "IF"
+	ELSE     = "ELSE"
+	RETURN   = "return"
+	TRUE     = "true"
+	FALSE    = "false"
 )
 
-var kewwords = map[string]Type{
-	"fn":  FUNCTION,
-	"let": LET,
+var keywords = map[string]Type{
+	"fn":     FUNCTION,
+	"let":    LET,
+	"if":     IF,
+	"else":   ELSE,
+	"return": RETURN,
+	"true":   TRUE,
+	"false":  FALSE,
 }
 
 func LookupIdent(ident string) Type {
-	if tok, ok := kewwords[ident]; ok {
+	if tok, ok := keywords[ident]; ok {
 		return tok
 	}
 
