@@ -681,3 +681,42 @@ func TestFunctionParameters(t *testing.T) {
 		}
 	}
 }
+
+func TestCallExpressionParsing(t *testing.T) {
+	input := "add(1, 2 * 3, 4 + 5);"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("1 Statement じゃないよ。got=%d", len(program.Statements))
+	}
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("*ast.ExpressionStatementじゃないよ。got=%T", program.Statements[0])
+	}
+
+	callExpr, ok := exprStmt.Expression.(*ast.CallExpression)
+	if !ok {
+		t.Fatalf("*ast.CallExpressionじゃないよ. got=%T", exprStmt.Expression)
+	}
+
+	// フィールド検証
+	// add(1, 2 * 3, 4 + 5);
+	if !testIdentifier(t, callExpr.Function, "add") {
+		return
+	}
+
+	// add(1, 2 * 3, 4 + 5);
+	if len(callExpr.Arguments) != 3 {
+		t.Errorf("3 Arguments じゃないよ。got=%d", len(callExpr.Arguments))
+	}
+
+	testLiteralExpression(t, callExpr.Arguments[0], 1)
+	testInfixExpression(t, callExpr.Arguments[1], 2, "*", 3)
+	testInfixExpression(t, callExpr.Arguments[2], 4, "+", 5)
+
+}

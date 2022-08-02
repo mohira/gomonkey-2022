@@ -73,6 +73,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfixFn(token.ASTERISK, p.parseInfixExpression)
 	p.registerInfixFn(token.SLASH, p.parseInfixExpression)
 
+	// 関数呼び出し用？ よくわかってない
+	p.registerInfixFn(token.LPAREN, p.parseCallExpression)
 	return p
 }
 
@@ -296,6 +298,8 @@ var precedences = map[token.TokenType]int{
 
 	token.ASTERISK: PRODUCT,
 	token.SLASH:    PRODUCT,
+
+	token.LPAREN: CALL,
 }
 
 func (p *Parser) curPrecedence() int {
@@ -472,4 +476,40 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 	}
 
 	return identifiers
+}
+
+func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
+	callExpr := &ast.CallExpression{
+		Token:     p.curToken,
+		Function:  function,
+		Arguments: nil,
+	}
+
+	callExpr.Arguments = p.parseCallArguments()
+
+	return callExpr
+}
+
+func (p *Parser) parseCallArguments() []ast.Expression {
+	var args []ast.Expression
+
+	// 引数が0個の場合はこれ
+	if p.peekTokenIs(token.RPAREN) {
+		p.nextToken()
+		return args
+	}
+
+	p.nextToken()
+	args = append(args, p.parseExpression(LOWEST))
+
+	for p.peekTokenIs(token.COMMA) {
+		p.nextToken() // exprを読み飛ばし、
+		p.nextToken() // カンマを読み飛ばし
+		args = append(args, p.parseExpression(LOWEST))
+	}
+
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+	return args
 }
