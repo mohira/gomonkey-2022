@@ -12,6 +12,8 @@ https://interpreterbook.com/waiig_code_1.4.zip
   - bytes.Bufferじゃなくてstrings.Builderを使う
   - 理解するのが目標だから日本語をバンバン使う
   - traceはデバッグモードみたいなのをいれる
+  - !testFoo と if !testFoo{return} の違いが謎
+  - t.Fatalf と t.Errorf の使い分けが謎。特にサブテストのとき。実用Goに書いてないかな。
 
 ## コツ
 
