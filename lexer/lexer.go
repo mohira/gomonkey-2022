@@ -22,6 +22,8 @@ func New(input string) *Lexer {
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
+	l.skipWhitespace()
+
 	switch l.ch {
 	case '(':
 		tok = newToken(token.LPAREN, l.ch)
@@ -88,5 +90,15 @@ func (l *Lexer) readChar() {
 }
 
 func (l *Lexer) peekChar() byte {
-	return l.input[l.readPosition]
+	if l.readPosition >= len(l.input) {
+		return 0
+	} else {
+		return l.input[l.readPosition]
+	}
+}
+
+func (l *Lexer) skipWhitespace() {
+	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
+		l.readChar()
+	}
 }

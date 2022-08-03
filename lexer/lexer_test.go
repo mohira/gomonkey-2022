@@ -64,3 +64,26 @@ func Test2文字トークンの字句解析(t *testing.T) {
 		testToken(t, tok, tt.expectedToken, tt.expectedLiteral)
 	}
 }
+
+func Test空白文字対処(t *testing.T) {
+	input := `
+( 
+	) ! `
+
+	tests := []struct {
+		expectedToken   token.Type
+		expectedLiteral string
+	}{
+		{token.LPAREN, "("},
+		{token.RPAREN, ")"},
+		{token.BANG, "!"},
+		{token.EOF, ""},
+	}
+	l := New(input)
+
+	for _, tt := range tests {
+		tok := l.NextToken()
+
+		testToken(t, tok, tt.expectedToken, tt.expectedLiteral)
+	}
+}
