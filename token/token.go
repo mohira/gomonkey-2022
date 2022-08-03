@@ -23,6 +23,7 @@ const (
 	RBRACE = "}"
 
 	SEMICOLON = ";"
+	COMMA     = ","
 
 	PLUS     = "+"
 	MINUS    = "-"

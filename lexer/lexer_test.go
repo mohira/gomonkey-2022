@@ -17,7 +17,7 @@ func testToken(t *testing.T, tok token.Token, expectedToken token.Type, expected
 }
 
 func Test1文字トークンの字句解析(t *testing.T) {
-	input := `(){}=+-*/!;`
+	input := `(){}=+-*/!,;`
 
 	tests := []struct {
 		expectedToken   token.Type
@@ -33,6 +33,7 @@ func Test1文字トークンの字句解析(t *testing.T) {
 		{token.ASTERISK, "*"},
 		{token.SLASH, "/"},
 		{token.BANG, "!"},
+		{token.COMMA, ","},
 		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}
@@ -113,13 +114,14 @@ func TestILLEGALなトークン(t *testing.T) {
 func Test可変長文字数(t *testing.T) {
 	input := `let x = 1;
 let total = 234;
+let add = fn(x, y) { return x + y };
 `
 
-	//let add = fn(x, y) { return x + y };
 	tests := []struct {
 		expectedToken   token.Type
 		expectedLiteral string
 	}{
+		// let x = 1;
 		{token.LET, "let"},
 		{token.IDENT, "x"},
 		{token.ASSIGN, "="},
@@ -133,6 +135,23 @@ let total = 234;
 		{token.INT, "234"},
 		{token.SEMICOLON, ";"},
 
+		// let add = fn(x, y) { return x + y };
+		{token.LET, "let"},
+		{token.IDENT, "add"},
+		{token.ASSIGN, "="},
+		{token.FUNCTION, "fn"},
+		{token.LPAREN, "("},
+		{token.IDENT, "x"},
+		{token.COMMA, ","},
+		{token.SEMICOLON, "y"},
+		{token.SEMICOLON, ")"},
+		{token.SEMICOLON, "{"},
+		{token.SEMICOLON, "return"},
+		{token.SEMICOLON, "x"},
+		{token.SEMICOLON, "+"},
+		{token.SEMICOLON, "y"},
+		{token.SEMICOLON, "}"},
+		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}
 	l := New(input)
