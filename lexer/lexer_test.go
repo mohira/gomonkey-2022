@@ -168,19 +168,26 @@ if (5 < 10) {
 				return true;
 			} else {
 				return false;
-			}*/
-		{token.EOF, "if"},
-		{token.EOF, "("},
-		{token.EOF, "5"},
-		{token.EOF, "<"},
-		{token.EOF, "10"},
-		{token.EOF, ""},
-		{token.EOF, ""},
-		{token.EOF, ""},
-		{token.EOF, ""},
-		{token.EOF, ""},
-		{token.EOF, ""},
-		{token.EOF, ""},
+			}
+		*/
+		{token.IF, "if"},
+		{token.LPAREN, "("},
+		{token.INT, "5"},
+		{token.LT, "<"},
+		{token.INT, "10"},
+		{token.RPAREN, ")"},
+		{token.LBRACKET, "{"},
+		{token.RETURN, "return"},
+		{token.TRUE, "true"},
+		{token.SEMICOLON, ";"},
+		{token.RBRACKET, "}"},
+		{token.ELSE, "else"},
+		{token.LBRACE, "{"},
+		{token.RETURN, "return"},
+		{token.FALSE, "false"},
+		{token.SEMICOLON, ";"},
+		{token.RBRACE, "}"},
+		{token.SEMICOLON, ";"},
 
 		{token.EOF, ""},
 	}

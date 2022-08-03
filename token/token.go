@@ -14,6 +14,10 @@ const (
 	LET      = "let"
 	FUNCTION = "fn"
 	RETURN   = "return"
+	IF       = "if"
+	ELSE     = "else"
+	TRUE     = "true"
+	FALSE    = "false"
 
 	INT   = "INT"
 	IDENT = "IDENT"
@@ -48,6 +52,10 @@ var keywords = map[string]Type{
 	"let":    LET,
 	"fn":     FUNCTION,
 	"return": RETURN,
+	"if":     IF,
+	"else":   ELSE,
+	"true":   TRUE,
+	"false":  FALSE,
 }
 
 func LookupIdent(key string) Type {
