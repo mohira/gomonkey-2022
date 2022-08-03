@@ -18,13 +18,16 @@ const (
 	INT   = "INT"
 	IDENT = "IDENT"
 
-	LPAREN = "("
-	RPAREN = ")"
-	LBRACE = "{"
-	RBRACE = "}"
+	LPAREN   = "("
+	RPAREN   = ")"
+	LBRACE   = "{"
+	RBRACE   = "}"
+	LBRACKET = "["
+	RBRACKET = "]"
 
-	SEMICOLON = ";"
 	COMMA     = ","
+	SEMICOLON = ";"
+	COLON     = ":"
 
 	PLUS     = "+"
 	MINUS    = "-"

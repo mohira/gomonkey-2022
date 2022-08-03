@@ -17,7 +17,7 @@ func testToken(t *testing.T, tok token.Token, expectedToken token.Type, expected
 }
 
 func Test1文字トークンの字句解析(t *testing.T) {
-	input := `(){}=+-*/!,;`
+	input := `(){}=+-*/!,;[]:`
 
 	tests := []struct {
 		expectedToken   token.Type
@@ -35,6 +35,9 @@ func Test1文字トークンの字句解析(t *testing.T) {
 		{token.BANG, "!"},
 		{token.COMMA, ","},
 		{token.SEMICOLON, ";"},
+		{token.LBRACKET, "["},
+		{token.RBRACKET, "]"},
+		{token.COLON, ":"},
 		{token.EOF, ""},
 	}
 	l := New(input)
