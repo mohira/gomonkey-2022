@@ -66,6 +66,8 @@ func (l *Lexer) NextToken() token.Token {
 	case 0:
 		tok.Type = token.EOF
 		tok.Literal = ""
+	default:
+		tok = newToken(token.ILLEGAL, l.ch)
 	}
 
 	l.readChar()

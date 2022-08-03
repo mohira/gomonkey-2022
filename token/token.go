@@ -8,7 +8,14 @@ type Token struct {
 }
 
 const (
-	EOF = ""
+	EOF     = ""
+	ILLEGAL = "ILLEGAL"
+
+	LET      = "let"
+	FUNCTION = "fn"
+
+	INT   = "INT"
+	IDENT = "IDENT"
 
 	LPAREN = "("
 	RPAREN = ")"
