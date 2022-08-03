@@ -165,6 +165,12 @@ func (l *Lexer) readString() string {
 		if l.ch == '"' {
 			break
 		}
+
+		// l.ch==0 つまり、 " で綴じずに、終端の場合にループを抜けないと無限ループになる
+		if l.ch == 0 {
+			// エラーにしてもいいよね
+			break
+		}
 	}
 	return l.input[pos:l.position]
 

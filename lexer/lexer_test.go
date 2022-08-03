@@ -239,3 +239,23 @@ func Test文字列(t *testing.T) {
 		testToken(t, tok, tt.expectedToken, tt.expectedLiteral)
 	}
 }
+
+// MEMO: 仕様では、「"」はSTRING扱いになる。不完全だけど。だから、エラーにするのが良いと思う。どうやって？
+func test文字列無限ループ回避(t *testing.T) {
+	input := `"`
+
+	tests := []struct {
+		expectedToken   token.Type
+		expectedLiteral string
+	}{
+		{token.ILLEGAL, `"`},
+		{token.EOF, ""},
+	}
+	l := New(input)
+
+	for _, tt := range tests {
+		tok := l.NextToken()
+
+		testToken(t, tok, tt.expectedToken, tt.expectedLiteral)
+	}
+}
