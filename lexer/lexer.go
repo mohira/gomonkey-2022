@@ -71,10 +71,12 @@ func (l *Lexer) NextToken() token.Token {
 			literal := l.readIdentifier()
 			tok.Type = token.LookupIdent(literal)
 			tok.Literal = literal
+			return tok
 		} else if l.isDigit() {
 			literal := l.readNumber()
 			tok.Type = token.INT
 			tok.Literal = literal
+			return tok
 		} else {
 			tok = newToken(token.ILLEGAL, l.ch)
 		}
