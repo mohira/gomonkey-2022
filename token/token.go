@@ -40,7 +40,7 @@ var keywords = map[string]Type{
 	"let": LET,
 }
 
-func Lookup(key string) Type {
+func LookupIdent(key string) Type {
 	if v, ok := keywords[key]; ok {
 		return v
 	}
