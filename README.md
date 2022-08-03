@@ -2,6 +2,13 @@
 
 https://interpreterbook.com/waiig_code_1.4.zip
 
+## Lexerこれじゃん
+
+[(9) Lexical Scanning in Go - Rob Pike - YouTube](https://www.youtube.com/watch?v=HxaD_trXwRE&ab_channel=GoogleFOSSSydney)
+
+- スライドを雑に眺めただけなんだけど、monkeyと同じやり方。なので読めた気になる
+- 並行処理を使うとレキサーの設計がEasyになるって書いてあるけどほんまか？ww
+
 ## 2022/08/03(水) 字句解析何も見ないチャンレジ
 
 - たぶん、100分くらい。
