@@ -199,3 +199,38 @@ if (5 < 10) {
 		testToken(t, tok, tt.expectedToken, tt.expectedLiteral)
 	}
 }
+
+func Test文字列(t *testing.T) {
+	input := `
+let name = "Alice";
+let msg = "hello world";
+`
+
+	tests := []struct {
+		expectedToken   token.Type
+		expectedLiteral string
+	}{
+		// let name = "Alice";
+		{token.LET, "let"},
+		{token.IDENT, "name"},
+		{token.ASSIGN, "="},
+		{token.STRING, "Alice"},
+		{token.SEMICOLON, ";"},
+
+		// let msg = "hello world"; // 空白あり
+		{token.LET, "let"},
+		{token.IDENT, "msg"},
+		{token.ASSIGN, "="},
+		{token.STRING, "hello world"},
+		{token.SEMICOLON, ";"},
+
+		{token.EOF, ""},
+	}
+	l := New(input)
+
+	for _, tt := range tests {
+		tok := l.NextToken()
+
+		testToken(t, tok, tt.expectedToken, tt.expectedLiteral)
+	}
+}

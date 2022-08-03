@@ -19,8 +19,9 @@ const (
 	TRUE     = "true"
 	FALSE    = "false"
 
-	INT   = "INT"
-	IDENT = "IDENT"
+	IDENT  = "IDENT"
+	INT    = "INT"
+	STRING = "STRING"
 
 	LPAREN   = "("
 	RPAREN   = ")"
