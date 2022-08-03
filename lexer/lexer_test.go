@@ -6,7 +6,7 @@ import (
 )
 
 func Test1文字トークンの字句解析(t *testing.T) {
-	input := `(){}`
+	input := `(){}+-*/!=;`
 
 	tests := []struct {
 		expectedToken   token.Type
@@ -16,6 +16,13 @@ func Test1文字トークンの字句解析(t *testing.T) {
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
 		{token.RBRACE, "}"},
+		{token.PLUS, "+"},
+		{token.MINUS, "-"},
+		{token.ASTERISK, "*"},
+		{token.SLASH, "/"},
+		{token.BANG, "!"},
+		{token.ASSIGN, "="},
+		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}
 	l := New(input)
