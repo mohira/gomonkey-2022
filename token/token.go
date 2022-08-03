@@ -23,5 +23,8 @@ const (
 	SLASH    = "/"
 	BANG     = "!"
 
+	EQ     = "=="
+	NOT_EQ = "!="
+
 	ASSIGN = "="
 )
