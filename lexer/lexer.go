@@ -23,25 +23,13 @@ func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 	switch l.ch {
 	case '(':
-		tok = token.Token{
-			Type:    token.LPAREN,
-			Literal: string(l.ch),
-		}
+		tok = newToken(token.LPAREN, l.ch)
 	case ')':
-		tok = token.Token{
-			Type:    token.RPAREN,
-			Literal: string(l.ch),
-		}
+		tok = newToken(token.RPAREN, l.ch)
 	case '{':
-		tok = token.Token{
-			Type:    token.LBRACE,
-			Literal: string(l.ch),
-		}
+		tok = newToken(token.LBRACE, l.ch)
 	case '}':
-		tok = token.Token{
-			Type:    token.RBRACE,
-			Literal: string(l.ch),
-		}
+		tok = newToken(token.RBRACE, l.ch)
 	case 0:
 		tok.Type = token.EOF
 		tok.Literal = ""
@@ -50,6 +38,10 @@ func (l *Lexer) NextToken() token.Token {
 	l.readChar()
 
 	return tok
+}
+
+func newToken(tokenType token.Type, ch byte) token.Token {
+	return token.Token{tokenType, string(ch)}
 }
 
 // 1文字読み進める
