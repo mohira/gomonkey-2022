@@ -112,8 +112,9 @@ func TestILLEGALなトークン(t *testing.T) {
 
 func Test可変長文字数(t *testing.T) {
 	input := `let x = 1;
+let total = 234;
 `
-	// let total = 234
+
 	//let add = fn(x, y) { return x + y };
 	tests := []struct {
 		expectedToken   token.Type
@@ -124,6 +125,14 @@ func Test可変長文字数(t *testing.T) {
 		{token.ASSIGN, "="},
 		{token.INT, "1"},
 		{token.SEMICOLON, ";"},
+
+		// let total = 234;
+		{token.LET, "let"},
+		{token.IDENT, "total"},
+		{token.ASSIGN, "="},
+		{token.INT, "234"},
+		{token.SEMICOLON, ";"},
+
 		{token.EOF, ""},
 	}
 	l := New(input)
