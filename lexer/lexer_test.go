@@ -125,7 +125,7 @@ if (5 < 10) {
 	return true;
 } else {
 	return false;
-}
+};
 `
 
 	tests := []struct {
@@ -168,7 +168,7 @@ if (5 < 10) {
 				return true;
 			} else {
 				return false;
-			}
+			};
 		*/
 		{token.IF, "if"},
 		{token.LPAREN, "("},
@@ -176,11 +176,11 @@ if (5 < 10) {
 		{token.LT, "<"},
 		{token.INT, "10"},
 		{token.RPAREN, ")"},
-		{token.LBRACKET, "{"},
+		{token.LBRACE, "{"},
 		{token.RETURN, "return"},
 		{token.TRUE, "true"},
 		{token.SEMICOLON, ";"},
-		{token.RBRACKET, "}"},
+		{token.RBRACE, "}"},
 		{token.ELSE, "else"},
 		{token.LBRACE, "{"},
 		{token.RETURN, "return"},
