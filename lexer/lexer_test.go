@@ -17,7 +17,7 @@ func testToken(t *testing.T, tok token.Token, expectedToken token.Type, expected
 }
 
 func Test1文字トークンの字句解析(t *testing.T) {
-	input := `(){}=+-*/!,;[]:`
+	input := `(){}=+-*/!,;[]:<>`
 
 	tests := []struct {
 		expectedToken   token.Type
@@ -38,6 +38,8 @@ func Test1文字トークンの字句解析(t *testing.T) {
 		{token.LBRACKET, "["},
 		{token.RBRACKET, "]"},
 		{token.COLON, ":"},
+		{token.LT, "<"},
+		{token.GT, ">"},
 		{token.EOF, ""},
 	}
 	l := New(input)
@@ -117,7 +119,13 @@ func TestILLEGALなトークン(t *testing.T) {
 func Test可変長文字数(t *testing.T) {
 	input := `let x = 1;
 let total = 234;
-let add = fn(x, y) { return x + y };
+let add = fn(x, y) { x + y };
+
+if (5 < 10) {
+	return true;
+} else {
+	return false;
+}
 `
 
 	tests := []struct {
@@ -138,7 +146,7 @@ let add = fn(x, y) { return x + y };
 		{token.INT, "234"},
 		{token.SEMICOLON, ";"},
 
-		// let add = fn(x, y) { return x + y };
+		// let add = fn(x, y) { x + y };
 		{token.LET, "let"},
 		{token.IDENT, "add"},
 		{token.ASSIGN, "="},
@@ -149,12 +157,31 @@ let add = fn(x, y) { return x + y };
 		{token.IDENT, "y"},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
-		{token.RETURN, "return"},
 		{token.IDENT, "x"},
 		{token.PLUS, "+"},
 		{token.IDENT, "y"},
 		{token.RBRACE, "}"},
 		{token.SEMICOLON, ";"},
+
+		/*
+			if (5 < 10) {
+				return true;
+			} else {
+				return false;
+			}*/
+		{token.EOF, "if"},
+		{token.EOF, "("},
+		{token.EOF, "5"},
+		{token.EOF, "<"},
+		{token.EOF, "10"},
+		{token.EOF, ""},
+		{token.EOF, ""},
+		{token.EOF, ""},
+		{token.EOF, ""},
+		{token.EOF, ""},
+		{token.EOF, ""},
+		{token.EOF, ""},
+
 		{token.EOF, ""},
 	}
 	l := New(input)

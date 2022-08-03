@@ -35,6 +35,9 @@ const (
 	SLASH    = "/"
 	BANG     = "!"
 
+	LT = "<"
+	GT = ">"
+
 	EQ     = "=="
 	NOT_EQ = "!="
 
