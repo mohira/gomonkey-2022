@@ -6,13 +6,16 @@ import (
 )
 
 func Test1文字トークンの字句解析(t *testing.T) {
-	input := `(`
+	input := `(){}`
 
 	tests := []struct {
 		expectedToken   token.Type
 		expectedLiteral string
 	}{
 		{token.LPAREN, "("},
+		{token.RPAREN, ")"},
+		{token.LBRACE, "{"},
+		{token.RBRACE, "}"},
 		{token.EOF, ""},
 	}
 	l := New(input)
@@ -21,10 +24,10 @@ func Test1文字トークンの字句解析(t *testing.T) {
 		tok := l.NextToken()
 
 		if tok.Type != tt.expectedToken {
-			t.Errorf("TokenTypeが違うよ。got=%q, want=%q", tok.Type, tt.expectedToken)
+			t.Fatalf("TokenTypeが違うよ。got=%q, want=%q", tok.Type, tt.expectedToken)
 		}
 		if tok.Literal != tt.expectedLiteral {
-			t.Errorf("TokenLiteralが違うよ。got=%s, want=%s", tok.Type, tt.expectedToken)
+			t.Fatalf("TokenLiteralが違うよ。got=%s, want=%s", tok.Type, tt.expectedToken)
 		}
 	}
 }
