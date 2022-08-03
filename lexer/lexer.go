@@ -78,6 +78,12 @@ func (l *Lexer) NextToken() token.Token {
 	case 0:
 		tok.Type = token.EOF
 		tok.Literal = ""
+	case '"':
+		// " が来たので文字列として読み込む
+		// ただし、最後が " で綴じていないとダメ
+		literal := l.readString()
+		tok.Literal = literal
+		tok.Type = token.STRING
 	default:
 		if l.isLetter() {
 			literal := l.readIdentifier()
@@ -150,4 +156,16 @@ func (l *Lexer) readNumber() string {
 	}
 
 	return l.input[oldPosition:l.position]
+}
+
+func (l *Lexer) readString() string {
+	pos := l.position + 1 // " の文をスキップしている
+	for {
+		l.readChar()
+		if l.ch == '"' {
+			break
+		}
+	}
+	return l.input[pos:l.position]
+
 }

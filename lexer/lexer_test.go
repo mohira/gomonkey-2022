@@ -12,7 +12,7 @@ func testToken(t *testing.T, tok token.Token, expectedToken token.Type, expected
 		t.Fatalf("TokenTypeが違うよ。got=%q, want=%q", tok.Type, expectedToken)
 	}
 	if tok.Literal != expectedLiteral {
-		t.Fatalf("TokenLiteralが違うよ。got=%s, want=%s", tok.Type, expectedToken)
+		t.Fatalf("TokenLiteralが違うよ。got=%s, want=%s", tok.Literal, expectedLiteral)
 	}
 }
 
@@ -202,26 +202,31 @@ if (5 < 10) {
 
 func Test文字列(t *testing.T) {
 	input := `
-let name = "Alice";
-let msg = "hello world";
+"Alice";
+"hello world";
+"";
+" ";
+"  ";
 `
-
+	//"123"
+	//""←カラの文字列は！？
 	tests := []struct {
 		expectedToken   token.Type
 		expectedLiteral string
 	}{
-		// let name = "Alice";
-		{token.LET, "let"},
-		{token.IDENT, "name"},
-		{token.ASSIGN, "="},
 		{token.STRING, "Alice"},
 		{token.SEMICOLON, ";"},
 
-		// let msg = "hello world"; // 空白あり
-		{token.LET, "let"},
-		{token.IDENT, "msg"},
-		{token.ASSIGN, "="},
 		{token.STRING, "hello world"},
+		{token.SEMICOLON, ";"},
+
+		{token.STRING, ""},
+		{token.SEMICOLON, ";"},
+
+		{token.STRING, " "},
+		{token.SEMICOLON, ";"},
+
+		{token.STRING, "  "},
 		{token.SEMICOLON, ";"},
 
 		{token.EOF, ""},
