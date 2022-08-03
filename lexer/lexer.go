@@ -67,7 +67,13 @@ func (l *Lexer) NextToken() token.Token {
 		tok.Type = token.EOF
 		tok.Literal = ""
 	default:
-		tok = newToken(token.ILLEGAL, l.ch)
+		if l.isLetter() {
+			literal := l.readIdentifier()
+			tok.Type = token.Lookup(literal)
+			tok.Literal = literal
+		} else {
+			tok = newToken(token.ILLEGAL, l.ch)
+		}
 	}
 
 	l.readChar()
@@ -76,7 +82,7 @@ func (l *Lexer) NextToken() token.Token {
 }
 
 func newToken(tokenType token.Type, ch byte) token.Token {
-	return token.Token{tokenType, string(ch)}
+	return token.Token{Type: tokenType, Literal: string(ch)}
 }
 
 // 1文字読み進める
@@ -103,4 +109,18 @@ func (l *Lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
 		l.readChar()
 	}
+}
+
+func (l *Lexer) isLetter() bool {
+	return 'a' <= l.ch && l.ch <= 'z' || 'A' <= l.ch && l.ch <= 'Z' || l.ch == '_'
+}
+
+func (l *Lexer) readIdentifier() string {
+	oldPosition := l.position
+
+	for l.isLetter() {
+		l.readChar()
+	}
+
+	return l.input[oldPosition:l.position]
 }

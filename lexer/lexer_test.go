@@ -110,27 +110,27 @@ func TestILLEGALなトークン(t *testing.T) {
 	}
 }
 
-//func Test可変長文字数(t *testing.T) {
-//	input := `let x = 1;
-//`
-//	// let total = 234
-//	//let add = fn(x, y) { return x + y };
-//	tests := []struct {
-//		expectedToken   token.Type
-//		expectedLiteral string
-//	}{
-//		{token.LET, "let"},
-//		{token.IDENT, "x"},
-//		{token.ASSIGN, "="},
-//		{token.INT, "1"},
-//		{token.SEMICOLON, ";"},
-//		{token.EOF, ""},
-//	}
-//	l := New(input)
-//
-//	for _, tt := range tests {
-//		tok := l.NextToken()
-//
-//		testToken(t, tok, tt.expectedToken, tt.expectedLiteral)
-//	}
-//}
+func Test可変長文字数(t *testing.T) {
+	input := `let x = ;
+`
+	// let total = 234
+	//let add = fn(x, y) { return x + y };
+	tests := []struct {
+		expectedToken   token.Type
+		expectedLiteral string
+	}{
+		{token.LET, "let"},
+		{token.IDENT, "x"},
+		{token.ASSIGN, "="},
+		//{token.INT, "1"},
+		{token.SEMICOLON, ";"},
+		{token.EOF, ""},
+	}
+	l := New(input)
+
+	for _, tt := range tests {
+		tok := l.NextToken()
+
+		testToken(t, tok, tt.expectedToken, tt.expectedLiteral)
+	}
+}
