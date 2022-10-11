@@ -1,7 +1,6 @@
 package lexer
 
 import (
-	"fmt"
 	"gomonkey/token"
 	"testing"
 )
@@ -50,9 +49,10 @@ let add = fn(x, y) {
 };
 
 let result = add(five, ten);
+
+_ = 3;
+foo_bar = 4;
 `
-	// MEMO: _ foo_bar = 1 もテストケースにいれるべきじゃん
-	input = `let five = 5;`
 
 	tests := []struct {
 		expectedType    token.Type
@@ -65,6 +65,55 @@ let result = add(five, ten);
 		{token.INT, "5"},
 		{token.SEMICOLON, ";"},
 
+		// let ten = 10;
+		{token.LET, "let"},
+		{token.IDENT, "ten"},
+		{token.ASSIGN, "="},
+		{token.INT, "10"},
+		{token.SEMICOLON, ";"},
+
+		// let add = fn(x, y) { x + y; };
+		{token.LET, "let"},
+		{token.IDENT, "add"},
+		{token.ASSIGN, "="},
+		{token.FUNCTION, "fn"},
+		{token.LPAREN, "("},
+		{token.IDENT, "x"},
+		{token.COMMA, ","},
+		{token.IDENT, "y"},
+		{token.RPAREN, ")"},
+		{token.LBRACE, "{"},
+		{token.IDENT, "x"},
+		{token.PLUS, "+"},
+		{token.IDENT, "y"},
+		{token.SEMICOLON, ";"},
+		{token.RBRACE, "}"},
+		{token.SEMICOLON, ";"},
+
+		// let result = add(five, ten);
+		{token.LET, "let"},
+		{token.IDENT, "result"},
+		{token.ASSIGN, "="},
+		{token.IDENT, "add"},
+		{token.LPAREN, "("},
+		{token.IDENT, "five"},
+		{token.COMMA, ","},
+		{token.IDENT, "ten"},
+		{token.RPAREN, ")"},
+		{token.SEMICOLON, ";"},
+
+		// _ = 3;
+		{token.IDENT, "_"},
+		{token.ASSIGN, "="},
+		{token.INT, "3"},
+		{token.SEMICOLON, ";"},
+
+		// foo_bar = 4;
+		{token.IDENT, "foo_bar"},
+		{token.ASSIGN, "="},
+		{token.INT, "4"},
+		{token.SEMICOLON, ";"},
+
 		{token.EOF, ""},
 	}
 
@@ -73,7 +122,6 @@ let result = add(five, ten);
 	for i, tt := range tests {
 		tok := l.NextToken()
 
-		fmt.Printf("%[1]T %[1]v\n", tok)
 		if tok.Type != tt.expectedType {
 			t.Fatalf("tests[%d] - tokentype wrong. expected=%q, got=%q", i, tt.expectedType, tok.Type)
 		}
