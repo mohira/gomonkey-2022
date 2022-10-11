@@ -1,5 +1,7 @@
 package ast
 
+import "gomonkey/token"
+
 type Node interface {
 	TokenLiteral() string
 }
@@ -24,4 +26,31 @@ func (p *Program) TokenLiteral() string {
 	} else {
 		return ""
 	}
+}
+
+type LetStatement struct {
+	Token token.Token // token.LET
+	Name  *Identifier // Identifierノード(token.IDENTではない！)
+	Value Expression
+}
+
+func (ls *LetStatement) TokenLiteral() string {
+	return ls.Token.Literal
+}
+
+func (ls *LetStatement) statementNode() {
+	panic("implement me")
+}
+
+type Identifier struct {
+	Token token.Token // token.IDENT
+	Value string
+}
+
+func (i *Identifier) TokenLiteral() string {
+	return i.Token.Literal
+}
+
+func (i *Identifier) expressionNode() {
+	panic("implement me")
 }
