@@ -1,6 +1,7 @@
 package lexer
 
 import (
+	"fmt"
 	"gomonkey/token"
 	"testing"
 )
@@ -50,6 +51,7 @@ let add = fn(x, y) {
 
 let result = add(five, ten);
 `
+	// MEMO: _ foo_bar = 1 もテストケースにいれるべきじゃん
 	input = `let five = 5;`
 
 	tests := []struct {
@@ -57,11 +59,11 @@ let result = add(five, ten);
 		expectedLiteral string
 	}{
 		// let five = 5;
-		{token.LET, "="},
-		{token.IDENT, "+"},
-		{token.ASSIGN, "("},
-		{token.INT, ")"},
-		{token.SEMICOLON, "{"},
+		{token.LET, "let"},
+		{token.IDENT, "five"},
+		{token.ASSIGN, "="},
+		{token.INT, "5"},
+		{token.SEMICOLON, ";"},
 
 		{token.EOF, ""},
 	}
@@ -71,6 +73,7 @@ let result = add(five, ten);
 	for i, tt := range tests {
 		tok := l.NextToken()
 
+		fmt.Printf("%[1]T %[1]v\n", tok)
 		if tok.Type != tt.expectedType {
 			t.Fatalf("tests[%d] - tokentype wrong. expected=%q, got=%q", i, tt.expectedType, tok.Type)
 		}
