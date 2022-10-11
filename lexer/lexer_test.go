@@ -7,7 +7,9 @@ import (
 
 func TestNextToken_1文字(t *testing.T) {
 	input := `=+(){},;
-!-/*5`
+!-/*5
+<>
+`
 
 	tests := []struct {
 		expectedType    token.Type
@@ -21,12 +23,16 @@ func TestNextToken_1文字(t *testing.T) {
 		{token.RBRACE, "}"},
 		{token.COMMA, ","},
 		{token.SEMICOLON, ";"},
+
 		// !-/*5
 		{token.BANG, "!"},
 		{token.MINUS, "-"},
 		{token.SLASH, "/"},
 		{token.ASTERISK, "*"},
 		{token.INT, "5"},
+
+		{token.LT, "<"},
+		{token.GT, ">"},
 
 		{token.EOF, ""},
 	}
