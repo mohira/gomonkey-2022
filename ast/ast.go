@@ -140,3 +140,20 @@ func (es *ExpressionStatement) statementNode() {
 func (es *ExpressionStatement) TokenLiteral() string {
 	return es.TokenLiteral()
 }
+
+type IntegerLiteral struct {
+	Token token.Token // token.INT
+	Value int64
+}
+
+func (il *IntegerLiteral) expressionNode() {
+	panic("implement me")
+}
+
+func (il *IntegerLiteral) TokenLiteral() string {
+	return il.Token.Literal
+}
+
+func (il *IntegerLiteral) String() string {
+	return il.Token.Literal
+}
