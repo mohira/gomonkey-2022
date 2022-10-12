@@ -77,6 +77,11 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 		return nil
 	}
 
+	letStmt.Name = &ast.Identifier{
+		Token: p.curToken,
+		Value: p.curToken.Literal,
+	}
+
 	// TODO: セミコロンに遭遇するまで式を読み飛ばしている
 	for !p.curTokenIs(token.SEMICOLON) {
 		p.nextToken()

@@ -1,8 +1,9 @@
-package parser
+package parser_test
 
 import (
 	"gomonkey/ast"
 	"gomonkey/lexer"
+	"gomonkey/parser"
 	"testing"
 )
 
@@ -13,8 +14,9 @@ let y = 10;
 let foobar = 838383;
 `
 	l := lexer.New(input)
-	p := New(l)
+	p := parser.New(l)
 	program := p.ParseProgram()
+	//checkParseErrors(t, p)
 
 	if program == nil {
 		t.Fatalf("ParseProgram() returned nil")
@@ -40,9 +42,25 @@ let foobar = 838383;
 	}
 }
 
+func checkParseErrors(t *testing.T, p *parser.Parser) {
+	errors := p.Errors()
+	if len(errors) == 0 {
+		return
+	}
+
+	t.Errorf("parser has %d errors", len(errors))
+
+	for _, msg := range errors {
+		t.Errorf("parser error: %q", msg)
+	}
+
+	// エラーが起きている時点で処理をとめちゃうべき
+	// エラーに気づいている状態で移行のテストしても無駄だからね
+	t.FailNow()
+}
+
 func testLetStatement(t *testing.T, stmt ast.Statement, expectedName string) bool {
 	t.Helper()
-
 	if stmt.TokenLiteral() != "let" {
 		t.Errorf("stmt.TokenLiteral not 'let'. got=%q", stmt.TokenLiteral())
 		return false
@@ -53,7 +71,6 @@ func testLetStatement(t *testing.T, stmt ast.Statement, expectedName string) boo
 		t.Errorf("stmt が *ast.LetStatement じゃないよ。got=%T", letStmt)
 		return false
 	}
-
 	// MEMO: LetStatementのValueのテストは後回し(<expression>だから大変なので)
 	if letStmt.Name.Value != expectedName {
 		t.Errorf("letStmt.Name.Value が '%s' じゃないよ。got=%s", expectedName, letStmt.Name.Value)
