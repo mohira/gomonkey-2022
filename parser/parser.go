@@ -33,7 +33,7 @@ func (p *Parser) Errors() []string {
 }
 
 func (p *Parser) peekError(t token.Type) {
-	msg := fmt.Sprintf("😢 次のトークンは %s になってほしいけど、 %s が来ちゃってる！", t, p.peekToken)
+	msg := fmt.Sprintf("😢 次のトークンは %s になってほしいけど、 %s が来ちゃってる！", t, p.peekToken.Type)
 
 	p.errors = append(p.errors, msg)
 }
@@ -80,6 +80,10 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	letStmt.Name = &ast.Identifier{
 		Token: p.curToken,
 		Value: p.curToken.Literal,
+	}
+
+	if !p.expectPeek(token.ASSIGN) {
+		return nil
 	}
 
 	// TODO: セミコロンに遭遇するまで式を読み飛ばしている
