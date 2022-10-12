@@ -53,6 +53,10 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
 	p.registerPrefix(token.INT, p.parseIntegerLiteral)
 
+	// 前置演算式は ! と - の2種類だけです
+	p.registerPrefix(token.BANG, p.parsePrefixExpression)
+	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
+
 	p.nextToken()
 	p.nextToken()
 
@@ -182,6 +186,8 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 		return nil
 	}
 
+	// ((-1) * 2)
+	// (-(1 * 2))
 	// 実際にパースする
 	leftExp := prefix()
 
@@ -214,4 +220,17 @@ func (p *Parser) noPrefixParseFnError(t token.Type) {
 	//msg := fmt.Sprintf("no prefix parse function for %s found", t)
 	msg := fmt.Sprintf("👺 %s に対する前置演算のパースの関数がないよ！ マジで！", t)
 	p.errors = append(p.errors, msg)
+}
+
+func (p *Parser) parsePrefixExpression() ast.Expression {
+	expression := &ast.PrefixExpression{
+		Token:    p.curToken,
+		Operator: p.curToken.Literal,
+	}
+
+	p.nextToken()
+
+	expression.Right = p.parseExpression(PREFIX) // ここまじで意味わからん
+
+	return expression
 }
