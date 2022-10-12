@@ -67,3 +67,19 @@ func (rs *ReturnStatement) statementNode() {
 func (rs *ReturnStatement) TokenLiteral() string {
 	return rs.Token.Literal
 }
+
+// ExpressionStatement は 「1つの式」だけで構成される「文」
+// x = 5; は let文だけど
+// x + 5; は 式文
+type ExpressionStatement struct {
+	Token      token.Token // 式の最初のトークン
+	Expression Expression
+}
+
+func (es *ExpressionStatement) statementNode() {
+	panic("implement me")
+}
+
+func (es *ExpressionStatement) TokenLiteral() string {
+	return es.TokenLiteral()
+}
