@@ -124,6 +124,15 @@ type ExpressionStatement struct {
 	Expression Expression
 }
 
+func (es *ExpressionStatement) String() string {
+	panic("implement me")
+}
+
+func (es *ExpressionStatement) expressionNode() {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (es *ExpressionStatement) statementNode() {
 	panic("implement me")
 }
