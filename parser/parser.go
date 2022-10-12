@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"gomonkey/ast"
 	"gomonkey/lexer"
 	"gomonkey/token"
@@ -11,15 +12,30 @@ type Parser struct {
 
 	curToken  token.Token
 	peekToken token.Token
+
+	errors []string
 }
 
 func New(l *lexer.Lexer) *Parser {
-	p := Parser{l: l}
+	p := Parser{
+		l:      l,
+		errors: []string{},
+	}
 
 	p.nextToken()
 	p.nextToken()
 
 	return &p
+}
+
+func (p *Parser) Errors() []string {
+	return p.errors
+}
+
+func (p *Parser) peekError(t token.Type) {
+	msg := fmt.Sprintf("😢 次のトークンは %s になってほしいけど、 %s が来ちゃってる！", t, p.peekToken)
+
+	p.errors = append(p.errors, msg)
 }
 
 func (p *Parser) nextToken() {
@@ -79,7 +95,7 @@ func (p *Parser) peekTokenIs(t token.Type) bool {
 
 func (p *Parser) expectPeek(t token.Type) bool {
 	if p.peekTokenIs(t) {
-		p.nextToken() // 1個進めている！
+		p.nextToken() // 1個進めている！ ← 期待通りなら1つすすめるのはよさそう(自然っぽい)
 		return true
 	} else {
 		return false
