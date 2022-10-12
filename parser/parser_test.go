@@ -54,6 +54,7 @@ func testLetStatement(t *testing.T, stmt ast.Statement, expectedName string) boo
 		return false
 	}
 
+	// MEMO: LetStatementのValueのテストは後回し(<expression>だから大変なので)
 	if letStmt.Name.Value != expectedName {
 		t.Errorf("letStmt.Name.Value が '%s' じゃないよ。got=%s", expectedName, letStmt.Name.Value)
 		return false
