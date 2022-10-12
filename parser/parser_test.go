@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"fmt"
 	"gomonkey/ast"
 	"gomonkey/lexer"
 	"gomonkey/parser"
@@ -176,4 +177,67 @@ func TestIntegerLiteralExpression(t *testing.T) {
 		t.Errorf("literal.TokenLiteral() が %s じゃないよ。got=%s", "5", literal.TokenLiteral())
 	}
 
+}
+
+func TestParsingPrefixExpressions(t *testing.T) {
+	prefixTests := []struct {
+		input        string
+		operator     string
+		integerValue int64
+	}{
+		{"!5", "!", 5},
+		{"-15", "-", 15},
+	}
+
+	for _, tt := range prefixTests {
+		l := lexer.New(tt.input)
+		p := parser.New(l)
+		program := p.ParseProgram()
+		checkParseErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("program.Statements が %d 文じゃないよ！got=%d\b", 1, len(program.Statements))
+		}
+
+		exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("だめでした。got=%T", program.Statements[0])
+		}
+
+		prefixExpr, ok := exprStmt.Expression.(*ast.PrefixExpression)
+		if !ok {
+			t.Fatalf("型アサーション失敗！ got=%T", exprStmt.Expression)
+		}
+
+		if prefixExpr.Operator != tt.operator {
+			t.Fatalf("prefixExpr.Operator が '%s' じゃないぞ！ got=%s", tt.operator, prefixExpr.Operator)
+		}
+
+		if !testIntegerLiteral(t, prefixExpr.Right, tt.integerValue) {
+			return
+		}
+	}
+
+}
+
+func testIntegerLiteral(t *testing.T, expr ast.Expression, expectedValue int64) bool {
+	t.Helper()
+
+	integerLiteral, ok := expr.(*ast.IntegerLiteral)
+	if !ok {
+		t.Errorf("与えられた expr が *ast.IntegerLiteralじゃないよ！！！ got=%T", integerLiteral)
+		return false
+	}
+
+	if integerLiteral.Value != expectedValue {
+		t.Errorf("integerLiteral.Value が %d じゃないぞ！ got=%d", expectedValue, integerLiteral.Value)
+		return false
+	}
+
+	if integerLiteral.TokenLiteral() != fmt.Sprintf("%d", expectedValue) {
+		t.Errorf("integerLiteral.TokenLiteral が %d じゃないよ. got=%s", expectedValue, integerLiteral.TokenLiteral())
+		return false
+	}
+
+	return true
 }

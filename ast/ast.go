@@ -157,3 +157,31 @@ func (il *IntegerLiteral) TokenLiteral() string {
 func (il *IntegerLiteral) String() string {
 	return il.Token.Literal
 }
+
+type PrefixExpression struct {
+	Token    token.Token // 前置トークン、たとえば「！」
+	Operator string
+	Right    Expression
+}
+
+func (pe *PrefixExpression) expressionNode() {
+	panic("implement me")
+}
+
+func (pe *PrefixExpression) TokenLiteral() string {
+	return pe.Token.Literal
+}
+
+func (pe *PrefixExpression) String() string {
+	var out strings.Builder
+
+	// たとえば、 (!5) になるってことですな
+	// String() メソッドにおいて、演算子とそのオペランドとなる Right 内の式をわざと丸括弧で括っている。
+	// このようにすることで、どのオペランドがどの演算子に属するのかがわかるようになる。
+	out.WriteString("(")
+	out.WriteString(pe.Operator)
+	out.WriteString(pe.Right.String())
+	out.WriteString(")")
+
+	return out.String()
+}
