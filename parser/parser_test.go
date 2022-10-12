@@ -196,7 +196,7 @@ func TestParsingPrefixExpressions(t *testing.T) {
 		checkParseErrors(t, p)
 
 		if len(program.Statements) != 1 {
-			t.Fatalf("program.Statements が %d 文じゃないよ！got=%d\b", 1, len(program.Statements))
+			t.Fatalf("program.Statements が %d 文じゃないよ！got=%d\n", 1, len(program.Statements))
 		}
 
 		exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
