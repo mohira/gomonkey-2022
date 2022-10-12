@@ -103,6 +103,7 @@ func (p *Parser) expectPeek(t token.Type) bool {
 		p.nextToken() // 1個進めている！ ← 期待通りなら1つすすめるのはよさそう(自然っぽい)
 		return true
 	} else {
+		p.peekError(t) // 期待にそぐわなかったらエラーとして追加する
 		return false
 	}
 }
