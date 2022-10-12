@@ -54,3 +54,16 @@ func (i *Identifier) TokenLiteral() string {
 func (i *Identifier) expressionNode() {
 	panic("implement me")
 }
+
+type ReturnStatement struct {
+	Token       token.Token // token.RETURN
+	ReturnValue Expression
+}
+
+func (rs *ReturnStatement) statementNode() {
+	panic("implement me")
+}
+
+func (rs *ReturnStatement) TokenLiteral() string {
+	return rs.Token.Literal
+}
