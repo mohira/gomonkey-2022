@@ -7,6 +7,17 @@ import (
 	"gomonkey/token"
 )
 
+const (
+	_           int = iota // 0
+	LOWEST                 // 1
+	EQUALS                 // 2
+	LESSGREATER            // 3
+	SUM                    // 4
+	PRODUCT                // 5
+	PREFIX                 // 6
+	CALL                   // 7 //myFunction(X)
+)
+
 type (
 	prefixParseFn func() ast.Expression
 	infixParseFn  func(ast.Expression) ast.Expression
@@ -36,6 +47,9 @@ func New(l *lexer.Lexer) *Parser {
 		l:      l,
 		errors: []string{},
 	}
+
+	p.prefixParseFns = make(map[token.Type]prefixParseFn)
+	p.registerPrefix(token.IDENT, p.parseIdentifier)
 
 	p.nextToken()
 	p.nextToken()
@@ -155,4 +169,25 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 	}
 
 	return stmt
+}
+
+func (p *Parser) parseExpression(precedence int) ast.Expression {
+	// 現在のトークンに応じて、前置演算式のパース用の関数を探しにいく
+	prefix := p.prefixParseFns[p.curToken.Type]
+
+	if prefix == nil {
+		return nil
+	}
+
+	// 実際にパースする
+	leftExp := prefix()
+
+	return leftExp
+}
+
+func (p *Parser) parseIdentifier() ast.Expression {
+	return &ast.Identifier{
+		Token: p.curToken,
+		Value: p.curToken.Literal,
+	}
 }
