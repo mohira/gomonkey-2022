@@ -241,3 +241,57 @@ func testIntegerLiteral(t *testing.T, expr ast.Expression, expectedValue int64) 
 
 	return true
 }
+
+func TestParsingInfixExpressions(t *testing.T) {
+	// テーブル駆動テスト
+	infixTests := []struct {
+		input      string
+		leftValue  int64
+		operator   string
+		rightValue int64
+	}{
+		{"3 + 4", 3, "+", 4},
+		{"3 - 4", 3, "-", 4},
+		{"3 * 4", 3, "*", 4},
+		{"3 / 4", 3, "/", 4},
+		{"3 > 4", 3, ">", 4},
+		{"3 < 4", 3, "<", 4},
+		{"3 == 4", 3, "==", 4},
+		{"3 != 4", 3, "!=", 4},
+	}
+
+	for _, tt := range infixTests {
+		l := lexer.New(tt.input)
+		p := parser.New(l)
+		program := p.ParseProgram()
+		checkParseErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("1文じゃないよ！ got=%d\n", len(program.Statements))
+		}
+
+		exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("program.Statements[0] is not *ast.ExpressionStatementでっせ！ got=%T", program.Statements[0])
+		}
+
+		infixExpr, ok := exprStmt.Expression.(*ast.InfixExpression)
+		if !ok {
+			t.Fatalf("infixExpr が *ast.InfixExpression じゃないぞ！ got=%T", exprStmt.Expression)
+		}
+
+		if !testIntegerLiteral(t, infixExpr.Left, tt.leftValue) {
+			return
+		}
+
+		if infixExpr.Operator != tt.operator {
+			t.Fatalf("infixExpr.Operator が '%s' じゃないよ。got=%s", tt.operator, infixExpr.Operator)
+		}
+
+		if !testIntegerLiteral(t, infixExpr.Right, tt.rightValue) {
+			return
+		}
+
+	}
+
+}
