@@ -297,12 +297,22 @@ func TestParsingInfixExpressions(t *testing.T) {
 }
 
 func Testえび実験_3項とかになっても大丈夫かな(t *testing.T) {
-	input := `3 + 4 * 5`
-	input = `3 * 4 + 5`
-	l := lexer.New(input)
-	p := parser.New(l)
-	program := p.ParseProgram()
-	checkParseErrors(t, p)
+	tests := []struct {
+		input string
+		want  string
+	}{
+		{"3 + 4 * 5;", "(3 + (4 * 5))"},
+		{"3 * 4 + 5;", "((3 * 4) + 5)"},
+	}
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := parser.New(l)
+		program := p.ParseProgram()
+		checkParseErrors(t, p)
 
-	_ = program
+		if program.String() != tt.want {
+			t.Errorf("got=%s, want=%s", program.String(), tt.want)
+		}
+	}
+
 }

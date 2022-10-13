@@ -125,7 +125,11 @@ type ExpressionStatement struct {
 }
 
 func (es *ExpressionStatement) String() string {
-	panic("implement me")
+	if es.Expression != nil {
+		return es.Expression.String()
+	}
+
+	return ""
 }
 
 func (es *ExpressionStatement) expressionNode() {
