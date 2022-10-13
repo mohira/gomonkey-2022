@@ -316,3 +316,40 @@ func Testえび実験_3項とかになっても大丈夫かな(t *testing.T) {
 	}
 
 }
+
+func TestOperatorPrecedenceParsing(t *testing.T) {
+	// 異なる優先順位を持っているもっと複雑なパターンの検証
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"-a * b", "((-a) * b)"},
+		{"!-a", "(!(-a))"},
+		{"a + b + c", "((a + b) + c)"},
+		{"a + b - c", "((a + b) - c)"},
+		{"a * b * c", "((a * b) * c)"},
+		{"a * b / c", "((a * b) / c)"},
+		// TODO: {"a + b * c + d / e - f", "(((a + (b * c)) + (d / e)) - f)"},
+		{"3 + 4; -5 * 5", "(3 + 4)((-5) * 5)"},
+		{"5 > 4 == 3 < 4", "((5 > 4) == (3 < 4))"},
+		{"5 < 4 != 3 > 4", "((5 < 4) != (3 > 4))"},
+		{"3 + 4 * 5", "(3 + (4 * 5))"},
+		{"3 * 1 + 4 * 5", "((3 * 1) + (4 * 5))"},
+
+		// TODO:
+		{"3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := parser.New(l)
+		program := p.ParseProgram()
+		checkParseErrors(t, p)
+
+		got := program.String()
+		if got != tt.expected {
+			t.Errorf("got=%s, want=%s", got, tt.expected)
+		}
+	}
+
+}
