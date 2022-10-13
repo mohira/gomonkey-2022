@@ -19,6 +19,36 @@ const (
 	CALL                   // 7 //myFunction(X)
 )
 
+var precedences = map[token.Type]int{
+	token.EQ:     EQUALS,
+	token.NOT_EQ: EQUALS,
+
+	token.LT: LESSGREATER,
+	token.GT: LESSGREATER,
+
+	token.PLUS:  SUM,
+	token.MINUS: SUM,
+
+	token.ASTERISK: PRODUCT,
+	token.SLASH:    PRODUCT,
+}
+
+func (p *Parser) peekPrecedence() int {
+	if p, ok := precedences[p.peekToken.Type]; ok {
+		return p
+	}
+
+	return LOWEST
+}
+
+func (p *Parser) curPrecedence() int {
+	if p, ok := precedences[p.curToken.Type]; ok {
+		return p
+	}
+
+	return LOWEST
+}
+
 type (
 	prefixParseFn func() ast.Expression
 	infixParseFn  func(ast.Expression) ast.Expression
