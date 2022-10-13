@@ -335,43 +335,8 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		{"3 + 4 * 5", "(3 + (4 * 5))"},
 		{"3 * 1 + 4 * 5", "((3 * 1) + (4 * 5))"},
 
-		// TODO:
-		//{"a + b * c + d / e - f", "(((a + (b * c)) + (d / e)) - f)"},
-
-		// TODO:
-		//{"3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
-	}
-
-	for _, tt := range tests {
-		l := lexer.New(tt.input)
-		p := parser.New(l)
-		program := p.ParseProgram()
-		checkParseErrors(t, p)
-
-		got := program.String()
-		if got != tt.expected {
-			t.Errorf("got=%s, want=%s", got, tt.expected)
-		}
-	}
-
-}
-
-func TestOperatorPrecedenceParsing_デバッグ用(t *testing.T) {
-	// 異なる優先順位を持っているもっと複雑なパターンの検証
-	tests := []struct {
-		input    string
-		expected string
-	}{
-		// TODO:
-		//{"a + b * c + d / e - f",
-		//	"(((a + (b * c)) + (d / e)) - f)"},
-		//                                  got=(a + ((b * c) + ((d / e) - f)))
-		// TODO:
-		//{"3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
-		//                                       got=(3 + ((4 * 5) == ((3 * 1) + (4 * 5))))
-
-		// テストケースを小さくする
-		//                               got=(3 + ((4 * 5) == (3 * 1)))
+		{"a + b * c + d / e - f", "(((a + (b * c)) + (d / e)) - f)"},
+		{"3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
 		{"3 + 4 * 5 == 6 * 7", "((3 + (4 * 5)) == (6 * 7))"},
 	}
 
