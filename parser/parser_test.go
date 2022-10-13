@@ -295,3 +295,14 @@ func TestParsingInfixExpressions(t *testing.T) {
 	}
 
 }
+
+func Testえび実験_3項とかになっても大丈夫かな(t *testing.T) {
+	input := `3 + 4 * 5`
+	input = `3 * 4 + 5`
+	l := lexer.New(input)
+	p := parser.New(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	_ = program
+}
