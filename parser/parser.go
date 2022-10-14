@@ -86,6 +86,9 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
 	p.registerPrefix(token.INT, p.parseIntegerLiteral)
 
+	p.registerPrefix(token.TRUE, p.parseBooleanLiteral)
+	p.registerPrefix(token.FALSE, p.parseBooleanLiteral)
+
 	// 前置演算式は ! と - の2種類だけです
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
@@ -308,4 +311,19 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 	infixExpr.Right = p.parseExpression(curPrecedence)
 
 	return infixExpr
+}
+
+func (p *Parser) parseBooleanLiteral() ast.Expression {
+	boolean := &ast.Boolean{
+		Token: p.curToken,
+	}
+	if p.curToken.Type == token.TRUE {
+		boolean.Value = true
+	}
+
+	if !p.expectPeek(token.SEMICOLON) {
+		return nil
+	}
+
+	return boolean
 }
