@@ -300,7 +300,11 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 
 	p.nextToken()
 
-	infixExpr.Right = p.parseExpression(curPrecedence)
+	if infixExpr.Operator == "+" {
+		infixExpr.Right = p.parseExpression(curPrecedence - 1)
+	} else {
+		infixExpr.Right = p.parseExpression(curPrecedence)
+	}
 
 	return infixExpr
 }
