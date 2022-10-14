@@ -369,3 +369,82 @@ func TestPratt構文解析の仕組みの実験(t *testing.T) {
 	}
 
 }
+
+func testIdentifier(t *testing.T, expr ast.Expression, expectedValue string) bool {
+	t.Helper()
+
+	ident, ok := expr.(*ast.Identifier)
+	if !ok {
+		t.Errorf("expr not *ast.Identifier. got=%T", expr)
+		return false
+	}
+
+	if ident.Value != expectedValue {
+		t.Errorf("ident.Value not %s. got=%s", expectedValue, ident.Value)
+		return false
+	}
+
+	if ident.TokenLiteral() != expectedValue {
+		t.Errorf("ident.TokenLiteral() not %s. got=%s", expectedValue, ident.TokenLiteral())
+		return false
+	}
+
+	return true
+}
+
+// Expressionを検証する より一般的なヘルパーテスト関数 リテラル編
+func testLiteralExpression(t *testing.T, expr ast.Expression, expected any) bool {
+	t.Helper()
+	// 期待値によって検証項目を切り替えるというシンプルな発想
+	switch v := expected.(type) {
+	case int:
+		return testIntegerLiteral(t, expr, int64(v))
+	case string:
+		return testIdentifier(t, expr, v)
+	}
+
+	t.Errorf("😢 そのtypeのリテラルのテストヘルパーはまだないんだわこりゃ. got=%T", expr)
+	return false
+}
+
+func testInfixExpression(t *testing.T, expr ast.Expression, left any, operator string, right any) bool {
+	infixExpr, ok := expr.(*ast.InfixExpression)
+	if !ok {
+		t.Errorf("expr is not *ast.InfixExpression. got=%T(%s)", expr, expr)
+		return false
+	}
+
+	if !testLiteralExpression(t, infixExpr.Left, left) {
+		return false
+	}
+
+	if infixExpr.Operator != operator {
+		t.Errorf("Operater が '%s' じゃないぞ！ got='%s'", operator, infixExpr.Operator)
+		return false
+	}
+
+	if !testLiteralExpression(t, infixExpr.Right, right) {
+		return false
+	}
+
+	return true
+}
+
+func Testテストヘルパーを使っていい感じにテストコードが書けることを試すやつ(t *testing.T) {
+	input := `5 + 10;`
+
+	l := lexer.New(input)
+	p := parser.New(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("だめ〜")
+	}
+
+	if !testInfixExpression(t, exprStmt.Expression, 5, "+", 10) {
+		return
+	}
+
+}
