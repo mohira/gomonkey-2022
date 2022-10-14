@@ -316,13 +316,7 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 func (p *Parser) parseBooleanLiteral() ast.Expression {
 	boolean := &ast.Boolean{
 		Token: p.curToken,
-	}
-	if p.curToken.Type == token.TRUE {
-		boolean.Value = true
-	}
-
-	if !p.expectPeek(token.SEMICOLON) {
-		return nil
+		Value: p.curTokenIs(token.TRUE),
 	}
 
 	return boolean
