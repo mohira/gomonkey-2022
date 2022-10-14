@@ -93,6 +93,9 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
 
+	// 2.8.2 グループ化された式に対応していく
+	p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
+
 	p.infixParseFns = make(map[token.Type]infixParseFn)
 	p.registerInfix(token.EQ, p.parseInfixExpression)
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
@@ -320,4 +323,20 @@ func (p *Parser) parseBooleanLiteral() ast.Expression {
 	}
 
 	return boolean
+}
+
+func (p *Parser) parseGroupedExpression() ast.Expression {
+	// カッコがあるASTノードなんてものは、不要！ そんなのいらない！
+	// 単純にこれでいい！
+	// 	- カッコを剥がした式でパースする ← 閉じカッコは優先順位が最低値だから、どのみちカッコ内の演算子が優先されるので心配いらない
+	// 	- 閉じカッコがちゃんとあるかを確かめる
+	p.nextToken()
+
+	expr := p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	return expr
 }
