@@ -340,6 +340,9 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		{"false", "false"},
 		{"3 > 5 == false", "((3 > 5) == false)"},
 		{"3 < 5 == true", "((3 < 5) == true)"},
+
+		// 2.8.2 グループ化された式
+		{"1 + (2 + 3) + 4", "((1 + (2 + 3)) + 4)"},
 	}
 
 	for _, tt := range tests {
