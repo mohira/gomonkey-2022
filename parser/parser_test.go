@@ -448,3 +448,39 @@ func Testテストヘルパーを使っていい感じにテストコードが�
 	}
 
 }
+
+func TestBooleanLiteral(t *testing.T) {
+	tests := []struct {
+		input           string
+		expectedBoolean bool
+	}{
+		{"true;", true},
+		{"false;", false},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := parser.New(l)
+		program := p.ParseProgram()
+		checkParseErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("文の数がおかしいね？ want 1, got=%d", len(program.Statements))
+		}
+
+		exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("*ast.ExpressionStatement じゃないけど？ got=%T", program.Statements[0])
+		}
+
+		booleanLiteral, ok := exprStmt.Expression.(*ast.Boolean)
+		if !ok {
+			t.Fatalf("*ast.Boolean じゃないよ？ got=%T", exprStmt.Expression)
+		}
+
+		if booleanLiteral.Value != tt.expectedBoolean {
+			t.Errorf("got=%t want=%t", booleanLiteral.Value, tt.expectedBoolean)
+		}
+
+	}
+}
