@@ -353,3 +353,19 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 	}
 
 }
+
+func TestPratt構文解析の仕組みの実験(t *testing.T) {
+	// p.76あたりからの説明
+	input := `1 + 2 + 3`
+	want := `((1 + 2) + 3)`
+	l := lexer.New(input)
+	p := parser.New(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	got := program.String()
+	if got != want {
+		t.Errorf("おかしいよ.got=%s want=%s", got, want)
+	}
+
+}

@@ -217,21 +217,21 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 	return stmt
 }
 
-func (p *Parser) parseExpression(precedence int) ast.Expression {
+func (p *Parser) parseExpression(curPrecedence int) ast.Expression {
 	// 現在のトークンに応じて、前置演算式のパース用の関数を探しにいく
-	prefix := p.prefixParseFns[p.curToken.Type]
+	prefixFn := p.prefixParseFns[p.curToken.Type]
 
-	if prefix == nil {
+	if prefixFn == nil {
 		p.noPrefixParseFnError(p.curToken.Type)
 		return nil
 	}
 
-	leftExp := prefix() // ast.IntegerLiteral{3} になっている
+	leftExp := prefixFn() // ast.IntegerLiteral{3} になっている
 
 	// 条件1: 次がセミコロンだったら、 `3;`みたいなやつだったってこと！
 	// 条件2: この条件に当てはまる
 	// => 次のトークンの処理を今よりも優先しろ！ ex: `3 + 4` だったら、+を先に処理する => 中置演算式としてパースしなさい
-	for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence() {
+	for !p.peekTokenIs(token.SEMICOLON) && curPrecedence < p.peekPrecedence() {
 		// 次のトークンのパースを優先しろって話なので、次のトークン用のパース関数を探しにいく。中置演算式のパースですね。
 		infixFn := p.infixParseFns[p.peekToken.Type]
 
@@ -296,11 +296,11 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 		Operator: p.curToken.Literal,
 	}
 
-	precedence := p.curPrecedence()
+	curPrecedence := p.curPrecedence()
 
 	p.nextToken()
 
-	infixExpr.Right = p.parseExpression(precedence)
+	infixExpr.Right = p.parseExpression(curPrecedence)
 
 	return infixExpr
 }
