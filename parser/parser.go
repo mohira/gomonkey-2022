@@ -93,6 +93,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
 
+	// 2.8.3 if式
+	p.registerPrefix(token.IF, p.parseIfExpression)
 	// 2.8.2 グループ化された式に対応していく
 	p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
 
@@ -339,4 +341,30 @@ func (p *Parser) parseGroupedExpression() ast.Expression {
 	}
 
 	return expr
+}
+
+func (p *Parser) parseIfExpression() ast.Expression {
+	// if (x < y) { x } else { y }
+	ifExpr := &ast.IfExpression{
+		Token: p.curToken,
+	}
+
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+	p.nextToken()
+
+	ifExpr.Condition = p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	ifExpr.Consequence = p.parseBlockStatment()
+
+	return ifExpr
 }
