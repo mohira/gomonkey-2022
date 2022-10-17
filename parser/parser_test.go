@@ -516,3 +516,51 @@ func testBooleanLiteral(t *testing.T, expr ast.Expression, value bool) bool {
 
 	return true
 }
+
+func TestIfExpression(t *testing.T) {
+	input := `if (x < y) { x }`
+
+	l := lexer.New(input)
+	p := parser.New(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Statemnts not contain %d statements. got=%d", 1, len(program.Statements))
+	}
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("not *ast.ExpressionStatement. got=%T", program.Statements[0])
+	}
+
+	ifExpr, ok := exprStmt.Expression.(*ast.IfExpression)
+	if !ok {
+		t.Fatalf("not *ast.IfExpression. got=%T", exprStmt.Expression)
+	}
+
+	// if (x < y) { x }
+	if !testInfixExpression(t, ifExpr.Condition, "x", "<", "y") {
+		return
+	}
+
+	// consequence
+	if len(ifExpr.Consequence.Statements) != 1 {
+		t.Errorf("consequnce is not 1 statement. got=%d", len(ifExpr.Consequence.Statements))
+	}
+
+	consequence, ok := ifExpr.Consequence.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("not *ast.ExpressionStatement. got=%T", ifExpr.Consequence.Statements[0])
+	}
+
+	if !testLiteralExpression(t, consequence.Expression, "x") {
+		return
+	}
+
+	// elseブロックは無いよ
+	if ifExpr.Alternative != nil {
+		t.Errorf("ifExpr.Alternative が nil じゃないよ. got=%+v", ifExpr.Alternative)
+	}
+
+}
