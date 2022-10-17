@@ -364,7 +364,29 @@ func (p *Parser) parseIfExpression() ast.Expression {
 		return nil
 	}
 
-	ifExpr.Consequence = p.parseBlockStatment()
+	ifExpr.Consequence = p.parseBlockStatement()
 
 	return ifExpr
+}
+
+func (p *Parser) parseBlockStatement() *ast.BlockStatement {
+	blockStmt := &ast.BlockStatement{
+		Token: p.curToken,
+	}
+	blockStmt.Statements = []ast.Statement{}
+
+	p.nextToken()
+
+	// } は ブロック終端ってことね
+	for !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.EOF) {
+		stmt := p.parseStatement()
+
+		if stmt != nil {
+			blockStmt.Statements = append(blockStmt.Statements, stmt)
+		}
+		p.nextToken()
+	}
+
+	return blockStmt
+
 }
