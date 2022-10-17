@@ -236,6 +236,10 @@ func (b *Boolean) String() string {
 	return b.Token.Literal
 }
 
+// IfExpression
+//
+//	if ( <condition> ) { <consequence> }
+//	if ( <condition> ) { <consequence> } else { <alternative> }
 type IfExpression struct {
 	Token       token.Token // token.IF
 	Condition   Expression
