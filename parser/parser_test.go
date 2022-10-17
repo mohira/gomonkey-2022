@@ -618,7 +618,7 @@ func TestIfElseExpression(t *testing.T) {
 			ifExpr.Alternative.Statements[0])
 	}
 
-	if !testIdentifier(t, alternative, "x") {
+	if !testIdentifier(t, alternative.Expression, "y") {
 		return
 	}
 }

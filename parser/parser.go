@@ -366,6 +366,16 @@ func (p *Parser) parseIfExpression() ast.Expression {
 
 	ifExpr.Consequence = p.parseBlockStatement()
 
+	// elseがある場合の処理
+	if p.peekTokenIs(token.ELSE) {
+		p.nextToken() // ELSEなう
+
+		if !p.expectPeek(token.LBRACE) {
+			return nil
+		}
+
+		ifExpr.Alternative = p.parseBlockStatement()
+	}
 	return ifExpr
 }
 
