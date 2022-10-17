@@ -554,7 +554,7 @@ func TestIfExpression(t *testing.T) {
 		t.Fatalf("not *ast.ExpressionStatement. got=%T", ifExpr.Consequence.Statements[0])
 	}
 
-	if !testLiteralExpression(t, consequence.Expression, "x") {
+	if !testIdentifier(t, consequence.Expression, "x") {
 		return
 	}
 
@@ -563,4 +563,62 @@ func TestIfExpression(t *testing.T) {
 		t.Errorf("ifExpr.Alternative が nil じゃないよ. got=%+v", ifExpr.Alternative)
 	}
 
+}
+
+func TestIfElseExpression(t *testing.T) {
+	input := `if (x < y) { x } else { y }`
+
+	l := lexer.New(input)
+	p := parser.New(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Statemnts not contain %d statements. got=%d", 1, len(program.Statements))
+	}
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("not *ast.ExpressionStatement. got=%T", program.Statements[0])
+	}
+
+	ifExpr, ok := exprStmt.Expression.(*ast.IfExpression)
+	if !ok {
+		t.Fatalf("not *ast.IfExpression. got=%T", exprStmt.Expression)
+	}
+
+	// if (x < y) { x } else { y }
+	if !testInfixExpression(t, ifExpr.Condition, "x", "<", "y") {
+		return
+	}
+
+	// consequence
+	if len(ifExpr.Consequence.Statements) != 1 {
+		t.Errorf("consequnce is not 1 statement. got=%d", len(ifExpr.Consequence.Statements))
+	}
+
+	consequence, ok := ifExpr.Consequence.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("not *ast.ExpressionStatement. got=%T", ifExpr.Consequence.Statements[0])
+	}
+
+	if !testIdentifier(t, consequence.Expression, "x") {
+		return
+	}
+
+	// if (x < y) { x } else { y }
+	if len(ifExpr.Alternative.Statements) != 1 {
+		t.Errorf("ifExpr.Alternative.Statements does not contain 1 statements. got=%d\n",
+			len(ifExpr.Alternative.Statements))
+	}
+
+	alternative, ok := ifExpr.Alternative.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("Statements[0] is not ast.ExpressionStatement. got=%T",
+			ifExpr.Alternative.Statements[0])
+	}
+
+	if !testIdentifier(t, alternative, "x") {
+		return
+	}
 }
