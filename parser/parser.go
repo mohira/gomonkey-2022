@@ -432,8 +432,7 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 	p.nextToken() // (の次に進んだ
 
 	// ( または x に遭遇している
-	if p.peekTokenIs(token.RPAREN) {
-		p.nextToken()
+	if p.curTokenIs(token.RPAREN) {
 		return identifiers
 	}
 

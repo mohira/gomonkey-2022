@@ -687,6 +687,7 @@ func TestFunctionParameterParsing(t *testing.T) {
 		functionLit := exprStmt.Expression.(*ast.FunctionLiteral)
 
 		if len(functionLit.Parameters) != len(tt.expectedParams) {
+			fmt.Printf("👺 %[1]T %[1]v\n", functionLit)
 			t.Errorf("parameterの数がおかしいよ。 want=%d got=%d", len(tt.expectedParams), len(functionLit.Parameters))
 		}
 
