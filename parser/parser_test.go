@@ -622,3 +622,47 @@ func TestIfElseExpression(t *testing.T) {
 		return
 	}
 }
+
+func TestFunctionLiteral(t *testing.T) {
+	input := `fn(x, y) { return x + y; }`
+
+	l := lexer.New(input)
+	p := parser.New(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("1文じゃないよ. got=%d", len(program.Statements))
+	}
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] not *ast.ExpressionStatement. got=%T", program.Statements[0])
+	}
+
+	// fn(x, y) { return x + y; }
+	functionLit, ok := exprStmt.Expression.(*ast.FunctionLiteral)
+	if !ok {
+		t.Fatalf("exprStmt.Expression not *ast.FunctionLiteral. got=%T", exprStmt.Expression)
+	}
+
+	// 関数リテラルのパラメータ関連
+	if len(functionLit.Parameters) != 2 {
+		t.Fatalf("function literal Parameters wrong. want 2, got=%d", len(functionLit.Parameters))
+	}
+	testLiteralExpression(t, functionLit.Parameters[0], "x")
+	testLiteralExpression(t, functionLit.Parameters[1], "y")
+
+	// 関数リテラルのBody関連
+	if len(functionLit.Body.Statements) != 1 {
+		t.Fatalf("function.Body.Statements has not 1 statements. got=%d", len(functionLit.Body.Statements))
+	}
+
+	bodyStmt, ok := functionLit.Body.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("function body stmt is not *ast.ExpressionStatement. got=%T", functionLit.Body.Statements[0])
+	}
+
+	testInfixExpression(t, bodyStmt, "x", "+", "y")
+
+}
