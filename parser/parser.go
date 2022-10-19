@@ -95,8 +95,12 @@ func New(l *lexer.Lexer) *Parser {
 
 	// 2.8.3 if式
 	p.registerPrefix(token.IF, p.parseIfExpression)
+
 	// 2.8.2 グループ化された式に対応していく
 	p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
+
+	// 2.8.4 関数リテラル
+	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
 
 	p.infixParseFns = make(map[token.Type]infixParseFn)
 	p.registerInfix(token.EQ, p.parseInfixExpression)
@@ -399,4 +403,43 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 
 	return blockStmt
 
+}
+
+func (p *Parser) parseFunctionLiteral() ast.Expression {
+	// 	fn(x, y) { return x + y; }
+	functionLit := &ast.FunctionLiteral{
+		Token:      p.curToken,
+		Parameters: nil,
+		Body:       nil,
+	}
+
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+
+	functionLit.Parameters = p.parseFunctionParameters()
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	functionLit.Body = p.parseBlockStatement()
+
+	return functionLit
+}
+
+func (p *Parser) parseFunctionParameters() []*ast.Identifier {
+	var params []*ast.Identifier
+	for !p.peekTokenIs(token.RPAREN) || !p.peekTokenIs(token.COMMA) {
+		p.nextToken()
+
+		ident, ok := p.parseIdentifier().(*ast.Identifier)
+		if !ok {
+			return nil
+		}
+		fmt.Printf("😁 %[1]T %[1]v\n", p.curToken)
+
+		params = append(params, ident)
+	}
+	return params
 }
