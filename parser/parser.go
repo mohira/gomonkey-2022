@@ -406,11 +406,9 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 }
 
 func (p *Parser) parseFunctionLiteral() ast.Expression {
-	// 	fn(x, y) { return x + y; }
+	// 	fn(x, y) { x + y; }
 	functionLit := &ast.FunctionLiteral{
-		Token:      p.curToken,
-		Parameters: nil,
-		Body:       nil,
+		Token: p.curToken,
 	}
 
 	if !p.expectPeek(token.LPAREN) {
@@ -429,17 +427,30 @@ func (p *Parser) parseFunctionLiteral() ast.Expression {
 }
 
 func (p *Parser) parseFunctionParameters() []*ast.Identifier {
-	var params []*ast.Identifier
-	for !p.peekTokenIs(token.RPAREN) || !p.peekTokenIs(token.COMMA) {
-		p.nextToken()
+	var identifiers []*ast.Identifier
 
-		ident, ok := p.parseIdentifier().(*ast.Identifier)
+	p.nextToken() // (の次に進んだ
+
+	// ( または x に遭遇している
+	if p.peekTokenIs(token.RPAREN) {
+		p.nextToken()
+		return identifiers
+	}
+
+	for !p.curTokenIs(token.RPAREN) {
+		fmt.Printf("👉 %[1]T %[1]v\n", p.curToken)
+		param := p.parseIdentifier()
+		ident, ok := param.(*ast.Identifier)
 		if !ok {
 			return nil
 		}
-		fmt.Printf("😁 %[1]T %[1]v\n", p.curToken)
+		identifiers = append(identifiers, ident)
 
-		params = append(params, ident)
+		if p.peekTokenIs(token.COMMA) {
+			p.nextToken()
+		}
+		p.nextToken()
 	}
-	return params
+
+	return identifiers
 }

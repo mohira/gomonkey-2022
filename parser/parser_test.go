@@ -624,7 +624,7 @@ func TestIfElseExpression(t *testing.T) {
 }
 
 func TestFunctionLiteral(t *testing.T) {
-	input := `fn(x, y) { return x + y; }`
+	input := `fn(x, y) { x + y; }`
 
 	l := lexer.New(input)
 	p := parser.New(l)
@@ -663,6 +663,6 @@ func TestFunctionLiteral(t *testing.T) {
 		t.Fatalf("function body stmt is not *ast.ExpressionStatement. got=%T", functionLit.Body.Statements[0])
 	}
 
-	testInfixExpression(t, bodyStmt, "x", "+", "y")
+	testInfixExpression(t, bodyStmt.Expression, "x", "+", "y")
 
 }
