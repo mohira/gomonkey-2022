@@ -666,3 +666,32 @@ func TestFunctionLiteral(t *testing.T) {
 	testInfixExpression(t, bodyStmt.Expression, "x", "+", "y")
 
 }
+
+func TestFunctionParameterParsing(t *testing.T) {
+	tests := []struct {
+		input          string
+		expectedParams []string
+	}{
+		{input: "fn() {};", expectedParams: []string{}},
+		{input: "fn(x) {};", expectedParams: []string{"x"}},
+		{input: "fn(x, y, z) {};", expectedParams: []string{"x", "y", "z"}},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := parser.New(l)
+		program := p.ParseProgram()
+		checkParseErrors(t, p)
+
+		exprStmt := program.Statements[0].(*ast.ExpressionStatement)
+		functionLit := exprStmt.Expression.(*ast.FunctionLiteral)
+
+		if len(functionLit.Parameters) != len(tt.expectedParams) {
+			t.Errorf("parameterの数がおかしいよ。 want=%d got=%d", len(tt.expectedParams), len(functionLit.Parameters))
+		}
+
+		for i, ident := range tt.expectedParams {
+			testLiteralExpression(t, functionLit.Parameters[i], ident)
+		}
+	}
+}
