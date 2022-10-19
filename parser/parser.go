@@ -429,27 +429,56 @@ func (p *Parser) parseFunctionLiteral() ast.Expression {
 func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 	var identifiers []*ast.Identifier
 
-	p.nextToken() // (の次に進んだ
-
-	// ( または x に遭遇している
-	if p.curTokenIs(token.RPAREN) {
+	if p.peekTokenIs(token.RPAREN) {
+		p.nextToken()
 		return identifiers
 	}
 
-	for !p.curTokenIs(token.RPAREN) {
-		fmt.Printf("👉 %[1]T %[1]v\n", p.curToken)
-		param := p.parseIdentifier()
-		ident, ok := param.(*ast.Identifier)
-		if !ok {
-			return nil
+	p.nextToken()
+
+	ident := &ast.Identifier{
+		Token: p.curToken,
+		Value: p.curToken.Literal,
+	}
+	identifiers = append(identifiers, ident)
+
+	for p.peekTokenIs(token.COMMA) {
+		p.nextToken() // token.Identifier -> token.COMMA
+		p.nextToken() // token.COMMA      -> token.Identifier
+
+		ident := &ast.Identifier{
+			Token: p.curToken,
+			Value: p.curToken.Literal,
 		}
 		identifiers = append(identifiers, ident)
-
-		if p.peekTokenIs(token.COMMA) {
-			p.nextToken()
-		}
-		p.nextToken()
 	}
 
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
 	return identifiers
+
+	//// 自力で書いたパターンも残しておく
+	//p.nextToken() // (の次に進んだ
+	//
+	//// ( または x に遭遇している
+	//if p.curTokenIs(token.RPAREN) {
+	//	return identifiers
+	//}
+	//
+	//for !p.curTokenIs(token.RPAREN) {
+	//	fmt.Printf("👉 %[1]T %[1]v\n", p.curToken)
+	//	param := p.parseIdentifier()
+	//	ident, ok := param.(*ast.Identifier)
+	//	if !ok {
+	//		return nil
+	//	}
+	//	identifiers = append(identifiers, ident)
+	//
+	//	if p.peekTokenIs(token.COMMA) {
+	//		p.nextToken()
+	//	}
+	//	p.nextToken()
+	//}
+	//return identifiers
 }
