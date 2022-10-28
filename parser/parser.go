@@ -229,7 +229,7 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 }
 
 func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
-	defer untrace(trace("parseExpressionStatement()"))
+	//defer untrace(trace("parseExpressionStatement()"))
 	stmt := &ast.ExpressionStatement{Token: p.curToken}
 
 	stmt.Expression = p.parseExpression(LOWEST)
@@ -242,7 +242,7 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 }
 
 func (p *Parser) parseExpression(curPrecedence int) ast.Expression {
-	defer untrace(trace(fmt.Sprintf("parseExression() precedence=%d", curPrecedence)))
+	//defer untrace(trace(fmt.Sprintf("parseExression() precedence=%d", curPrecedence)))
 
 	// 現在のトークンに応じて、前置演算式のパース用の関数を探しにいく
 	prefixFn := p.prefixParseFns[p.curToken.Type]
@@ -281,7 +281,7 @@ func (p *Parser) parseIdentifier() ast.Expression {
 }
 
 func (p *Parser) parseIntegerLiteral() ast.Expression {
-	defer untrace(trace("parseIntegerLiteral()"))
+	//defer untrace(trace("parseIntegerLiteral()"))
 	lit := &ast.IntegerLiteral{Token: p.curToken}
 
 	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
@@ -303,7 +303,7 @@ func (p *Parser) noPrefixParseFnError(t token.Type) {
 }
 
 func (p *Parser) parsePrefixExpression() ast.Expression {
-	defer untrace(trace("parsePrefixExpression()"))
+	//defer untrace(trace("parsePrefixExpression()"))
 	expression := &ast.PrefixExpression{
 		Token:    p.curToken,
 		Operator: p.curToken.Literal,
@@ -317,7 +317,7 @@ func (p *Parser) parsePrefixExpression() ast.Expression {
 }
 
 func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
-	defer untrace(trace(fmt.Sprintf("parseInfixExpression() left=%[1]T %[1]q", left)))
+	//defer untrace(trace(fmt.Sprintf("parseInfixExpression() left=%[1]T %[1]q", left)))
 	// `3 + 4`
 	infixExpr := &ast.InfixExpression{
 		Token:    p.curToken,
