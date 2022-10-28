@@ -219,8 +219,9 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 
 	returnStmt.ReturnValue = p.parseExpression(LOWEST)
 
-	if !p.expectPeek(token.SEMICOLON) {
-		return nil
+	// return文のセミコロンは省略できる！
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
 	}
 
 	return returnStmt

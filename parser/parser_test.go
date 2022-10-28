@@ -92,7 +92,6 @@ func TestReturnStatements(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		fmt.Println("👺", tt.input)
 		l := lexer.New(tt.input)
 		p := parser.New(l)
 		program := p.ParseProgram()
