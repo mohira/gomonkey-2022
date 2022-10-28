@@ -696,3 +696,40 @@ func TestFunctionParameterParsing(t *testing.T) {
 		}
 	}
 }
+
+func TestCallExpressionParsing(t *testing.T) {
+	input := `add(1, 2 * 3, 4 + 5);`
+
+	l := lexer.New(input)
+	p := parser.New(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("1文じゃないよ")
+	}
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("だめだよ")
+	}
+
+	callExpr, ok := exprStmt.Expression.(*ast.CallExpression)
+	if !ok {
+		t.Fatalf("ast.CallExpressionじゃないよ！ got=%T", exprStmt.Expression)
+	}
+
+	// add(1, 2 * 3, 4 + 5);
+	if !testIdentifier(t, callExpr.Function, "add") {
+		return
+	}
+
+	// Argsのチェック
+	if len(callExpr.Arguments) != 3 {
+		t.Fatalf("Argumentsの数が違うよ. want=3, got=%d", len(callExpr.Arguments))
+	}
+
+	testLiteralExpression(t, callExpr.Arguments[0], "1")
+	testInfixExpression(t, callExpr.Arguments[1], 2, "*", 3)
+	testInfixExpression(t, callExpr.Arguments[2], 4, "+", 5)
+}
