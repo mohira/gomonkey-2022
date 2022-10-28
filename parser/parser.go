@@ -184,8 +184,9 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	p.nextToken()
 	letStmt.Value = p.parseExpression(LOWEST)
 
-	if !p.expectPeek(token.SEMICOLON) {
-		return nil
+	// let文のセミコロンは省略できる！
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
 	}
 
 	return letStmt
