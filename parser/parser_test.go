@@ -729,7 +729,7 @@ func TestCallExpressionParsing(t *testing.T) {
 		t.Fatalf("Argumentsの数が違うよ. want=3, got=%d", len(callExpr.Arguments))
 	}
 
-	testLiteralExpression(t, callExpr.Arguments[0], "1")
+	testLiteralExpression(t, callExpr.Arguments[0], 1)
 	testInfixExpression(t, callExpr.Arguments[1], 2, "*", 3)
 	testInfixExpression(t, callExpr.Arguments[2], 4, "+", 5)
 }
