@@ -180,9 +180,12 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 		return nil
 	}
 
-	// TODO: セミコロンに遭遇するまで式を読み飛ばしている
-	for !p.curTokenIs(token.SEMICOLON) {
-		p.nextToken()
+	// let x = 5;
+	p.nextToken()
+	letStmt.Value = p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.SEMICOLON) {
+		return nil
 	}
 
 	return letStmt
@@ -214,9 +217,10 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 
 	p.nextToken()
 
-	// TODO: セミコロンに遭遇するまで読み飛ばしている
-	if !p.curTokenIs(token.SEMICOLON) {
-		p.nextToken()
+	returnStmt.ReturnValue = p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.SEMICOLON) {
+		return nil
 	}
 
 	return returnStmt
