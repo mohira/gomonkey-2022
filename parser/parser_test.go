@@ -86,9 +86,13 @@ func TestReturnStatements(t *testing.T) {
 		{"return 5;", 5},
 		{"return true;", true},
 		{"return foobar;", "foobar"},
+
+		// セミコロンは省略できる
+		{"return foobar", "foobar"},
 	}
 
 	for _, tt := range tests {
+		fmt.Println("👺", tt.input)
 		l := lexer.New(tt.input)
 		p := parser.New(l)
 		program := p.ParseProgram()
@@ -108,9 +112,7 @@ func TestReturnStatements(t *testing.T) {
 			t.Fatalf("returnStmt.TokenLiteral is not 'return'. got=%s", returnStmt.TokenLiteral())
 		}
 
-		if testLiteralExpression(t, returnStmt.ReturnValue, tt.expectedValue) {
-			return
-		}
+		testLiteralExpression(t, returnStmt.ReturnValue, tt.expectedValue)
 
 	}
 }
