@@ -112,6 +112,9 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.ASTERISK, p.parseInfixExpression)
 	p.registerInfix(token.SLASH, p.parseInfixExpression)
 
+	// 2.8.5 関数の呼び出し式
+	// `(` を 中置演算式におけるOperatorだと思うってこと！
+	p.registerInfix(token.LPAREN, p.parseCallExpression)
 	return &p
 }
 
@@ -232,6 +235,7 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 
 func (p *Parser) parseExpression(curPrecedence int) ast.Expression {
 	defer untrace(trace(fmt.Sprintf("parseExression() precedence=%d", curPrecedence)))
+
 	// 現在のトークンに応じて、前置演算式のパース用の関数を探しにいく
 	prefixFn := p.prefixParseFns[p.curToken.Type]
 
@@ -481,4 +485,41 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 	//	p.nextToken()
 	//}
 	//return identifiers
+}
+
+func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
+	callExpr := &ast.CallExpression{
+		Token:    p.curToken,
+		Function: function,
+	}
+
+	callExpr.Arguments = p.parseCallArguments()
+
+	return callExpr
+}
+
+func (p *Parser) parseCallArguments() []ast.Expression {
+	var args []ast.Expression
+
+	// 引数がない場合
+	if p.peekTokenIs(token.RPAREN) {
+		p.nextToken()
+		return args
+	}
+
+	p.nextToken()
+	args = append(args, p.parseExpression(LOWEST))
+	//           ↓
+	// add(2, 3, 4)
+	for p.peekTokenIs(token.COMMA) {
+		p.nextToken()
+		p.nextToken()
+		args = append(args, p.parseExpression(LOWEST))
+	}
+
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	return args
 }
