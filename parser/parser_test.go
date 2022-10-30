@@ -12,7 +12,7 @@ func TestLetStatements(t *testing.T) {
 	tests := []struct {
 		input              string
 		expectedIdentifier string
-		expecetedValue     any
+		expectedValue      any
 	}{
 		{"let x = 5;", "x", 5},
 		{"let y = true;", "y", true},
@@ -36,7 +36,7 @@ func TestLetStatements(t *testing.T) {
 		}
 
 		val := stmt.(*ast.LetStatement).Value
-		if !testLiteralExpression(t, val, tt.expecetedValue) {
+		if !testLiteralExpression(t, val, tt.expectedValue) {
 			return
 
 		}
