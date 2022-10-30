@@ -1,6 +1,7 @@
 package evaluator_test
 
 import (
+	"gomonkey/evaluator"
 	"gomonkey/lexer"
 	"gomonkey/object"
 	"gomonkey/parser"
@@ -44,5 +45,5 @@ func testEval(input string) object.Object {
 	p := parser.New(l)
 	program := p.ParseProgram()
 
-	return Eval(program)
+	return evaluator.Eval(program)
 }
