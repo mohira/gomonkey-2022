@@ -13,6 +13,8 @@ import (
 // 第一に、前置の「-」演算子がサポートするオペランドは整数だけだからだ。
 // 第二に、このテスト関数は全ての整数演算を含むように成長させ、期待する振る舞いを明確で整理された書き方で1つの場所にまとめておくためだ。
 func TestIntegerExpression(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		input    string
 		expected int64
@@ -39,9 +41,12 @@ func TestIntegerExpression(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		evaluated := testEval(tt.input)
+		t.Run(tt.input, func(t *testing.T) {
+			evaluated := testEval(tt.input)
 
-		testIntegerObject(t, evaluated, tt.expected)
+			testIntegerObject(t, evaluated, tt.expected)
+
+		})
 	}
 
 }
@@ -70,6 +75,8 @@ func testEval(input string) object.Object {
 }
 
 func TestBooleanExpression(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		input    string
 		expected bool
@@ -108,8 +115,10 @@ func TestBooleanExpression(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		evaluated := testEval(tt.input)
-		testBooleanObject(t, evaluated, tt.expected)
+		t.Run(tt.input, func(t *testing.T) {
+			evaluated := testEval(tt.input)
+			testBooleanObject(t, evaluated, tt.expected)
+		})
 	}
 }
 
@@ -129,6 +138,8 @@ func testBooleanObject(t *testing.T, obj object.Object, expected bool) bool {
 }
 
 func TestBangOperator(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		input    string
 		expected bool
@@ -150,8 +161,10 @@ func TestBangOperator(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		evaluated := testEval(tt.input)
+		t.Run(tt.input, func(t *testing.T) {
+			evaluated := testEval(tt.input)
 
-		testBooleanObject(t, evaluated, tt.expected)
+			testBooleanObject(t, evaluated, tt.expected)
+		})
 	}
 }
