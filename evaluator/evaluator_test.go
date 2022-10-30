@@ -47,3 +47,33 @@ func testEval(input string) object.Object {
 
 	return evaluator.Eval(program)
 }
+
+func TestBooleanExpression(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected bool
+	}{
+		{"true", true},
+		{"false", false},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		testBooleanObject(t, evaluated, tt.expected)
+	}
+}
+
+func testBooleanObject(t *testing.T, obj object.Object, expected bool) bool {
+	booleanObj, ok := obj.(*object.Boolean)
+	if !ok {
+		t.Errorf("obj is not *object.Boolean. got=%[1]T, (%+[1]v)", obj)
+		return false
+	}
+
+	if booleanObj.Value != expected {
+		t.Errorf("booleanObj.Value is not %t, got %t", expected, booleanObj.Value)
+		return false
+	}
+
+	return true
+}
