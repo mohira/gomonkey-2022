@@ -8,13 +8,22 @@ import (
 	"testing"
 )
 
+// 私は「-」前置演算子のために新しいテスト関数を書くのではなく、このテストを拡張することにした。
+// それには2つ理由がある。
+// 第一に、前置の「-」演算子がサポートするオペランドは整数だけだからだ。
+// 第二に、このテスト関数は全ての整数演算を含むように成長させ、期待する振る舞いを明確で整理された書き方で1つの場所にまとめておくためだ。
 func TestIntegerExpression(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected int64
 	}{
+		// ast.IntegerLiteralなやつ
 		{"5", 5},
 		{"10", 10},
+
+		// ast.PrefixExpressionなやつ
+		{"-5", -5},
+		{"-10", -10},
 	}
 
 	for _, tt := range tests {
