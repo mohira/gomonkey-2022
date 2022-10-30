@@ -46,6 +46,7 @@ func Eval(node ast.Node) object.Object {
 func evalInfixExpression(operator string, left, right object.Object) object.Object {
 	switch {
 	case left.Type() == object.IntegerObj && right.Type() == object.IntegerObj:
+		// MEMO: 整数オペランド同士の==演算とかはここでで処理されている
 		return evalIntegerInfixExpression(operator, left, right)
 	case operator == "==":
 		return nativeBoolToBooleanObject(left == right)
