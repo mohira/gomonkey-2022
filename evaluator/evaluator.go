@@ -6,6 +6,11 @@ import (
 	"gomonkey/object"
 )
 
+var (
+	TRUE  = &object.Boolean{Value: true}
+	FALSE = &object.Boolean{Value: false}
+)
+
 func Eval(node ast.Node) object.Object {
 	fmt.Printf("Eval: %[1]T %[1]v\n", node)
 
@@ -22,11 +27,19 @@ func Eval(node ast.Node) object.Object {
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: n.Value}
 	case *ast.Boolean:
-		return &object.Boolean{Value: n.Value}
+		return nativeBoolToBooleanObject(n.Value)
 
 	}
 
 	return nil
+}
+
+func nativeBoolToBooleanObject(value bool) object.Object {
+	if value {
+		return TRUE
+	} else {
+		return FALSE
+	}
 }
 
 func evalStatements(stmts []ast.Statement) object.Object {
