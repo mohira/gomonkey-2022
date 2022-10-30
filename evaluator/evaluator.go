@@ -1,7 +1,6 @@
 package evaluator
 
 import (
-	"fmt"
 	"gomonkey/ast"
 	"gomonkey/object"
 )
@@ -13,8 +12,6 @@ var (
 )
 
 func Eval(node ast.Node) object.Object {
-	fmt.Printf("Eval: %[1]T %[1]v\n", node)
-
 	switch n := node.(type) {
 	// 複数の文
 	case *ast.Program:
@@ -89,8 +86,6 @@ func nativeBoolToBooleanObject(value bool) object.Object {
 }
 
 func evalStatements(stmts []ast.Statement) object.Object {
-	fmt.Printf("evalStatements: %[1]T %[1]v\n", stmts)
-
 	var result object.Object
 
 	for _, stmt := range stmts {
