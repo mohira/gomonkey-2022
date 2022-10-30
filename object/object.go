@@ -7,6 +7,7 @@ type Type string
 const (
 	IntegerObj = "INTEGER"
 	BooleanObj = "BOOLEAN"
+	NullObj    = "NULL"
 )
 
 type Object interface {
@@ -36,4 +37,14 @@ func (b *Boolean) Type() Type {
 
 func (b *Boolean) Inspect() string {
 	return fmt.Sprintf("%t", b.Value)
+}
+
+type Null struct{} // 何の値もラップしていないことが「値の不存在」を表現している
+
+func (n *Null) Type() Type {
+	return NullObj
+}
+
+func (n *Null) Inspect() string {
+	return "NULL"
 }
