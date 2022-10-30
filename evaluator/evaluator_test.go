@@ -76,6 +76,21 @@ func TestBooleanExpression(t *testing.T) {
 	}{
 		{"true", true},
 		{"false", false},
+
+		// 比較演算とか
+		{"1 < 2", true},
+		{"1 < 1", false},
+		{"2 < 1", false},
+
+		{"2 > 1", true}, // 追加してやったぞ！
+		{"1 > 2", false},
+		{"1 > 1", false},
+
+		{"1 == 1", true},
+		{"1 == 2", false},
+
+		{"1 != 2", true},
+		{"1 != 1", false},
 	}
 
 	for _, tt := range tests {
