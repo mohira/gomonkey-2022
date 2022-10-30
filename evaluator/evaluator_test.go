@@ -93,6 +93,10 @@ func TestBangOperator(t *testing.T) {
 		{"!!true", true},
 		{"!!false", false},
 		{"!!5", true},
+
+		// Integerならとにかくfalseになる仕様。!0でも!1でもとにかくfalse
+		{"!1", false},
+		{"!0", false},
 	}
 
 	for _, tt := range tests {
