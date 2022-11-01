@@ -28,7 +28,7 @@ func Eval(node ast.Node) object.Object {
 		truthy := condition != NULL && condition != FALSE
 
 		if truthy {
-			return Eval(n.Consequence.Statements[0])
+			return evalStatements(n.Consequence.Statements)
 		} else {
 			if n.Alternative == nil {
 				return NULL
