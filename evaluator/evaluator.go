@@ -27,6 +27,7 @@ func Eval(node ast.Node) object.Object {
 	// 式
 	case *ast.IfExpression:
 		return evalIfExpression(n)
+
 	case *ast.PrefixExpression: // !true, !5, !!false
 		right := Eval(n.Right)
 
@@ -51,18 +52,19 @@ func Eval(node ast.Node) object.Object {
 func evalIfExpression(n *ast.IfExpression) object.Object {
 	condition := Eval(n.Condition)
 
-	truthy := condition != NULL && condition != FALSE
-
-	if truthy {
-		return evalStatements(n.Consequence.Statements)
+	if isTruthy(condition) {
+		return Eval(n.Consequence)
+	} else if n.Alternative != nil {
+		return Eval(n.Alternative)
 	} else {
-		if n.Alternative == nil {
-			return NULL
-		}
-
-		return evalStatements(n.Alternative.Statements)
+		// 条件式false かつ elseブロックがないときってこと
+		return NULL
 	}
+}
 
+func isTruthy(condition object.Object) bool {
+	// switchよりこっちの方が、Definitionな感じなので良いと思う！
+	return condition != NULL && condition != FALSE
 }
 
 func evalInfixExpression(operator string, left, right object.Object) object.Object {
