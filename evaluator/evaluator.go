@@ -22,6 +22,22 @@ func Eval(node ast.Node) object.Object {
 		return Eval(n.Expression)
 
 	// 式
+	case *ast.IfExpression:
+		condition := Eval(n.Condition)
+		var truthy bool
+
+		if condition != NULL && condition != FALSE {
+			truthy = true
+		} else {
+			truthy = false
+		}
+
+		if truthy {
+			return Eval(n.Consequence.Statements[0])
+		} else {
+			return Eval(n.Alternative.Statements[0])
+		}
+
 	case *ast.PrefixExpression: // !true, !5, !!false
 		right := Eval(n.Right)
 
