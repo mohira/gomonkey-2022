@@ -17,26 +17,16 @@ func Eval(node ast.Node) object.Object {
 	case *ast.Program:
 		return evalStatements(n.Statements)
 
+	case *ast.BlockStatement:
+		return evalStatements(n.Statements)
+
 	// 単一の文
 	case *ast.ExpressionStatement:
 		return Eval(n.Expression)
 
 	// 式
 	case *ast.IfExpression:
-		condition := Eval(n.Condition)
-
-		truthy := condition != NULL && condition != FALSE
-
-		if truthy {
-			return evalStatements(n.Consequence.Statements)
-		} else {
-			if n.Alternative == nil {
-				return NULL
-			}
-
-			return evalStatements(n.Alternative.Statements)
-		}
-
+		return evalIfExpression(n)
 	case *ast.PrefixExpression: // !true, !5, !!false
 		right := Eval(n.Right)
 
@@ -56,6 +46,23 @@ func Eval(node ast.Node) object.Object {
 	}
 
 	return nil
+}
+
+func evalIfExpression(n *ast.IfExpression) object.Object {
+	condition := Eval(n.Condition)
+
+	truthy := condition != NULL && condition != FALSE
+
+	if truthy {
+		return evalStatements(n.Consequence.Statements)
+	} else {
+		if n.Alternative == nil {
+			return NULL
+		}
+
+		return evalStatements(n.Alternative.Statements)
+	}
+
 }
 
 func evalInfixExpression(operator string, left, right object.Object) object.Object {
