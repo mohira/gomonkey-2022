@@ -34,6 +34,8 @@ func Eval(node ast.Node) object.Object {
 				return NULL
 			}
 			return Eval(n.Alternative.Statements[0])
+			//return evalStatements(n.Consequence.Statements)
+
 		}
 
 	case *ast.PrefixExpression: // !true, !5, !!false

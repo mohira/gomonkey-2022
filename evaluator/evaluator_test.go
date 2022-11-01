@@ -184,7 +184,11 @@ func TestIfElseExpressions(t *testing.T) {
 		{"if (1 > 2) { 10 } else { 20 }", 20},
 		{"if (1 < 2) { 10 } else { 20 }", 10},
 
-		{"if (1 < 2) { 10; 20; } else { 30 }", 20},
+		// consequence が複数のstatement
+		{"if (true) { 10; 20; } else { 30 }", 20},
+		{"if (true) { 10; 20; }", 20},
+
+		{"if (false) { 10 } else { 20; 30; }", 30},
 	}
 
 	for _, tt := range tests {
