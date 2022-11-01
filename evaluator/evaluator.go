@@ -35,6 +35,9 @@ func Eval(node ast.Node) object.Object {
 		if truthy {
 			return Eval(n.Consequence.Statements[0])
 		} else {
+			if n.Alternative == nil {
+				return NULL
+			}
 			return Eval(n.Alternative.Statements[0])
 		}
 
