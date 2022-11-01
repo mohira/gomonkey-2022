@@ -189,6 +189,9 @@ func TestIfElseExpressions(t *testing.T) {
 		{"if (true) { 10; 20; }", 20},
 
 		{"if (false) { 10 } else { 20; 30; }", 30},
+
+		// 未定義のつもりなんだが！？ ん？
+		{"if (a) { 10 }", nil},
 	}
 
 	for _, tt := range tests {
