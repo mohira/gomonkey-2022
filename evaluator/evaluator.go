@@ -24,13 +24,8 @@ func Eval(node ast.Node) object.Object {
 	// 式
 	case *ast.IfExpression:
 		condition := Eval(n.Condition)
-		var truthy bool
 
-		if condition != NULL && condition != FALSE {
-			truthy = true
-		} else {
-			truthy = false
-		}
+		truthy := condition != NULL && condition != FALSE
 
 		if truthy {
 			return Eval(n.Consequence.Statements[0])
