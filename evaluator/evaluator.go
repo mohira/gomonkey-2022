@@ -24,6 +24,8 @@ func Eval(node ast.Node) object.Object {
 	case *ast.ExpressionStatement:
 		return Eval(n.Expression)
 
+	case *ast.ReturnStatement:
+		return Eval(n.ReturnValue)
 	// 式
 	case *ast.IfExpression:
 		return evalIfExpression(n)
