@@ -25,7 +25,8 @@ func Eval(node ast.Node) object.Object {
 		return Eval(n.Expression)
 
 	case *ast.ReturnStatement:
-		return Eval(n.ReturnValue)
+		val := Eval(n.ReturnValue)
+		return &object.ReturnValue{Value: val}
 	// 式
 	case *ast.IfExpression:
 		return evalIfExpression(n)
@@ -164,9 +165,10 @@ func evalStatements(stmts []ast.Statement) object.Object {
 	for _, stmt := range stmts {
 		result = Eval(stmt)
 
-		// return文がきたらおわりですが！？
-		if _, ok := stmt.(*ast.ReturnStatement); ok {
-			return result
+		// stmtの型アサーションじゃなくて、result(オブジェクト型)の型アサーションにしている
+		if returnValue, ok := result.(*object.ReturnValue); ok {
+			// 返すときは、Returnオブジェクトを剥がして、その中身を返すようにしている
+			return returnValue.Value
 		}
 	}
 
