@@ -164,8 +164,10 @@ func evalStatements(stmts []ast.Statement) object.Object {
 	for _, stmt := range stmts {
 		result = Eval(stmt)
 
-		// return文がきたらおわりです！ でええんか？
-		// return result
+		// return文がきたらおわりですが！？
+		if _, ok := stmt.(*ast.ReturnStatement); ok {
+			return result
+		}
 	}
 
 	return result
