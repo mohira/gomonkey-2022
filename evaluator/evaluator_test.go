@@ -190,8 +190,10 @@ func TestIfElseExpressions(t *testing.T) {
 
 		{"if (false) { 10 } else { 20; 30; }", 30},
 
-		// 未定義のつもりなんだが！？ ん？
-		{"if (a) { 10 }", nil},
+		// 現状では 識別子(*ast.Identifier)を評価する用になってないから、
+		// conditionがnilになる。(monkeyのNULLではない！)
+		// ホスト言語のnilは、monkeyのNULLでもなけれあFALSEでもないので、truthyになる
+		{"if (a) { 10 }", 10},
 	}
 
 	for _, tt := range tests {
