@@ -15,10 +15,10 @@ func Eval(node ast.Node) object.Object {
 	switch n := node.(type) {
 	// 複数の文
 	case *ast.Program:
-		return evalStatements(n.Statements)
+		return evalProgram(n)
 
 	case *ast.BlockStatement:
-		return evalStatements(n.Statements)
+		return evalBlockStatement(n)
 
 	// 単一の文
 	case *ast.ExpressionStatement:
@@ -50,6 +50,20 @@ func Eval(node ast.Node) object.Object {
 	}
 
 	return nil
+}
+
+func evalProgram(program *ast.Program) object.Object {
+	var result object.Object
+
+	for _, stmt := range program.Statements {
+		result = Eval(stmt)
+
+		if returnValue, ok := result.(*object.ReturnValue); ok {
+			return returnValue.Value
+		}
+	}
+
+	return result
 }
 
 func evalIfExpression(n *ast.IfExpression) object.Object {
@@ -159,16 +173,17 @@ func nativeBoolToBooleanObject(value bool) object.Object {
 	}
 }
 
-func evalStatements(stmts []ast.Statement) object.Object {
+func evalBlockStatement(block *ast.BlockStatement) object.Object {
 	var result object.Object
 
-	for _, stmt := range stmts {
+	for _, stmt := range block.Statements {
 		result = Eval(stmt)
 
-		// stmtの型アサーションじゃなくて、result(オブジェクト型)の型アサーションにしている
-		if returnValue, ok := result.(*object.ReturnValue); ok {
-			// 返すときは、Returnオブジェクトを剥がして、その中身を返すようにしている
-			return returnValue.Value
+		// アンラップしないので、型情報だけでいい
+		// が、nilの場合に.Type()のアクセスをするとpanicになるので、
+		// 短絡評価を使っている感じだと思う
+		if result != nil && result.Type() == object.ReturnValueObj {
+			return result // 返すけど、アンラップはしません！
 		}
 	}
 
