@@ -59,11 +59,10 @@ func evalProgram(program *ast.Program) object.Object {
 	for _, stmt := range program.Statements {
 		result = Eval(stmt)
 
-		if returnValue, ok := result.(*object.ReturnValue); ok {
-			return returnValue.Value
-		}
-
-		if result != nil && result.Type() == object.ErrorObj {
+		switch result := result.(type) {
+		case *object.ReturnValue:
+			return result.Value
+		case *object.Error:
 			return result
 		}
 	}
@@ -188,16 +187,25 @@ func evalBlockStatement(block *ast.BlockStatement) object.Object {
 	for _, stmt := range block.Statements {
 		result = Eval(stmt)
 
+		if result != nil {
+			rt := result.Type()
+			if rt == object.ReturnValueObj || rt == object.ErrorObj {
+				return result
+			}
+		}
+
 		// アンラップしないので、型情報だけでいい
 		// が、nilの場合に.Type()のアクセスをするとpanicになるので、
 		// 短絡評価を使っている感じだと思う
-		if result != nil && result.Type() == object.ReturnValueObj {
-			return result // 返すけど、アンラップはしません！
-		}
+		// このベタベタ実装もきらいじゃないよ！
+		// if result != nil && result.Type() == object.ReturnValueObj {
+		// 	   return result // 返すけど、アンラップはしません！
+		// }
+		//
+		// if result != nil && result.Type() == object.ErrorObj {
+		//  	return result
+		// }
 
-		if result != nil && result.Type() == object.ErrorObj {
-			return result
-		}
 	}
 
 	return result
