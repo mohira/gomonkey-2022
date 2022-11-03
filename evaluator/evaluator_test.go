@@ -288,6 +288,10 @@ func TestErrorHandling(t *testing.T) {
 		// 実験: % は ILLEGALなトークン(トークンとして認めてないのでParse時点で失敗する
 		//		{"3 % 4;", "unknown operator: INTEGER % INTEGER"},
 
+		// >> 1 + true
+		// 💥 ERROR:type mismatch: INTEGER + BOOLEAN
+		// >> - (1 + true)
+		// 💥 ERROR:unknown operator: -ERROR
 	}
 
 	for _, tt := range tests {
