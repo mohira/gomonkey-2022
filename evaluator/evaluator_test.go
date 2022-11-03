@@ -264,3 +264,36 @@ if (10 > 1) {
 		})
 	}
 }
+
+func TestErrorHandling(t *testing.T) {
+	tests := []struct {
+		input           string
+		expectedMessage string
+	}{
+		{"3 + true;", "type mismatch: INTEGER + BOOLEAN"},
+		{"true + 3;", "type mismatch: BOOLEAN + INTEGER"},
+		{"3 + true; 4;", "type mismatch: INTEGER + BOOLEAN"}, // エラーは実行を中断するよ
+
+		{"-true", "unknown operator: -BOOLEAN"},
+		{"true + false", "unknown operator: BOOLEAN + BOOLEAN"},
+		{"3; true + false; 4;", "unknown operator: BOOLEAN + BOOLEAN"},
+		{"if (10 > 1) { true + false; }", "unknown operator: BOOLEAN + BOOLEAN"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			evaluated := testEval(tt.input)
+
+			errObj, ok := evaluated.(*object.Error)
+			if !ok {
+				t.Errorf("Errorオブジェクトじゃないよ！ got=%[1]T(%+[1]v)", evaluated)
+				return
+			}
+
+			if errObj.Message != tt.expectedMessage {
+				t.Errorf("エラーオブジェクトのMessageがちがうよ！ want=%s, got=%s", tt.expectedMessage, errObj.Message)
+			}
+
+		})
+	}
+}
