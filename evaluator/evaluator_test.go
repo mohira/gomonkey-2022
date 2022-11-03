@@ -42,6 +42,7 @@ func TestIntegerExpression(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
+			t.Parallel()
 			evaluated := testEval(tt.input)
 
 			testIntegerObject(t, evaluated, tt.expected)
@@ -116,6 +117,8 @@ func TestBooleanExpression(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
+			t.Parallel()
+
 			evaluated := testEval(tt.input)
 			testBooleanObject(t, evaluated, tt.expected)
 		})
@@ -162,6 +165,8 @@ func TestBangOperator(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
+			t.Parallel()
+
 			evaluated := testEval(tt.input)
 
 			testBooleanObject(t, evaluated, tt.expected)
@@ -198,6 +203,8 @@ func TestIfElseExpressions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
+			t.Parallel()
+
 			evaluated := testEval(tt.input)
 			integer, ok := tt.expected.(int) // 最初から int64 じゃだめなの？ あとで試す
 			if ok {
@@ -250,6 +257,8 @@ if (10 > 1) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
+			t.Parallel()
+
 			evaluated := testEval(tt.input)
 			testIntegerObject(t, evaluated, tt.expected)
 		})
