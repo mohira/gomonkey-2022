@@ -97,6 +97,11 @@ func evalProgram(program *ast.Program) object.Object {
 func evalIfExpression(n *ast.IfExpression) object.Object {
 	condition := Eval(n.Condition)
 
+	if isError(condition) {
+		// ERRORオブジェクトは実は truthy だった！
+		// truthy := 「NULLでない かつ falseでない」 なので！！！
+		return condition
+	}
 	if isTruthy(condition) {
 		return Eval(n.Consequence)
 	} else if n.Alternative != nil {
