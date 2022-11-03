@@ -96,12 +96,10 @@ func evalInfixExpression(operator string, left, right object.Object) object.Obje
 		return nativeBoolToBooleanObject(left != right)
 	case left.Type() == object.BooleanObj && right.Type() == object.BooleanObj:
 		// どっちもBOOLEAN
-		// unknown operator: BOOLEAN + BOOLEAN
 		msg := fmt.Sprintf("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 		return &object.Error{Message: msg}
 
 	default:
-		//type mismatch: INTEGER + BOOLEAN
 		msg := fmt.Sprintf("type mismatch: %s %s %s", left.Type(), operator, right.Type())
 		return &object.Error{Message: msg}
 	}
