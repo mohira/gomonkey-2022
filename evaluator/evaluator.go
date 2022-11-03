@@ -27,6 +27,11 @@ func Eval(node ast.Node) object.Object {
 
 	case *ast.ReturnStatement:
 		val := Eval(n.ReturnValue)
+
+		if isError(val) {
+			return val
+		}
+
 		return &object.ReturnValue{Value: val}
 	// 式
 	case *ast.IfExpression:
