@@ -43,7 +43,14 @@ func Eval(node ast.Node) object.Object {
 
 	case *ast.InfixExpression:
 		left := Eval(n.Left)
+		if isError(left) {
+			return left
+		}
+
 		right := Eval(n.Right)
+		if isError(right) {
+			return right
+		}
 
 		return evalInfixExpression(n.Operator, left, right)
 

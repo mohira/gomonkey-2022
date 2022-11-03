@@ -288,11 +288,15 @@ func TestErrorHandling(t *testing.T) {
 		// 実験: % は ILLEGALなトークン(トークンとして認めてないのでParse時点で失敗する
 		//		{"3 % 4;", "unknown operator: INTEGER % INTEGER"},
 
+		// ERRORオブジェクト が演算に入っちゃって、エラーメッセージがちゃんとしなくなるのはダメだよ！ な、ケース。
+		// オペランドにERRORオブジェクトが入るケース。
 		// >> 1 + true
 		// 💥 ERROR:type mismatch: INTEGER + BOOLEAN
 		// >> - (1 + true)
 		// 💥 ERROR:unknown operator: -ERROR
 		{"- (1 + true)", "type mismatch: INTEGER + BOOLEAN"},
+		{"(1 + true) + 2", "type mismatch: INTEGER + BOOLEAN"},
+		{"1 + (true + 2)", "type mismatch: BOOLEAN + INTEGER"},
 	}
 
 	for _, tt := range tests {
