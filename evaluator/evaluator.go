@@ -35,6 +35,10 @@ func Eval(node ast.Node) object.Object {
 	case *ast.PrefixExpression: // !true, !5, !!false
 		right := Eval(n.Right)
 
+		if isError(right) {
+			return right
+		}
+
 		return evalPrefixExpression(n.Operator, right)
 
 	case *ast.InfixExpression:
@@ -51,6 +55,14 @@ func Eval(node ast.Node) object.Object {
 	}
 
 	return nil
+}
+
+func isError(obj object.Object) bool {
+	if obj != nil {
+		return obj.Type() == object.ErrorObj
+	}
+
+	return false
 }
 
 func evalProgram(program *ast.Program) object.Object {
