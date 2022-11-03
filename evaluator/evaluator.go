@@ -62,6 +62,10 @@ func evalProgram(program *ast.Program) object.Object {
 		if returnValue, ok := result.(*object.ReturnValue); ok {
 			return returnValue.Value
 		}
+
+		if result != nil && result.Type() == object.ErrorObj {
+			return result
+		}
 	}
 
 	return result
@@ -193,6 +197,10 @@ func evalBlockStatement(block *ast.BlockStatement) object.Object {
 		// 短絡評価を使っている感じだと思う
 		if result != nil && result.Type() == object.ReturnValueObj {
 			return result // 返すけど、アンラップはしません！
+		}
+
+		if result != nil && result.Type() == object.ErrorObj {
+			return result
 		}
 	}
 
