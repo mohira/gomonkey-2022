@@ -297,6 +297,10 @@ func TestErrorHandling(t *testing.T) {
 		{"- (1 + true)", "type mismatch: INTEGER + BOOLEAN"},
 		{"(1 + true) + 2", "type mismatch: INTEGER + BOOLEAN"},
 		{"1 + (true + 2)", "type mismatch: BOOLEAN + INTEGER"},
+
+		// ERRORオブジェクトは実は truthy だった！
+		// truthy := NULLでない かつ falseでない なので！！！
+		{"if (1 + true) { return 2; }", "type mismatch: INTEGER + BOOLEAN"},
 	}
 
 	for _, tt := range tests {
