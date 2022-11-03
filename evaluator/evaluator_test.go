@@ -270,14 +270,18 @@ func TestErrorHandling(t *testing.T) {
 		input           string
 		expectedMessage string
 	}{
+		// type mismatch: オペランド同士の型が一致していない
 		{"3 + true;", "type mismatch: INTEGER + BOOLEAN"},
 		{"true + 3;", "type mismatch: BOOLEAN + INTEGER"},
 		{"3 + true; 4;", "type mismatch: INTEGER + BOOLEAN"}, // エラーは実行を中断するよ
 
-		{"-true", "unknown operator: -BOOLEAN"},
+		// unknown operator: オペランド同士の型は一致しているが、演算子がおかしい
 		{"true + false", "unknown operator: BOOLEAN + BOOLEAN"},
 		{"3; true + false; 4;", "unknown operator: BOOLEAN + BOOLEAN"},
 		{"if (10 > 1) { true + false; }", "unknown operator: BOOLEAN + BOOLEAN"},
+
+		// 単項演算子
+		{"-true", "unknown operator: -BOOLEAN"},
 	}
 
 	for _, tt := range tests {

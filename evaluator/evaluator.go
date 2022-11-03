@@ -1,6 +1,7 @@
 package evaluator
 
 import (
+	"fmt"
 	"gomonkey/ast"
 	"gomonkey/object"
 )
@@ -94,7 +95,9 @@ func evalInfixExpression(operator string, left, right object.Object) object.Obje
 	case operator == "!=":
 		return nativeBoolToBooleanObject(left != right)
 	default:
-		return NULL
+		//type mismatch: INTEGER + BOOLEAN
+		msg := fmt.Sprintf("type mismatch: %s %s %s", left.Type(), operator, right.Type())
+		return &object.Error{Message: msg}
 	}
 }
 
