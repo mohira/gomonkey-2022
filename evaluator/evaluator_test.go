@@ -277,6 +277,7 @@ func TestErrorHandling(t *testing.T) {
 		// unknown operator: オペランド同士の型は一致しているが、演算子がおかしい
 		{"true + false", "unknown operator: BOOLEAN + BOOLEAN"},
 		{"if (10 > 1) { true + false; }", "unknown operator: BOOLEAN + BOOLEAN"},
+		{"3 % 4;", "unknown operator: INTEGER % INTEGER"},
 
 		// 単項演算子
 		{"-true", "unknown operator: -BOOLEAN"},
