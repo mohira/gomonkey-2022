@@ -98,13 +98,10 @@ func evalInfixExpression(operator string, left, right object.Object) object.Obje
 		return nativeBoolToBooleanObject(left == right)
 	case operator == "!=":
 		return nativeBoolToBooleanObject(left != right)
-	case left.Type() == object.BooleanObj && right.Type() == object.BooleanObj:
-		// どっちもBOOLEAN
-		msg := fmt.Sprintf("unknown operator: %s %s %s", left.Type(), operator, right.Type())
-		return &object.Error{Message: msg}
+	case left.Type() != right.Type():
+		return newError("type mismatch: %s %s %s", left.Type(), operator, right.Type())
 	default:
-		msg := fmt.Sprintf("type mismatch: %s %s %s", left.Type(), operator, right.Type())
-		return &object.Error{Message: msg}
+		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
 }
 
@@ -131,7 +128,7 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 	case "!=":
 		return nativeBoolToBooleanObject(leftValue != rightValue)
 	default:
-		return NULL
+		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
 }
 
@@ -142,7 +139,7 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 	case "-":
 		return evalMinusPrefixOperatorExpression(right)
 	default:
-		return NULL
+		return newError("unknown operator: %s%s", operator, right.Type())
 	}
 }
 
@@ -150,8 +147,7 @@ func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 	if right.Type() != object.IntegerObj {
 		// `-`という単項演算子が許されるのは(決めの問題でもあるが)、ふつーは、数値だけなので、
 		// 条件判定は、 INTEGERオブジェクトじゃないとき でよさげ！
-		msg := fmt.Sprintf("unknown operator: -%s", right.Type())
-		return &object.Error{Message: msg}
+		return newError("unknown operator: -%s", right.Type())
 	}
 
 	value := right.(*object.Integer).Value
@@ -205,4 +201,8 @@ func evalBlockStatement(block *ast.BlockStatement) object.Object {
 	}
 
 	return result
+}
+
+func newError(format string, a ...any) *object.Error {
+	return &object.Error{Message: fmt.Sprintf(format, a...)}
 }
