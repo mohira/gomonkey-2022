@@ -47,12 +47,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return &object.ReturnValue{Value: val}
 	// 式
 	case *ast.CallExpression:
-		fn := Eval(n.Function, env) // fn(x) { x * 2;}
-		if isError(fn) {
-			return newError("TODO: あとでな")
+		function := Eval(n.Function, env) // fn(x) { x * 2;}
+		if isError(function) {
+			return function // Evalした地点でErrorだったらもうErrorオブジェクトなので、newErrorは不要だよ！
 		}
 
-		return evalCallExpr(fn, n.Arguments, env)
+		return evalCallExpr(function, n.Arguments, env)
 
 	//case *ast.CallExpression:
 	//	// えび案
