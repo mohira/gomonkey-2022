@@ -193,11 +193,6 @@ func TestIfElseExpressions(t *testing.T) {
 		{"if (true) { 10; 20; }", 20},
 
 		{"if (false) { 10 } else { 20; 30; }", 30},
-
-		// 現状では 識別子(*ast.Identifier)を評価する用になってないから、
-		// conditionがnilになる。(monkeyのNULLではない！)
-		// ホスト言語のnilは、monkeyのNULLでもなければFALSEでもないので、truthyになる
-		{"if (a) { 10 }", 10},
 	}
 
 	for _, tt := range tests {
@@ -301,6 +296,7 @@ func TestErrorHandling(t *testing.T) {
 
 		// 未定義な識別子へのアクセス
 		{"foobar; ", "identifier not found: foobar"},
+		{"if (a) { 10; }", "identifier not found: a"},
 	}
 
 	for _, tt := range tests {
