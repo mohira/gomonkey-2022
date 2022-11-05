@@ -47,7 +47,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return &object.ReturnValue{Value: val}
 	// 式
 	case *ast.CallExpression:
-		fn := Eval(n.Function, env)
+		fn := Eval(n.Function, env) // fn(x) { x * 2;}
 		if isError(fn) {
 			return newError("TODO: あとでな")
 		}
@@ -111,6 +111,33 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	}
 
 	return nil
+}
+
+func evalCallExpr(fn object.Object, args []ast.Expression, env *object.Environment) object.Object {
+	// fn(x) { x * 2 ;} ← これがFUNCTIONオブジェクトなんですよ！
+	fnObj, ok := fn.(*object.Function)
+	if !ok {
+		// ex: let a = 1; a();
+		// ex: let f = fn(){return 1;}; f()();  // 1() ってことになるやる
+		return newError("TODO: おかしいよ")
+	}
+
+	// こうしたほうがいいんじゃないの？
+	// fnEnv:=object.NewEnvironment()
+
+	for i, arg := range args {
+		name := fnObj.Parameters[i].String() // 'x'
+
+		p := Eval(arg, env) // INT(5)
+		if isError(p) {
+			return p
+		}
+
+		env.Set(name, p)
+	}
+
+	// Bodyのeval大会
+	return evalBlockStatement(fnObj.Body, env)
 }
 
 func isError(obj object.Object) bool {
