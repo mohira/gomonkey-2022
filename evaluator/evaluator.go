@@ -68,7 +68,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 
 		// 環境を渡さない！！！ あんまわかってないけど！
-		return applyFunction(function, args, env)
+		return applyFunction(function, args)
 		// 疑問
 		// return applyFunction(function, args, env) // この「現在の環境」を渡すとどういう問題になる？？？
 
@@ -117,14 +117,14 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	return nil
 }
 
-func applyFunction(fn object.Object, args []object.Object, env現在 *object.Environment) object.Object {
+func applyFunction(fn object.Object, args []object.Object) object.Object {
 	function, ok := fn.(*object.Function)
 	if !ok {
 		// TODO: このテストケースまだないけどね！
 		return newError("not a function: %s", fn.Type())
 	}
 
-	extendedEnv := extendedFunctionEnv(function, args, env現在)
+	extendedEnv := extendedFunctionEnv(function, args)
 
 	evaluated := Eval(function.Body, extendedEnv)
 
@@ -139,8 +139,8 @@ func unwrapReturnValue(obj object.Object) object.Object {
 	return obj
 }
 
-func extendedFunctionEnv(fn *object.Function, args []object.Object, env現在 *object.Environment) *object.Environment {
-	env := object.NewEnclosedEnvironment(env現在)
+func extendedFunctionEnv(fn *object.Function, args []object.Object) *object.Environment {
+	env := object.NewEnclosedEnvironment(fn.Env)
 
 	for i, param := range fn.Parameters {
 		env.Set(param.Value, args[i])
