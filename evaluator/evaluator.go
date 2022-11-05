@@ -18,17 +18,17 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	switch n := node.(type) {
 	// 複数の文
 	case *ast.Program:
-		return evalProgram(n)
+		return evalProgram(n, env)
 
 	case *ast.BlockStatement:
-		return evalBlockStatement(n)
+		return evalBlockStatement(n, env)
 
 	// 単一の文
 	case *ast.ExpressionStatement:
-		return Eval(n.Expression)
+		return Eval(n.Expression, env)
 
 	case *ast.LetStatement:
-		v := Eval(n.Value)
+		v := Eval(n.Value, env)
 
 		if isError(v) {
 			return v
@@ -40,7 +40,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return nil // ???? とりあえずこれにしとく
 
 	case *ast.ReturnStatement:
-		val := Eval(n.ReturnValue)
+		val := Eval(n.ReturnValue, env)
 
 		if isError(val) {
 			return val
@@ -49,10 +49,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return &object.ReturnValue{Value: val}
 	// 式
 	case *ast.IfExpression:
-		return evalIfExpression(n)
+		return evalIfExpression(n, env)
 
 	case *ast.PrefixExpression: // !true, !5, !!false
-		right := Eval(n.Right)
+		right := Eval(n.Right, env)
 
 		if isError(right) {
 			return right
@@ -61,12 +61,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalPrefixExpression(n.Operator, right)
 
 	case *ast.InfixExpression:
-		left := Eval(n.Left)
+		left := Eval(n.Left, env)
 		if isError(left) {
 			return left
 		}
 
-		right := Eval(n.Right)
+		right := Eval(n.Right, env)
 		if isError(right) {
 			return right
 		}
@@ -98,11 +98,11 @@ func isError(obj object.Object) bool {
 	return false
 }
 
-func evalProgram(program *ast.Program) object.Object {
+func evalProgram(program *ast.Program, env *object.Environment) object.Object {
 	var result object.Object
 
 	for _, stmt := range program.Statements {
-		result = Eval(stmt)
+		result = Eval(stmt, env)
 
 		switch result := result.(type) {
 		case *object.ReturnValue:
@@ -115,8 +115,8 @@ func evalProgram(program *ast.Program) object.Object {
 	return result
 }
 
-func evalIfExpression(n *ast.IfExpression) object.Object {
-	condition := Eval(n.Condition)
+func evalIfExpression(n *ast.IfExpression, env *object.Environment) object.Object {
+	condition := Eval(n.Condition, env)
 
 	if isError(condition) {
 		// ERRORオブジェクトは実は truthy だった！
@@ -124,9 +124,9 @@ func evalIfExpression(n *ast.IfExpression) object.Object {
 		return condition
 	}
 	if isTruthy(condition) {
-		return Eval(n.Consequence)
+		return Eval(n.Consequence, env)
 	} else if n.Alternative != nil {
-		return Eval(n.Alternative)
+		return Eval(n.Alternative, env)
 	} else {
 		// 条件式false かつ elseブロックがないときってこと
 		return NULL
@@ -231,11 +231,11 @@ func nativeBoolToBooleanObject(value bool) object.Object {
 	}
 }
 
-func evalBlockStatement(block *ast.BlockStatement) object.Object {
+func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) object.Object {
 	var result object.Object
 
 	for _, stmt := range block.Statements {
-		result = Eval(stmt)
+		result = Eval(stmt, env)
 
 		if result != nil {
 			rt := result.Type()
