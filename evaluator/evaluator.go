@@ -46,6 +46,27 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 		return &object.ReturnValue{Value: val}
 	// 式
+	case *ast.CallExpression:
+		fn := Eval(n.Function, env)
+		if isError(fn) {
+			return newError("TODO: あとでな")
+		}
+
+		return evalCallExpr(fn, n.Arguments, env)
+
+	//case *ast.CallExpression:
+	//	// えび案
+	//	fn := Eval(n.Function, env)
+	//	if isError(fn) {
+	//		return newError("TODO: あとでな")
+	//	}
+	//	f, ok := fn.(*object.Function)
+	//	if !ok {
+	//		return newError("TODO: えらー")
+	//	}
+	//
+	//	return evalCallExpr(f, n.Arguments, env)
+	//
 
 	case *ast.FunctionLiteral:
 		return &object.Function{
