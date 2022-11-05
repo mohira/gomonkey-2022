@@ -55,7 +55,7 @@ func TestIntegerExpression(t *testing.T) {
 func testIntegerObject(t *testing.T, obj object.Object, expected int64) bool {
 	integerObj, ok := obj.(*object.Integer)
 	if !ok {
-		t.Errorf("obj is not *object.Integer. got=%T", obj)
+		t.Errorf("obj is not *object.Integer. got=%[1]T %[1]v", obj)
 		return false
 	}
 
@@ -176,8 +176,6 @@ func TestBangOperator(t *testing.T) {
 }
 
 func TestIfElseExpressions(t *testing.T) {
-	t.Parallel()
-
 	tests := []struct {
 		input    string
 		expected any
@@ -198,14 +196,12 @@ func TestIfElseExpressions(t *testing.T) {
 
 		// 現状では 識別子(*ast.Identifier)を評価する用になってないから、
 		// conditionがnilになる。(monkeyのNULLではない！)
-		// ホスト言語のnilは、monkeyのNULLでもなけれあFALSEでもないので、truthyになる
+		// ホスト言語のnilは、monkeyのNULLでもなければFALSEでもないので、truthyになる
 		{"if (a) { 10 }", 10},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
-			t.Parallel()
-
 			evaluated := testEval(tt.input)
 			integer, ok := tt.expected.(int) // 最初から int64 じゃだめなの？ あとで試す
 			if ok {

@@ -12,8 +12,6 @@ var (
 	FALSE = &object.Boolean{Value: false}
 )
 
-var Environment = map[string]object.Object{}
-
 func Eval(node ast.Node, env *object.Environment) object.Object {
 	switch n := node.(type) {
 	// 複数の文
@@ -35,7 +33,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 
 		// 値を登録する
-		Environment[n.Name.Value] = v
+		env.Set(n.Name.Value, v)
 
 		return nil // ???? とりあえずこれにしとく
 
@@ -74,11 +72,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalInfixExpression(n.Operator, left, right)
 
 	case *ast.Identifier:
-		if _, ok := Environment[n.Value]; !ok {
+		v, ok := env.Get(n.Value)
+		if !ok {
 			return newError("identifier not found: %s", n.Value)
 		}
 
-		return Environment[n.Value]
+		return v
 
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: n.Value}
