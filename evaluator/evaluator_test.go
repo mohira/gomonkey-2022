@@ -384,10 +384,15 @@ func TestFunctionApplication(t *testing.T) {
 		{"let identity = fn(x) { return x; 10;}; identity(5);", 5},
 
 		{"let add = fn(x, y) { x + y; }; add(5, 5);", 10},
-		{"let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20},
 
 		// 関数は式です
 		{"fn(x) { x; }(5)", 5},
+
+		// 関数の引数を前から順に評価しているので、
+		// 第2引数の式を評価するときに、その第2引数が、また引数をもつような式だと、
+		// xという名前で、評価済みの、第1引数を上書きしちゃうので、こわれる！
+		{"let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20},
+		{"let add = fn(x, y) { x + y; }; add(5, add(90, 10));", 105},
 
 		// こういう外側の環境が必要なやつは、またあとできっとやるでしょう
 		//{"let a=1; fn(x){ a + x;} ", 5},
