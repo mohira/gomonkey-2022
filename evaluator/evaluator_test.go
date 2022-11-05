@@ -370,3 +370,32 @@ func TestFunctionObject(t *testing.T) {
 	}
 
 }
+
+func TestFunctionApplication(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{"let identity = fn(x) { x; }; identity(5);", 5},
+		{"let identity = fn(x) { return x; }; identity(5);", 5},
+		{"let identity = fn(x) { return x; 10;}; identity(5);", 5},
+
+		{"let double = fn(x) { x * 2 ;}; double(5);", 10},
+
+		{"let add = fn(x, y) { x + y; }; add(5, 5);", 10},
+		{"let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20},
+
+		// 関数は式です
+		{"fn(x) { x; }(5)", 5},
+
+		// こういう外側の環境が必要なやつは、またあとできっとやるでしょう
+		//{"let a=1; fn(x){ a + x;} ", 5},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			evaluated := testEval(tt.input)
+			testIntegerObject(t, evaluated, tt.expected)
+		})
+	}
+}
