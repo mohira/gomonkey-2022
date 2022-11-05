@@ -75,7 +75,7 @@ func Eval(node ast.Node) object.Object {
 
 	case *ast.Identifier:
 		if _, ok := Environment[n.Value]; !ok {
-			return newError("あとで")
+			return newError("identifier not found: %s", n.Value)
 		}
 
 		return Environment[n.Value]
