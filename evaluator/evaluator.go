@@ -46,6 +46,14 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 		return &object.ReturnValue{Value: val}
 	// 式
+
+	case *ast.FunctionLiteral:
+		return &object.Function{
+			Parameters: n.Parameters,
+			Body:       n.Body,
+			Env:        env, // ????
+		}
+
 	case *ast.IfExpression:
 		return evalIfExpression(n, env)
 
