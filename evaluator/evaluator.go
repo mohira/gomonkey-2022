@@ -52,6 +52,21 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return function // Evalした地点でErrorだったらもうErrorオブジェクトなので、newErrorは不要だよ！
 		}
 
+		// 「引数のリスト」だけど「複数の式」って捉えるほうがかっちょいいね
+		args := evalExpressions(n.Arguments, env) // OBJECTのスライス
+
+		// 手の込んだことは何もない。
+		// ast.Expression のリストの要素を、現在の環境のコンテキストで次々に評価する。
+		// もしエラーが発生したら、評価を中止してエラーを返す。
+		// この部分は、**引数を左から右 に評価すると決定した部分でもある**。
+		if len(args) == 1 && isError(args[0]) {
+			// 最初に出会ったERRORだけを返す仕組みになっとるがな！
+			// 複数の式を評価したときに、途中でErrorになったら、
+			// そのERRORオブジェクトだけを要素に持つスライスを返す設計(1,err,3みたいな多値での返却はしない)
+			// なので、こうなる。
+			return args[0]
+		}
+
 		return evalCallExpr(function, n.Arguments, env)
 
 	//case *ast.CallExpression:
@@ -111,6 +126,21 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	}
 
 	return nil
+}
+
+func evalExpressions(expressions []ast.Expression, env *object.Environment) []object.Object {
+	var result []object.Object
+
+	for _, expr := range expressions {
+		evaluated := Eval(expr, env)
+
+		if isError(evaluated) {
+			return []object.Object{evaluated}
+		}
+		result = append(result, evaluated)
+	}
+
+	return result
 }
 
 func evalCallExpr(fn object.Object, args []ast.Expression, env *object.Environment) object.Object {
