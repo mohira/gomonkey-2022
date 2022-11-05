@@ -35,7 +35,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		// 値を登録する
 		env.Set(n.Name.Value, v)
 
-		return nil // ???? とりあえずこれにしとく
+		return nil // Let文は値を返さない。nilでいいらしい。
 
 	case *ast.ReturnStatement:
 		val := Eval(n.ReturnValue, env)
@@ -72,12 +72,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalInfixExpression(n.Operator, left, right)
 
 	case *ast.Identifier:
-		v, ok := env.Get(n.Value)
-		if !ok {
-			return newError("identifier not found: %s", n.Value)
-		}
-
-		return v
+		return evalIdentifier(n, env)
 
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: n.Value}
@@ -262,4 +257,13 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) obje
 
 func newError(format string, a ...any) *object.Error {
 	return &object.Error{Message: fmt.Sprintf(format, a...)}
+}
+
+func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object {
+	v, ok := env.Get(node.Value)
+	if !ok {
+		return newError("identifier not found: %s", node.Value)
+	}
+
+	return v
 }
