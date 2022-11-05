@@ -12,7 +12,7 @@ var (
 	FALSE = &object.Boolean{Value: false}
 )
 
-var Environment map[string]object.Object
+var Environment = map[string]object.Object{}
 
 func Eval(node ast.Node) object.Object {
 	switch n := node.(type) {
