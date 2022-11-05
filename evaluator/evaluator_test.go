@@ -376,18 +376,22 @@ func TestFunctionApplication(t *testing.T) {
 		input    string
 		expected int64
 	}{
-
 		{"let double = fn(x) { x * 2 ;}; double(5);", 10},
 
+		// 暗黙の戻り値
 		{"let identity = fn(x) { x; }; identity(5);", 5},
+
+		// return 文による値の返却
 		{"let identity = fn(x) { return x; }; identity(5);", 5},
 		{"let identity = fn(x) { return x; 10;}; identity(5);", 5},
 
+		// 複数のパラメータ
 		{"let add = fn(x, y) { x + y; }; add(5, 5);", 10},
 
 		// 関数は式です
 		{"fn(x) { x; }(5)", 5},
 
+		// 関数に渡す前の引数の評価
 		// 関数の引数を前から順に評価しているので、
 		// 第2引数の式を評価するときに、その第2引数が、また引数をもつような式だと、
 		// xという名前で、評価済みの、第1引数を上書きしちゃうので、こわれる！
