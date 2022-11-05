@@ -301,6 +301,9 @@ func TestErrorHandling(t *testing.T) {
 		// ERRORオブジェクトは実は truthy だった！
 		// truthy := NULLでない かつ falseでない なので！！！
 		{"if (1 + true) { return 2; }", "type mismatch: INTEGER + BOOLEAN"},
+
+		// 未定義な識別子へのアクセス
+		{"foobar; ", "identifier not found: foobar"},
 	}
 
 	for _, tt := range tests {
