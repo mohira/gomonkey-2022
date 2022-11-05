@@ -14,7 +14,7 @@ var (
 
 var Environment = map[string]object.Object{}
 
-func Eval(node ast.Node) object.Object {
+func Eval(node ast.Node, env *object.Environment) object.Object {
 	switch n := node.(type) {
 	// 複数の文
 	case *ast.Program:
