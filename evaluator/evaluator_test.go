@@ -345,3 +345,28 @@ func TestLetStatements(t *testing.T) {
 		})
 	}
 }
+
+func TestFunctionObject(t *testing.T) {
+	input := "fn(x) { x + 2; };"
+
+	evaluated := testEval(input)
+
+	fnObj, ok := evaluated.(*object.Function)
+	if !ok {
+		t.Fatalf("object is not *object.Function. got=%[1]T(%+[1]v)", evaluated)
+	}
+
+	if len(fnObj.Parameters) != 1 {
+		t.Fatalf("パラメータ数が違うよ。got=%+v", fnObj.Parameters)
+	}
+
+	if fnObj.Parameters[0].String() != "x" {
+		t.Fatalf("パラメータが 'x' じゃないよ！ got=%q", fnObj.Parameters[0])
+	}
+
+	expectedBody := "(x + 2)"
+	if fnObj.Body.String() != expectedBody {
+		t.Fatalf("body is not %q. got=%q", expectedBody, fnObj.Body.String())
+	}
+
+}
