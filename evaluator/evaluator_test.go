@@ -418,7 +418,9 @@ let newAdder = fn(x) {
 
 let addTwo = newAdder(2);
 
-addTwo(3);
+fn(x) {
+	addTwo(3);
+}(9999)
 `
 	evaluated := testEval(input)
 
