@@ -333,6 +333,12 @@ func TestLetStatements(t *testing.T) {
 		// 再代入ありなケース
 		{"let a = 5; let b = a; b;", 5},
 		{"let a = 5; let b = a; let c = a + b + 5; c;", 15},
+
+		// あとで: let文単体だった場合はどうするっけ?
+		// {"let a = 5;", ?????}
+
+		// あとで: 識別子未定義の場合のテストもどっかに書く
+
 	}
 
 	for _, tt := range tests {

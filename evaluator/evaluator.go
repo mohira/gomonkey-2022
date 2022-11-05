@@ -12,6 +12,8 @@ var (
 	FALSE = &object.Boolean{Value: false}
 )
 
+var Environment map[string]object.Object
+
 func Eval(node ast.Node) object.Object {
 	switch n := node.(type) {
 	// 複数の文
@@ -24,6 +26,18 @@ func Eval(node ast.Node) object.Object {
 	// 単一の文
 	case *ast.ExpressionStatement:
 		return Eval(n.Expression)
+
+	case *ast.LetStatement:
+		v := Eval(n.Value)
+
+		if isError(v) {
+			return v
+		}
+
+		// 値を登録する
+		Environment[n.Name.Value] = v
+
+		return nil // ???? とりあえずこれにしとく
 
 	case *ast.ReturnStatement:
 		val := Eval(n.ReturnValue)
@@ -58,6 +72,13 @@ func Eval(node ast.Node) object.Object {
 		}
 
 		return evalInfixExpression(n.Operator, left, right)
+
+	case *ast.Identifier:
+		if _, ok := Environment[n.Value]; !ok {
+			return newError("あとで")
+		}
+
+		return Environment[n.Value]
 
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: n.Value}
