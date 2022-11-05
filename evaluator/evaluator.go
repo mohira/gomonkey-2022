@@ -67,7 +67,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return args[0]
 		}
 
-		return evalCallExpr(function, n.Arguments, env)
+		// 環境を渡さない！！！ あんまわかってないけど！
+		return applyFunction(function, args)
+		// 疑問
+		// return applyFunction(function, args, env) // この「現在の環境」を渡すとどういう問題になる？？？
 
 	//case *ast.CallExpression:
 	//	// えび案
@@ -87,7 +90,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return &object.Function{
 			Parameters: n.Parameters,
 			Body:       n.Body,
-			Env:        env, // ????
+			Env:        env, // Functionオブジェクト自身が環境を持っていた！
 		}
 
 	case *ast.IfExpression:
@@ -126,6 +129,38 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	}
 
 	return nil
+}
+
+func applyFunction(fn object.Object, args []object.Object) object.Object {
+	function, ok := fn.(*object.Function)
+	if !ok {
+		// TODO: このテストケースまだないけどね！
+		return newError("not a function: %s", fn.Type())
+	}
+
+	extendedEnv := extendedFunctionEnv(function, args)
+
+	evaluated := Eval(function.Body, extendedEnv)
+
+	return unwrapReturnValue(evaluated)
+}
+
+func unwrapReturnValue(obj object.Object) object.Object {
+	if returnValue, ok := obj.(*object.ReturnValue); ok {
+		return returnValue.Value
+	}
+
+	return obj
+}
+
+func extendedFunctionEnv(fn *object.Function, args []object.Object) *object.Environment {
+	env := object.NewEnclosedEnvironment(fn.Env)
+
+	for i, param := range fn.Parameters {
+		env.Set(param.Value, args[i])
+	}
+
+	return env
 }
 
 func evalExpressions(expressions []ast.Expression, env *object.Environment) []object.Object {
