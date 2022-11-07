@@ -240,6 +240,8 @@ func evalStringInfixExpression(operator string, left, right object.Object) objec
 		return &object.String{Value: leftValue + rightValue}
 	case "==":
 		return nativeBoolToBooleanObject(leftValue == rightValue)
+	case "!=":
+		return nativeBoolToBooleanObject(leftValue != rightValue)
 	default:
 		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
