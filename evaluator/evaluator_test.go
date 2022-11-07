@@ -491,3 +491,40 @@ func TestStringExpression(t *testing.T) {
 	}
 
 }
+
+func TestBuiltinFunctions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected any
+	}{
+		{`len("")`, 0},
+		{`len("four")`, 4},
+		{`len("hello world")`, 11},
+
+		{`len(1)`, "argument to `len` not supported, got INTEGER"},
+		{`len("one", "two")`, "argument error: wrong number of arguments (given 2, expected 1)"},
+		{`len()`, "argument error: wrong number of arguments (given 0, expected 1)"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			evaluated := testEval(tt.input)
+
+			switch expected := tt.expected.(type) {
+			case int:
+				testIntegerObject(t, evaluated, int64(expected))
+			case string:
+				errObj, ok := evaluated.(*object.Error)
+				if !ok {
+					t.Errorf("評価結果がERRORオブジェクトになってないよ. got=%[1]T(%+[1]v)", evaluated)
+				}
+
+				if errObj.Message != expected {
+					t.Errorf("おかしいよ。expected=%s, got=%s", expected, errObj.Message)
+				}
+			}
+
+		})
+	}
+
+}
