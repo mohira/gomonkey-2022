@@ -109,9 +109,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: n.Value}
+	case *ast.StringLiteral:
+		return &object.String{Value: n.Value}
 	case *ast.Boolean:
 		return nativeBoolToBooleanObject(n.Value)
-
 	}
 
 	return nil

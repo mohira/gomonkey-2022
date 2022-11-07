@@ -426,3 +426,18 @@ fn(x) {
 
 	testIntegerObject(t, evaluated, 5)
 }
+
+func TestStringExpression(t *testing.T) {
+	input := `"Hello, world!"`
+
+	evaluated := testEval(input)
+
+	strObj, ok := evaluated.(*object.String)
+	if !ok {
+		t.Fatalf("*object.Stringじゃないよ.got=%[1]T(%+[1]v)", evaluated)
+	}
+
+	if strObj.Value != "Hello, world!" {
+		t.Errorf("want %s, got %s", "Hello, world!", strObj.Value)
+	}
+}
