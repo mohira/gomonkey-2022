@@ -122,7 +122,10 @@ func applyFunction(fn object.Object, args []object.Object) object.Object {
 	switch fn := fn.(type) {
 
 	case *object.Function: // ユーザー定義関数ってことだね？
-		// 引数の過不足は一旦ここに書いておく
+		// ユーザー定義関数の引数の過不足はここにした！
+		// ビルトイン関数は、そのビルトイン関数が引数が何個で、どういうものであるかというのは、
+		// そのビルトイン関数の実装の近くに置くほうが、ドキュメント的な働きをするので、そっちにかいてる。
+		// 逆言うと、このapplyFunction全体で引数の過不足チェックをしていないのは、意図的だよという話。
 		if len(args) != len(fn.Parameters) {
 			return newError("argument error: wrong number of arguments (given %d, expected %d)", len(args), len(fn.Parameters))
 		}
@@ -135,24 +138,6 @@ func applyFunction(fn object.Object, args []object.Object) object.Object {
 	default:
 		return newError("not a function: %s", fn.Type())
 	}
-
-	// 俺たちがかいたやつを一時保存
-	//function, ok := fn.(*object.Function)
-	//if !ok {
-	//	// TODO: このテストケースまだないけどね！
-	//	return newError("not a function: %s", fn.Type())
-	//}
-	//
-	//// もっと早いタイミングでやったほうがいいかもしれないけど、なんかいい感じの置き場と書き方が思い浮かばなかったので、ここに書いときます！
-	//if len(args) != len(function.Parameters) {
-	//	return newError("argument error: wrong number of arguments (given %d, expected %d)", len(args), len(function.Parameters))
-	//}
-	//
-	//extendedEnv := extendedFunctionEnv(function, args)
-	//
-	//evaluated := Eval(function.Body, extendedEnv)
-	//
-	//return unwrapReturnValue(evaluated)
 }
 
 func unwrapReturnValue(obj object.Object) object.Object {

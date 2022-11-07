@@ -7,7 +7,9 @@ import (
 var builtins = map[string]*object.Builtin{
 	"len": {
 		Fn: func(args ...object.Object) object.Object {
-			// argsは1個 && STRING => len(STRING) // 配列とかハッシュマップに対してのlenはまたあとでな！
+			// 配列とかハッシュマップに対してのlenはまたあとでな！
+			// わざわざビルトイン関数の実装の中で引数の数チェックをするのは分かる。
+			// なぜなら、len関数は引数が1個です」というドキュメント的な作用があるから
 			if len(args) != 1 {
 				return newError("argument error: wrong number of arguments (given %d, expected %d)", len(args), 1)
 			}
