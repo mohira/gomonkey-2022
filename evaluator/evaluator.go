@@ -47,7 +47,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return &object.ReturnValue{Value: val}
 	// 式
 	case *ast.CallExpression:
-		function := Eval(n.Function, env) // fn(x) { x * 2;}
+		function := Eval(n.Function, env) // fn(x, y) { return x + y;}; add(1, 2, 9)
 		if isError(function) {
 			return function // Evalした地点でErrorだったらもうErrorオブジェクトなので、newErrorは不要だよ！
 		}
@@ -55,6 +55,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		// 「引数のリスト」だけど「複数の式」って捉えるほうがかっちょいいね
 		args := evalExpressions(n.Arguments, env) // OBJECTのスライス
 
+		// [INT(1), INT(2), INT(9)]
 		// 手の込んだことは何もない。
 		// ast.Expression のリストの要素を、現在の環境のコンテキストで次々に評価する。
 		// もしエラーが発生したら、評価を中止してエラーを返す。
@@ -119,10 +120,16 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 }
 
 func applyFunction(fn object.Object, args []object.Object) object.Object {
+	// fn: fn(x, y) { return x + y;}; add(1, 2, 9)
+	// args: [INT(1), INT(2), INT(9)]
 	function, ok := fn.(*object.Function)
 	if !ok {
 		// TODO: このテストケースまだないけどね！
 		return newError("not a function: %s", fn.Type())
+	}
+
+	if len(args) != len(function.Parameters) {
+		return newError("argument error: wrong number of arguments (given %d, expected %d)", len(args), len(function.Parameters))
 	}
 
 	extendedEnv := extendedFunctionEnv(function, args)
