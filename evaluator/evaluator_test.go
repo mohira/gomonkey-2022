@@ -265,10 +265,12 @@ func TestErrorHandling(t *testing.T) {
 		// type mismatch: オペランド同士の型が一致していない
 		{"3 + true;", "type mismatch: INTEGER + BOOLEAN"},
 		{"true + 3;", "type mismatch: BOOLEAN + INTEGER"},
+		{`"Hello" * 3`, "type mismatch: STRING * INTEGER"},
 
 		// unknown operator: オペランド同士の型は一致しているが、演算子がおかしい
 		{"true + false", "unknown operator: BOOLEAN + BOOLEAN"},
 		{"if (10 > 1) { true + false; }", "unknown operator: BOOLEAN + BOOLEAN"},
+		{`"Hello" - "World"`, "unknown operator: STRING - STRING"},
 
 		// 単項演算子
 		{"-true", "unknown operator: -BOOLEAN"},
@@ -427,8 +429,23 @@ fn(x) {
 	testIntegerObject(t, evaluated, 5)
 }
 
-func TestStringExpression(t *testing.T) {
+func TestStringLiteral(t *testing.T) {
 	input := `"Hello, world!"`
+
+	evaluated := testEval(input)
+
+	strObj, ok := evaluated.(*object.String)
+	if !ok {
+		t.Fatalf("*object.Stringじゃないよ.got=%[1]T(%+[1]v)", evaluated)
+	}
+
+	if strObj.Value != "Hello, world!" {
+		t.Errorf("want %s, got %s", "Hello, world!", strObj.Value)
+	}
+}
+
+func TestStringExpression(t *testing.T) {
+	input := `"Hello, " + "world!"`
 
 	evaluated := testEval(input)
 
