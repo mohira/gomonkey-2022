@@ -12,12 +12,12 @@ var builtins = map[string]*object.Builtin{
 				return newError("argument error: wrong number of arguments (given %d, expected %d)", len(args), 1)
 			}
 
-			arg, ok := args[0].(*object.String)
-			if !ok {
+			switch arg := args[0].(type) {
+			case *object.String:
+				return &object.Integer{Value: int64(len(arg.Value))}
+			default:
 				return newError("argument to `len` not supported, got %s", args[0].Type())
 			}
-
-			return &object.Integer{Value: int64(len(arg.Value))}
 		},
 	},
 }
