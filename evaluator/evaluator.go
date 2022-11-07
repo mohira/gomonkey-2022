@@ -366,10 +366,16 @@ func newError(format string, a ...any) *object.Error {
 }
 
 func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object {
-	v, ok := env.Get(node.Value)
-	if !ok {
-		return newError("identifier not found: %s", node.Value)
+	// 組み込み関数は事前宣言されているだけユーザー定義関数でシャドウイング的なことをできる仕様です。
+	// とはいえ、組み込み関数の値自体がメモリから消えるわけじゃないよね？ そういう意味で「上書き」っていうとちょっと誤解あるよね？
+	// https://hackmd.io/VFU8Wtf-QhqXCHieWojs_g
+	if v, ok := env.Get(node.Value); ok {
+		return v
 	}
 
-	return v
+	if builtin, ok := builtins[node.Value]; ok {
+		return builtin
+	}
+
+	return newError("identifier not found: %s", node.Value)
 }
