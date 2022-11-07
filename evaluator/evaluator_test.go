@@ -504,6 +504,9 @@ func TestBuiltinFunctions(t *testing.T) {
 		{`len(1)`, "argument to `len` not supported, got INTEGER"},
 		{`len("one", "two")`, "argument error: wrong number of arguments (given 2, expected 1)"},
 		{`len()`, "argument error: wrong number of arguments (given 0, expected 1)"},
+
+		// TODO: 組み込み関数は事前宣言されているだけで、あとから上書きありにする？ どうする？
+		// {`let len = fn(x) {return 1;}; len("hoge")`, 1},
 	}
 
 	for _, tt := range tests {
