@@ -119,24 +119,40 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 }
 
 func applyFunction(fn object.Object, args []object.Object) object.Object {
-	// fn: fn(x, y) { return x + y;}; add(1, 2, 9)
-	// args: [INT(1), INT(2), INT(9)]
-	function, ok := fn.(*object.Function)
-	if !ok {
-		// TODO: このテストケースまだないけどね！
+	switch fn := fn.(type) {
+
+	case *object.Function: // ユーザー定義関数ってことだね？
+		// 引数の過不足は一旦ここに書いておく
+		if len(args) != len(fn.Parameters) {
+			return newError("argument error: wrong number of arguments (given %d, expected %d)", len(args), len(fn.Parameters))
+		}
+		extendedEnv := extendedFunctionEnv(fn, args)
+		evaluated := Eval(fn.Body, extendedEnv)
+		return unwrapReturnValue(evaluated)
+
+	case *object.Builtin:
+		return fn.Fn(args...)
+	default:
 		return newError("not a function: %s", fn.Type())
 	}
 
-	// もっと早いタイミングでやったほうがいいかもしれないけど、なんかいい感じの置き場と書き方が思い浮かばなかったので、ここに書いときます！
-	if len(args) != len(function.Parameters) {
-		return newError("argument error: wrong number of arguments (given %d, expected %d)", len(args), len(function.Parameters))
-	}
-
-	extendedEnv := extendedFunctionEnv(function, args)
-
-	evaluated := Eval(function.Body, extendedEnv)
-
-	return unwrapReturnValue(evaluated)
+	// 俺たちがかいたやつを一時保存
+	//function, ok := fn.(*object.Function)
+	//if !ok {
+	//	// TODO: このテストケースまだないけどね！
+	//	return newError("not a function: %s", fn.Type())
+	//}
+	//
+	//// もっと早いタイミングでやったほうがいいかもしれないけど、なんかいい感じの置き場と書き方が思い浮かばなかったので、ここに書いときます！
+	//if len(args) != len(function.Parameters) {
+	//	return newError("argument error: wrong number of arguments (given %d, expected %d)", len(args), len(function.Parameters))
+	//}
+	//
+	//extendedEnv := extendedFunctionEnv(function, args)
+	//
+	//evaluated := Eval(function.Body, extendedEnv)
+	//
+	//return unwrapReturnValue(evaluated)
 }
 
 func unwrapReturnValue(obj object.Object) object.Object {

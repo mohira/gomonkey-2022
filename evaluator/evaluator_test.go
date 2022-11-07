@@ -519,7 +519,7 @@ func TestBuiltinFunctions(t *testing.T) {
 			case string:
 				errObj, ok := evaluated.(*object.Error)
 				if !ok {
-					t.Errorf("評価結果がERRORオブジェクトになってないよ. got=%[1]T(%+[1]v)", evaluated)
+					t.Fatalf("評価結果がERRORオブジェクトになってないよ. got=%[1]T(%+[1]v)", evaluated)
 				}
 
 				if errObj.Message != expected {
