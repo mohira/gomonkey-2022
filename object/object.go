@@ -10,12 +10,25 @@ type Type string
 
 const (
 	IntegerObj     = "INTEGER"
+	StringObj      = "STRING"
 	BooleanObj     = "BOOLEAN"
 	NullObj        = "NULL"
 	ReturnValueObj = "RETURN_VALUE"
 	ErrorObj       = "ERROR"
-	FunctionObj    = "FUNCTION"
-	StringObj      = "STRING"
+
+	FunctionObj = "FUNCTION"
+	BuiltinObj  = "BUILTIN"
+	// 発見: ユーザー定義"関数" と 組み込み"関数" は monkeyのオブジェクトの世界だと全く別物！
+	/*
+		Python でも 文字列表現としては、組み込み関数とユーザー定義関数は確かに違う扱いだった！
+		っていうか、CpythonならprintはCで実装されているので、それはそうというのはあとになって気づきました
+		>>> print
+		<built-in function print>
+		>>> def add():pass
+		...
+		>>> add
+		<function add at 0x1013d3250>
+	*/
 )
 
 type Object interface {
@@ -119,4 +132,18 @@ func (s *String) Type() Type {
 
 func (s *String) Inspect() string {
 	return s.Value
+}
+
+type BuiltinFunction func(args ...Object) Object
+
+type Builtin struct {
+	Fn BuiltinFunction
+}
+
+func (b *Builtin) Type() Type {
+	return BuiltinObj
+}
+
+func (b *Builtin) Inspect() string {
+	return "builtin function"
 }
