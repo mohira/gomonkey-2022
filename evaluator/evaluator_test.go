@@ -299,6 +299,10 @@ func TestErrorHandling(t *testing.T) {
 		// 未定義な識別子へのアクセス
 		{"foobar; ", "identifier not found: foobar"},
 		{"if (a) { 10; }", "identifier not found: a"},
+
+		// 関数を呼び出したときに引数の過不足がある
+		{"let add = fn(x, y) { return x + y;}; add(1, 2, 9)", "wrong number of arguments (given 3, expected 2)"},
+		// {"let add = fn(x, y) { return x + y;}; add(1)", "wrong number of arguments (given 1, expected 2)"},
 	}
 
 	for _, tt := range tests {
