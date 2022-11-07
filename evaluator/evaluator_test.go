@@ -445,16 +445,41 @@ func TestStringLiteral(t *testing.T) {
 }
 
 func TestStringExpression(t *testing.T) {
-	input := `"Hello, " + "world!"`
-
-	evaluated := testEval(input)
-
-	strObj, ok := evaluated.(*object.String)
-	if !ok {
-		t.Fatalf("*object.Stringじゃないよ.got=%[1]T(%+[1]v)", evaluated)
+	tests := []struct {
+		input string
+		want  any
+	}{
+		{`"Hello, " + "world!"`, "Hello, world!"},
+		{`"Hello" == "Hello"`, true},
 	}
 
-	if strObj.Value != "Hello, world!" {
-		t.Errorf("want %s, got %s", "Hello, world!", strObj.Value)
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			evaluated := testEval(tt.input)
+
+			switch tt.want.(type) {
+			case string:
+				strObj, ok := evaluated.(*object.String)
+				if !ok {
+					t.Fatalf("*object.Stringじゃないよ.got=%[1]T(%+[1]v)", evaluated)
+				}
+
+				if strObj.Value != tt.want {
+					t.Errorf("want %s, got %s", "Hello, world!", strObj.Value)
+				}
+			case bool:
+				boolObj, ok := evaluated.(*object.Boolean)
+				if !ok {
+					t.Fatalf("*object.Booleanじゃないよ.got=%[1]T(%+[1]v)", evaluated)
+				}
+
+				if boolObj.Value != tt.want {
+					t.Errorf("want %t, got %t", tt.want, boolObj.Value)
+				}
+
+			}
+
+		})
 	}
+
 }
