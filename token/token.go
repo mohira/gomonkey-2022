@@ -11,8 +11,9 @@ const (
 	ILLEGAL = "ILLEGAL" // 未知のトークン
 	EOF     = "EOF"     // ファイルの終端 → 構文解析終了のお知らせ
 
-	IDENT = "IDENT"
-	INT   = "INT"
+	IDENT  = "IDENT"
+	INT    = "INT"
+	STRING = "STRING"
 
 	ASSIGN   = "="
 	PLUS     = "+"
