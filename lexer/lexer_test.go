@@ -213,6 +213,8 @@ func TestNextToken_文字列(t *testing.T) {
 	input := `
 "foobar"
 "foo bar"
+"foo
+bar"
 `
 	tests := []struct {
 		expectedType    token.Type
@@ -220,6 +222,7 @@ func TestNextToken_文字列(t *testing.T) {
 	}{
 		{token.STRING, "foobar"},
 		{token.STRING, "foo bar"},
+		{token.STRING, "foo\nbar"},
 		{token.EOF, ""},
 	}
 
