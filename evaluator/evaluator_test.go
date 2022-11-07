@@ -451,6 +451,7 @@ func TestStringExpression(t *testing.T) {
 	}{
 		{`"Hello, " + "world!"`, "Hello, world!"},
 		{`"Hello" == "Hello"`, true},
+		{`"Hello" == "World"`, false},
 	}
 
 	for _, tt := range tests {
