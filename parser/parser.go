@@ -104,6 +104,9 @@ func New(l *lexer.Lexer) *Parser {
 	// 2.8.4 関数リテラル
 	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
 
+	// 4.2.2 文字列リテラル
+	p.registerPrefix(token.STRING, p.parseStringLiteral)
+
 	p.infixParseFns = make(map[token.Type]infixParseFn)
 	p.registerInfix(token.EQ, p.parseInfixExpression)
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
@@ -530,4 +533,11 @@ func (p *Parser) parseCallArguments() []ast.Expression {
 	}
 
 	return args
+}
+
+func (p *Parser) parseStringLiteral() ast.Expression {
+	return &ast.StringLiteral{
+		Token: p.curToken,
+		Value: p.curToken.Literal,
+	}
 }
