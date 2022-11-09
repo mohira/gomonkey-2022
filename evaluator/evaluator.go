@@ -110,6 +110,14 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	case *ast.ArrayLiteral:
 		elements := evalExpressions(n.Elements, env)
 
+		if len(elements) == 1 && isError(elements[0]) {
+			// 最初に出会ったERRORだけを返す仕組みになっとるがな！
+			// 複数の式を評価したときに、途中でErrorになったら、
+			// そのERRORオブジェクトだけを要素に持つスライスを返す設計(1,err,3みたいな多値での返却はしない)
+			// なので、こうなる。
+			return elements[0]
+		}
+
 		return &object.Array{Elements: elements}
 
 	case *ast.IntegerLiteral:

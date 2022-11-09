@@ -303,6 +303,9 @@ func TestErrorHandling(t *testing.T) {
 		// 関数を呼び出したときに引数の過不足がある
 		{"let add = fn(x, y) { return x + y;}; add(1, 2, 9)", "argument error: wrong number of arguments (given 3, expected 2)"},
 		{"let add = fn(x, y) { return x + y;}; add(1)", "argument error: wrong number of arguments (given 1, expected 2)"},
+
+		// ["foo" + 1]
+		{`["foo" + 1]`, "type mismatch: STRING + INTEGER"},
 	}
 
 	for _, tt := range tests {
