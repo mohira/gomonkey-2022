@@ -119,6 +119,38 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 
 		return &object.Array{Elements: elements}
+	case *ast.IndexExpression:
+		left := Eval(n.Left, env)
+		if isError(left) {
+			return left
+		}
+
+		array, ok := left.(*object.Array)
+		if !ok {
+			return newError("TODO: Arrayじゃないよ的なメッセーじ")
+		}
+
+		index := Eval(n.Index, env)
+		if isError(index) {
+			return index
+		}
+
+		intObj, ok := index.(*object.Integer)
+		if !ok {
+			return newError("TODO: あとで")
+		}
+
+		// 0以上の整数になってないといけない。 && (要素数-1)以下でないといけない
+		// 0 <= index <= len(elements) - 1
+		i := intObj.Value
+
+		validIndex := 0 <= i && i <= int64(len(array.Elements)-1)
+		if validIndex {
+			return array.Elements[i]
+		} else {
+			return NULL
+			//return newError("TODO: indexの制限みたしてないよ")
+		}
 
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: n.Value}
