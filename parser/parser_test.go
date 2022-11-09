@@ -761,3 +761,53 @@ func TestStringLiteralExpression(t *testing.T) {
 	}
 
 }
+
+func TestParsingArrayLiterals(t *testing.T) {
+	input := `[1, 2 * 2, 3 + 3]`
+
+	l := lexer.New(input)
+	p := parser.New(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("*ast.ExpressionStatementじゃないよ。got=%T", program.Statements[0])
+	}
+
+	arrayLiteral, ok := exprStmt.Expression.(*ast.ArrayLiteral)
+	if !ok {
+		t.Fatalf("*ast.ArrayLiteralじゃないよ。got=%T", exprStmt.Expression)
+	}
+
+	if len(arrayLiteral.Elements) != 3 {
+		t.Fatalf("要素数が3じゃないよ！ got=%d", len(arrayLiteral.Elements))
+	}
+	// [1, 2 * 2, 3 + 3]
+	testIntegerLiteral(t, arrayLiteral.Elements[0], 1)
+	testInfixExpression(t, arrayLiteral.Elements[1], 2, "*", 2)
+	testInfixExpression(t, arrayLiteral.Elements[2], 3, "+", 3)
+}
+
+func TestParsingArrayLiterals_空の配列の場合(t *testing.T) {
+	input := `[]`
+
+	l := lexer.New(input)
+	p := parser.New(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("*ast.ExpressionStatementじゃないよ。got=%T", program.Statements[0])
+	}
+
+	arrayLiteral, ok := exprStmt.Expression.(*ast.ArrayLiteral)
+	if !ok {
+		t.Fatalf("*ast.ArrayLiteralじゃないよ。got=%T", exprStmt.Expression)
+	}
+
+	if len(arrayLiteral.Elements) != 0 {
+		t.Fatalf("要素数が0じゃないよ！ got=%d", len(arrayLiteral.Elements))
+	}
+}

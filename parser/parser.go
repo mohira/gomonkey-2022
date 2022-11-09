@@ -107,6 +107,9 @@ func New(l *lexer.Lexer) *Parser {
 	// 4.2.2 文字列リテラル
 	p.registerPrefix(token.STRING, p.parseStringLiteral)
 
+	// 4.4.2 配列リテラル
+	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
+
 	p.infixParseFns = make(map[token.Type]infixParseFn)
 	p.registerInfix(token.EQ, p.parseInfixExpression)
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
@@ -540,4 +543,41 @@ func (p *Parser) parseStringLiteral() ast.Expression {
 		Token: p.curToken,
 		Value: p.curToken.Literal,
 	}
+}
+
+func (p *Parser) parseArrayLiteral() ast.Expression {
+	arrayLiteral := &ast.ArrayLiteral{
+		Token: p.curToken,
+	}
+
+	arrayLiteral.Elements = p.parseElements()
+
+	return arrayLiteral
+}
+
+func (p *Parser) parseElements() []ast.Expression {
+	var args []ast.Expression
+
+	// 引数がない場合
+	if p.peekTokenIs(token.RBRACKET) {
+		p.nextToken()
+		return args
+	}
+
+	p.nextToken()
+	args = append(args, p.parseExpression(LOWEST))
+	//           ↓
+	// add(2, 3, 4)
+	for p.peekTokenIs(token.COMMA) {
+		p.nextToken()
+		p.nextToken()
+		args = append(args, p.parseExpression(LOWEST))
+	}
+
+	if !p.expectPeek(token.RBRACKET) {
+		return nil
+	}
+
+	return args
+
 }
