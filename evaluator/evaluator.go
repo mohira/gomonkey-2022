@@ -125,33 +125,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return left
 		}
 
-		array, ok := left.(*object.Array)
-		if !ok {
-			return newError("TODO: Arrayじゃないよ的なメッセーじ")
-		}
-
 		index := Eval(n.Index, env)
 		if isError(index) {
 			return index
 		}
 
-		intObj, ok := index.(*object.Integer)
-		if !ok {
-			return newError("TODO: あとで")
-		}
-
-		// 0以上の整数になってないといけない。 && (要素数-1)以下でないといけない
-		// 0 <= index <= len(elements) - 1
-		i := intObj.Value
-
-		validIndex := 0 <= i && i <= int64(len(array.Elements)-1)
-		if validIndex {
-			return array.Elements[i]
-		} else {
-			return NULL
-			//return newError("TODO: indexの制限みたしてないよ")
-		}
-
+		return evalIndexExpression(left, index)
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: n.Value}
 	case *ast.StringLiteral:
@@ -162,6 +141,31 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	}
 
 	return nil
+}
+
+func evalIndexExpression(left, index object.Object) object.Object {
+	switch {
+	case left.Type() == object.ArrayObj && index.Type() == object.IntegerObj:
+		return evalArrayIndexExpression(left, index)
+	default:
+		// ここで捌いたほうが、汎用のエラーメッセージになって、とても良いと思います！
+		// つまり、case *ast.IndexExpression -> evalIndexExpression() -> evalArrayIndexExpression()
+		// という流れの良さがここでわかったと思います。
+		return newError("index operator not supported: %s", left.Type())
+	}
+}
+
+func evalArrayIndexExpression(array, index object.Object) object.Object {
+	arrayObject := array.(*object.Array)
+	idx := index.(*object.Integer).Value
+
+	max := int64(len(arrayObject.Elements) - 1)
+
+	if idx < 0 || idx > max {
+		return NULL
+	}
+
+	return arrayObject.Elements[idx]
 }
 
 func applyFunction(fn object.Object, args []object.Object) object.Object {
