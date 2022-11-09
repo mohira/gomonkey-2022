@@ -18,6 +18,7 @@ const (
 
 	FunctionObj = "FUNCTION"
 	BuiltinObj  = "BUILTIN"
+
 	// 発見: ユーザー定義"関数" と 組み込み"関数" は monkeyのオブジェクトの世界だと全く別物！
 	/*
 		Python でも 文字列表現としては、組み込み関数とユーザー定義関数は確かに違う扱いだった！
@@ -29,6 +30,7 @@ const (
 		>>> add
 		<function add at 0x1013d3250>
 	*/
+	ArrayObj = "ARRAY"
 )
 
 type Object interface {
@@ -146,4 +148,28 @@ func (b *Builtin) Type() Type {
 
 func (b *Builtin) Inspect() string {
 	return "builtin function"
+}
+
+type Array struct {
+	Elements []Object
+}
+
+func (a *Array) Type() Type {
+	return ArrayObj
+}
+
+func (a *Array) Inspect() string {
+	// [1, add(2, 3), 4 + 5]
+	var out strings.Builder
+
+	var elements []string
+	for _, e := range a.Elements {
+		elements = append(elements, e.Inspect())
+	}
+
+	out.WriteString("[")
+	out.WriteString(strings.Join(elements, ", "))
+	out.WriteString("]")
+
+	return out.String()
 }

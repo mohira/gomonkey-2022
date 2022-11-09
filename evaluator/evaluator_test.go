@@ -531,3 +531,23 @@ func TestBuiltinFunctions(t *testing.T) {
 	}
 
 }
+
+func TestArrayLiteral(t *testing.T) {
+	input := "[1, 2 * 3, 4 + 5]"
+
+	evaluated := testEval(input)
+
+	array, ok := evaluated.(*object.Array)
+	if !ok {
+		t.Fatalf("*object.Array じゃないよ。got=%T", evaluated)
+	}
+
+	if len(array.Elements) != 3 {
+		t.Errorf("要素数が 3 じゃないよ。got=%d", len(array.Elements))
+	}
+
+	// [1, 2 * 3, 4 + 5] -> [1, 6, 9]
+	testIntegerObject(t, array.Elements[0], 1)
+	testIntegerObject(t, array.Elements[1], 6)
+	testIntegerObject(t, array.Elements[2], 9)
+}
