@@ -17,6 +17,7 @@ const (
 	PRODUCT                // 5
 	PREFIX                 // 6
 	CALL                   // 7 //myFunction(X)
+	INDEX                  // 8
 )
 
 var precedences = map[token.Type]int{
@@ -33,6 +34,8 @@ var precedences = map[token.Type]int{
 	token.SLASH:    PRODUCT,
 
 	token.LPAREN: CALL,
+
+	token.LBRACKET: INDEX,
 }
 
 func (p *Parser) peekPrecedence() int {
@@ -123,6 +126,11 @@ func New(l *lexer.Lexer) *Parser {
 	// 2.8.5 関数の呼び出し式
 	// `(` を 中置演算式におけるOperatorだと思うってこと！
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
+
+	// 4.4.3 添字演算子式 ← 配列アクセスの式
+	// myArray[0]
+	// `[` を 中置演算式におけるOperatorだと思うってこと！
+	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
 	return &p
 }
 
@@ -250,6 +258,9 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 func (p *Parser) parseExpression(curPrecedence int) ast.Expression {
 	//defer untrace(trace(fmt.Sprintf("parseExression() precedence=%d", curPrecedence)))
 
+	// myArray[1 + 2]
+	//   ↑
+
 	// 現在のトークンに応じて、前置演算式のパース用の関数を探しにいく
 	prefixFn := p.prefixParseFns[p.curToken.Type]
 
@@ -258,7 +269,7 @@ func (p *Parser) parseExpression(curPrecedence int) ast.Expression {
 		return nil
 	}
 
-	leftExp := prefixFn() // ast.IntegerLiteral{3} になっている
+	leftExp := prefixFn() // *ast.Identifier{myArray}
 
 	// 条件1: 次がセミコロンだったら、 `3;`みたいなやつだったってこと！
 	// 条件2: この条件に当てはまる
@@ -267,12 +278,15 @@ func (p *Parser) parseExpression(curPrecedence int) ast.Expression {
 		// 次のトークンのパースを優先しろって話なので、次のトークン用のパース関数を探しにいく。中置演算式のパースですね。
 		infixFn := p.infixParseFns[p.peekToken.Type]
 
+		// myArray[1 + 2]
+		//    ↑
 		if infixFn == nil {
 			return leftExp
 		}
 
 		p.nextToken()
-
+		// myArray[1 + 2]
+		//        ↑
 		leftExp = infixFn(leftExp)
 	}
 
@@ -554,4 +568,27 @@ func (p *Parser) parseExpressionList(end token.Type) []ast.Expression {
 
 	return args
 
+}
+
+func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
+	// myArray[1 + 2]
+	//        ↑
+	indexExpr := &ast.IndexExpression{
+		Token: p.curToken,
+		Left:  left,
+	}
+
+	p.nextToken()
+
+	// myArray[1 + 2]
+	//         ↑
+	indexExpr.Index = p.parseExpression(LOWEST)
+
+	// myArray[1 + 2]
+	//             ↑
+	if !p.expectPeek(token.RBRACKET) {
+		return nil
+	}
+
+	return indexExpr
 }
