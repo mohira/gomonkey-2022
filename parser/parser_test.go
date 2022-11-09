@@ -355,6 +355,16 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		{"a + add(b * c) + d", "((a + add((b * c))) + d)"},
 		{"add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"},
 		{"add(a + b + c * d / f + g)", "add((((a + b) + ((c * d) / f)) + g))"},
+
+		// 4.4.3 添字の計算は最強！ プライマリだ！
+		{"a * [1, 2, 3, 4][b * c] * d", "((a * ([1, 2, 3, 4][(b * c)])) * d)"},
+		{"add(a * b[2], b[1], 2 * [1, 2][1])", "add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))"},
+
+		// 添字演算子の優先順位が、呼び出し式のみならず中置式の「 * 」演算子よりも高いことを 期待している。
+		//    2 * b[0]
+		// o: (2 * (b[0]))
+		// x: ((2 * b)[0]) ← ちがうよ！
+		{"2 * b[0]", "(2 * (b[0]))"},
 	}
 
 	for _, tt := range tests {
@@ -809,5 +819,32 @@ func TestParsingArrayLiterals_空の配列の場合(t *testing.T) {
 
 	if len(arrayLiteral.Elements) != 0 {
 		t.Fatalf("要素数が0じゃないよ！ got=%d", len(arrayLiteral.Elements))
+	}
+}
+
+func TestParsingIndexExpressions(t *testing.T) {
+	input := "myArray[1 + 2]"
+
+	l := lexer.New(input)
+	p := parser.New(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("だめだよ")
+	}
+
+	indexExpr, ok := exprStmt.Expression.(*ast.IndexExpression)
+	if !ok {
+		t.Fatalf("*ast.IndexExpressionになってないよ！ got=%T", exprStmt.Expression)
+	}
+
+	if !testIdentifier(t, indexExpr.Left, "myArray") {
+		return
+	}
+
+	if !testInfixExpression(t, indexExpr.Index, 1, "+", 2) {
+		return
 	}
 }

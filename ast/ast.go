@@ -403,3 +403,32 @@ func (al *ArrayLiteral) String() string {
 
 	return out.String()
 }
+
+type IndexExpression struct {
+	// <expression>[<expression>]
+	Token token.Token // '['
+	Left  Expression
+	Index Expression
+}
+
+func (ie *IndexExpression) expressionNode() {
+	panic("implement me")
+}
+
+func (ie *IndexExpression) TokenLiteral() string {
+	return ie.Token.Literal
+}
+
+func (ie *IndexExpression) String() string {
+	// (array[index])
+	var out strings.Builder
+
+	out.WriteString("(")
+	out.WriteString(ie.Left.String())
+	out.WriteString("[")
+	out.WriteString(ie.Index.String())
+	out.WriteString("]")
+	out.WriteString(")")
+
+	return out.String()
+}
