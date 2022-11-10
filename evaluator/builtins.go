@@ -89,4 +89,29 @@ var builtins = map[string]*object.Builtin{
 			}
 		},
 	},
+	"push": {
+		Fn: func(args ...object.Object) object.Object {
+			// 引数は2個でないとダメ
+			if len(args) != 2 {
+				return newError("argument error: wrong number of arguments (given %d, expected %d)", len(args), 2)
+			}
+
+			arg1 := args[0]
+			arg2 := args[1]
+
+			// 第1引数のデータ型が配列じゃないとだめ
+			if arg1.Type() != object.ArrayObj {
+				return newError("first argument to `push` not supported, got %s", arg1.Type())
+			}
+
+			arrayOrg := arg1.(*object.Array)
+			newElements := append(arrayOrg.Elements, arg2)
+			// make()で確保したほうが伸長しなくなるっぽいのでメモリ的に有利っぽい。
+			// そのときにappendじゃなくて、arr[length] = arg2 みたいな代入になって
+			// append感がちょっと減るじゃん？。
+			// それが嫌だなーっておもったので、append関数にしたんだと思います(後付)
+
+			return &object.Array{Elements: newElements}
+		},
+	},
 }

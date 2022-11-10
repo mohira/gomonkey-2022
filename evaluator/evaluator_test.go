@@ -545,6 +545,21 @@ func TestBuiltinFunctions(t *testing.T) {
 
 		{`rest()`, "argument error: wrong number of arguments (given 0, expected 1)"},
 		{`rest([1], [2])`, "argument error: wrong number of arguments (given 2, expected 1)"},
+
+		// push
+		{"push([1, 2, 3], 4)", []int{1, 2, 3, 4}},
+		// {"push([1, 2, 3], true)", []any{1, 2, 3, true}}, // 検証する価値はあるけど、テスト関数が面倒なので後回しにしますね？
+		{"let a = [1, 2, 3]; let b = push(a, 4); a;", []int{1, 2, 3}},
+
+		// error: 第一引数は配列じゃないとだめですお
+		{"push(1, 9)", "first argument to `push` not supported, got INTEGER"},
+		{`push("foo", 9)`, "first argument to `push` not supported, got STRING"},
+		{`push(true, 9)`, "first argument to `push` not supported, got BOOLEAN"},
+
+		// error: 引数過不足
+		{`push()`, "argument error: wrong number of arguments (given 0, expected 2)"},
+		{`push([1,2,3])`, "argument error: wrong number of arguments (given 1, expected 2)"},
+		{`push([1,2,3], [4,5,6], [7,8,9])`, "argument error: wrong number of arguments (given 3, expected 2)"},
 	}
 
 	for _, tt := range tests {
