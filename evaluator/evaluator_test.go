@@ -510,6 +510,9 @@ func TestBuiltinFunctions(t *testing.T) {
 
 		// TODO: 組み込み関数は事前宣言されているだけで、あとから上書きありにする？ どうする？
 		// {`let len = fn(x) {return 1;}; len("hoge")`, 1},
+
+		// lenで配列の要素数もわかるよ
+		{"len([1, 2, 3])", 3},
 	}
 
 	for _, tt := range tests {
