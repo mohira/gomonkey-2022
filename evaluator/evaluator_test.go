@@ -534,6 +534,17 @@ func TestBuiltinFunctions(t *testing.T) {
 
 		{`last()`, "argument error: wrong number of arguments (given 0, expected 1)"},
 		{`last([1], [2])`, "argument error: wrong number of arguments (given 2, expected 1)"},
+
+		{"rest([1, 2, 3])", []int{2, 3}},
+		{"rest([3, 1, 4])", []int{1, 4}},
+
+		{"let a = [1,2,3]; let b = rest(a); a;", []int{1, 2, 3}}, // 元の配列を破壊しない
+		{"rest(1)", "argument to `rest` not supported, got INTEGER"},
+		{`rest("foo")`, "argument to `rest` not supported, got STRING"},
+		{`rest(true)`, "argument to `rest` not supported, got BOOLEAN"},
+
+		{`rest()`, "argument error: wrong number of arguments (given 0, expected 1)"},
+		{`rest([1], [2])`, "argument error: wrong number of arguments (given 2, expected 1)"},
 	}
 
 	for _, tt := range tests {
@@ -552,10 +563,37 @@ func TestBuiltinFunctions(t *testing.T) {
 				if errObj.Message != expected {
 					t.Errorf("おかしいよ。expected=%s, got=%s", expected, errObj.Message)
 				}
+			case []int:
+				testArrayEqual(t, evaluated, expected)
 			}
 		})
 	}
+}
 
+func testArrayEqual(t *testing.T, obj object.Object, expected []int) bool {
+	t.Helper()
+
+	array, ok := obj.(*object.Array)
+	if !ok {
+		t.Errorf("*object.Array じゃないよ。got=%T", obj)
+		return false
+	}
+
+	if len(array.Elements) != len(expected) {
+		t.Errorf("要素数が違うよ！！ got=%d, want=%d", len(array.Elements), len(expected))
+		return false
+	}
+
+	for i, want := range expected {
+		got := array.Elements[i].(*object.Integer).Value
+
+		if got != int64(want) {
+			t.Errorf("%d番目の要素が違うよ！ got=%d, want=%d", i, got, want)
+			return false
+		}
+	}
+
+	return true
 }
 
 func TestArrayLiteral(t *testing.T) {

@@ -64,4 +64,29 @@ var builtins = map[string]*object.Builtin{
 			}
 		},
 	},
+	"rest": {
+		Fn: func(args ...object.Object) object.Object {
+			// 引数は1個でないとだめ
+			if len(args) != 1 {
+				return newError("argument error: wrong number of arguments (given %d, expected %d)", len(args), 1)
+			}
+
+			// 引数のデータ型が配列じゃないとだめ
+			switch arg := args[0].(type) {
+			case *object.Array:
+				// MEMO: 要素数が0の場合の rest は [] という設計もある。
+				length := len(arg.Elements)
+				if length == 0 {
+					return NULL
+				}
+
+				rest := make([]object.Object, length-1)
+				copy(rest, arg.Elements[1:length])
+
+				return &object.Array{Elements: rest}
+			default:
+				return newError("argument to `rest` not supported, got %s", arg.Type())
+			}
+		},
+	},
 }
