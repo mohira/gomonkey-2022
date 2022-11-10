@@ -42,7 +42,26 @@ var builtins = map[string]*object.Builtin{
 			default:
 				return newError("argument to `first` not supported, got %s", arg.Type())
 			}
+		},
+	},
+	"last": {
+		Fn: func(args ...object.Object) object.Object {
+			// 引数は1個でないとだめ
+			if len(args) != 1 {
+				return newError("argument error: wrong number of arguments (given %d, expected %d)", len(args), 1)
+			}
 
+			// 引数のデータ型が配列じゃないとだめ
+			switch arg := args[0].(type) {
+			case *object.Array:
+				// MEMO: 要素数が0なら、どうするか？ NULL にしました
+				if len(arg.Elements) == 0 {
+					return NULL
+				}
+				return arg.Elements[len(arg.Elements)-1]
+			default:
+				return newError("argument to `last` not supported, got %s", arg.Type())
+			}
 		},
 	},
 }

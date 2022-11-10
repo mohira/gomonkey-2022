@@ -524,6 +524,16 @@ func TestBuiltinFunctions(t *testing.T) {
 
 		// いつかやる: なんか面倒に感じたし、インタプリタ感はないから後回しにした。
 		// {`first([])`, nil},
+
+		{"last([1, 2, 3])", 3},
+		{"last([3, 1, 4])", 4},
+
+		{"last(1)", "argument to `last` not supported, got INTEGER"},
+		{`last("foo")`, "argument to `last` not supported, got STRING"},
+		{`last(true)`, "argument to `last` not supported, got BOOLEAN"},
+
+		{`last()`, "argument error: wrong number of arguments (given 0, expected 1)"},
+		{`last([1], [2])`, "argument error: wrong number of arguments (given 2, expected 1)"},
 	}
 
 	for _, tt := range tests {
