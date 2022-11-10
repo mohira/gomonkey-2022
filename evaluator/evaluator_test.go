@@ -513,6 +513,17 @@ func TestBuiltinFunctions(t *testing.T) {
 
 		// lenで配列の要素数もわかるよ
 		{"len([1, 2, 3])", 3},
+
+		{"first([1, 2, 3])", 1},
+		{"first([3, 1, 4])", 3},
+		{"first(1)", "argument to `first` not supported, got INTEGER"},
+		{`first("foo")`, "argument to `first` not supported, got STRING"},
+		{`first(true)`, "argument to `first` not supported, got BOOLEAN"},
+		{`first()`, "argument error: wrong number of arguments (given 0, expected 1)"},
+		{`first([1], [2])`, "argument error: wrong number of arguments (given 2, expected 1)"},
+
+		// いつかやる: なんか面倒に感じたし、インタプリタ感はないから後回しにした。
+		// {`first([])`, nil},
 	}
 
 	for _, tt := range tests {
@@ -532,7 +543,6 @@ func TestBuiltinFunctions(t *testing.T) {
 					t.Errorf("おかしいよ。expected=%s, got=%s", expected, errObj.Message)
 				}
 			}
-
 		})
 	}
 
