@@ -636,8 +636,22 @@ func (p *Parser) parseHashLiteral() ast.Expression {
 
 		// TODO: ケツカンマケースどうしよう？
 		// {"foo: "bar", }
-		if p.peekTokenIs(token.COMMA) {
-			p.nextToken()
+		//if p.peekTokenIs(token.COMMA) {
+		//	p.nextToken()
+		//}
+
+		// 1) {"foo": "bar"  }
+		// 2) {"foo": "bar", }
+		// 3) {"foo": "bar", "age": 5}
+		// NG
+		// 4) {"foo": "bar": }
+		// この実装の方が、エラーを報告するときにより意義のある情報になるから、こっちのが良いね
+		// こんなイメージ
+		// {"foo": "bar": }
+		//             ^
+		// parser error: "😢 次のトークンは , になってほしいけど、 : が来ちゃってる！"
+		if !p.peekTokenIs(token.RBRACE) && !p.expectPeek(token.COMMA) {
+			return nil
 		}
 	}
 
