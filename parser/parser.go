@@ -113,6 +113,9 @@ func New(l *lexer.Lexer) *Parser {
 	// 4.4.2 配列リテラル
 	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
 
+	// 4.5.2 ハッシュリテラル
+	p.registerPrefix(token.LBRACE, p.parseHashLiteral)
+
 	p.infixParseFns = make(map[token.Type]infixParseFn)
 	p.registerInfix(token.EQ, p.parseInfixExpression)
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
@@ -131,6 +134,7 @@ func New(l *lexer.Lexer) *Parser {
 	// myArray[0]
 	// `[` を 中置演算式におけるOperatorだと思うってこと！
 	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
+
 	return &p
 }
 
@@ -591,4 +595,56 @@ func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
 	}
 
 	return indexExpr
+}
+
+func (p *Parser) parseHashLiteral() ast.Expression {
+	// { "foo": "bar" }
+	// { "foo": "bar", "age": 25 }
+	// { }
+	// ↑
+	hashLiteral := &ast.HashLiteral{
+		Token: p.curToken,
+		Pairs: make(map[ast.Expression]ast.Expression),
+	}
+
+	for !p.peekTokenIs(token.RBRACE) {
+		// {"foo": "bar"}
+		// {"foo": "bar", "age": 25}
+		p.nextToken()
+
+		key := p.parseExpression(LOWEST)
+
+		// : じゃないとだめです
+		if !p.expectPeek(token.COLON) {
+			return nil
+		}
+		// {"foo": "bar", "age": 25}
+		//       ↑
+		p.nextToken()
+
+		// {"foo": "bar", "age": 25}
+		//           ↑
+		value := p.parseExpression(LOWEST)
+
+		hashLiteral.Pairs[key] = value
+		// {"foo": "bar", "age": 25}
+		//             ↑
+		// {"foo": "bar"}
+		//             ↑
+		// {"foo": "bar", }
+		//             ↑
+
+		// TODO: ケツカンマケースどうしよう？
+		// {"foo: "bar", }
+		if p.peekTokenIs(token.COMMA) {
+			p.nextToken()
+		}
+	}
+
+	// この時点では、 } の一個手前のトークンがある
+	if !p.expectPeek(token.RBRACE) {
+		return nil
+	}
+
+	return hashLiteral
 }
