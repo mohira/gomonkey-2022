@@ -1,6 +1,7 @@
 package ast
 
 import (
+	"fmt"
 	"gomonkey/token"
 	"strings"
 )
@@ -429,6 +430,34 @@ func (ie *IndexExpression) String() string {
 	out.WriteString(ie.Index.String())
 	out.WriteString("]")
 	out.WriteString(")")
+
+	return out.String()
+}
+
+type HashLiteral struct {
+	Token token.Token // `{`トークン
+	Pairs map[Expression]Expression
+}
+
+func (hl *HashLiteral) expressionNode() {
+	panic("implement me")
+}
+
+func (hl *HashLiteral) TokenLiteral() string {
+	return hl.Token.Literal
+}
+func (hl *HashLiteral) String() string {
+	// {"foo": "bar", "bob": "tom", }
+	var out strings.Builder
+
+	var pairs []string
+	for key, value := range hl.Pairs {
+		pairs = append(pairs, fmt.Sprintf("%s: %s", key, value))
+	}
+
+	out.WriteString("{")
+	out.WriteString(strings.Join(pairs, ", "))
+	out.WriteString("}")
 
 	return out.String()
 }

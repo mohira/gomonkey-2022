@@ -848,3 +848,119 @@ func TestParsingIndexExpressions(t *testing.T) {
 		return
 	}
 }
+
+func TestParsingHashLiteralsStringKeys(t *testing.T) {
+	input := `{"one": 1, "two": 2, "three": 3}`
+
+	l := lexer.New(input)
+	p := parser.New(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("*ast.ExpressionStatementじゃないよ。got=%T", program.Statements[0])
+	}
+
+	hashLiteral, ok := exprStmt.Expression.(*ast.HashLiteral)
+	if !ok {
+		t.Fatalf("*ast.HashLiteral じゃないよ。got=%T", exprStmt.Expression)
+	}
+
+	if len(hashLiteral.Pairs) != 3 {
+		t.Errorf("要素数が3じゃないよ.got=%d", len(hashLiteral.Pairs))
+	}
+
+	want := map[string]int64{
+		"one":   1,
+		"two":   2,
+		"three": 3,
+	}
+
+	for key, value := range hashLiteral.Pairs {
+		str, ok := key.(*ast.StringLiteral)
+		if !ok {
+			t.Errorf("ハッシュリテラルのKeyが ast.StringLiteral じゃないよ。got=%T", key)
+		}
+
+		wantValue := want[str.String()]
+
+		testIntegerLiteral(t, value, wantValue)
+	}
+}
+
+func TestParsingEmptyHashLiteral(t *testing.T) {
+	input := "{}"
+
+	l := lexer.New(input)
+	p := parser.New(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("*ast.ExpressionStatementじゃないよ。got=%T", program.Statements[0])
+	}
+
+	hashLiteral, ok := exprStmt.Expression.(*ast.HashLiteral)
+	if !ok {
+		t.Fatalf("*ast.HashLiteral じゃないよ。got=%T", exprStmt.Expression)
+	}
+
+	if len(hashLiteral.Pairs) != 0 {
+		t.Errorf("要素数が0じゃないよ.got=%d", len(hashLiteral.Pairs))
+	}
+}
+
+func TestParsingHashLiteralsWithExpression(t *testing.T) {
+	input := `{"one": 0 + 1, "two": 10 - 8, "three": 15 / 5}`
+
+	l := lexer.New(input)
+	p := parser.New(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("*ast.ExpressionStatementじゃないよ。got=%T", program.Statements[0])
+	}
+
+	hashLiteral, ok := exprStmt.Expression.(*ast.HashLiteral)
+	if !ok {
+		t.Fatalf("*ast.HashLiteral じゃないよ。got=%T", exprStmt.Expression)
+	}
+
+	if len(hashLiteral.Pairs) != 3 {
+		t.Errorf("要素数が3じゃないよ.got=%d", len(hashLiteral.Pairs))
+	}
+
+	// このテスト方式にするなら、infixExpr以外のケースも入れたほうが良くない？
+	tests := map[string]func(ast.Expression){
+		"one": func(expr ast.Expression) {
+			testInfixExpression(t, expr, 0, "+", 1)
+		},
+		"two": func(expr ast.Expression) {
+			testInfixExpression(t, expr, 10, "-", 8)
+		},
+		"three": func(expr ast.Expression) {
+			testInfixExpression(t, expr, 15, "/", 5)
+		},
+	}
+
+	for key, value := range hashLiteral.Pairs {
+		str, ok := key.(*ast.StringLiteral)
+
+		if !ok {
+			t.Errorf("ハッシュリテラルのKeyが ast.StringLiteral じゃないよ。got=%T", key)
+			continue
+		}
+
+		testFunc, ok := tests[str.String()]
+		if !ok {
+			t.Errorf("そのKey %q に対するテスト関数が見つからないよ！", str.String())
+			continue
+		}
+
+		testFunc(value)
+	}
+}
