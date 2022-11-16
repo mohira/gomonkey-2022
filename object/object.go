@@ -3,6 +3,7 @@ package object
 import (
 	"fmt"
 	"gomonkey/ast"
+	"hash/fnv"
 	"strings"
 )
 
@@ -172,4 +173,17 @@ func (a *Array) Inspect() string {
 	out.WriteString("]")
 
 	return out.String()
+}
+
+// HashKey ハッシュ値を表現する構造体。別にObjectインタフェースは満足してないよ
+type HashKey struct {
+	Type  Type
+	Value uint64
+}
+
+func (s *String) HashKey() HashKey {
+	h := fnv.New64a()
+	_, _ = h.Write([]byte(s.Value))
+
+	return HashKey{Type: s.Type(), Value: h.Sum64()}
 }
