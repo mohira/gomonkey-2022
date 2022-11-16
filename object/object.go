@@ -187,3 +187,17 @@ func (s *String) HashKey() HashKey {
 
 	return HashKey{Type: s.Type(), Value: h.Sum64()}
 }
+
+func (i *Integer) HashKey() HashKey {
+	// ポインタじゃないからこれでおk
+	// ハッシュ値の演算は不要
+	return HashKey{Type: i.Type(), Value: uint64(i.Value)}
+}
+
+func (b *Boolean) HashKey() HashKey {
+	var v uint64
+	if b.Value {
+		v = 1
+	}
+	return HashKey{Type: b.Type(), Value: v}
+}
