@@ -19,6 +19,7 @@ const (
 
 	FunctionObj = "FUNCTION"
 	BuiltinObj  = "BUILTIN"
+	HashObj     = "HASH"
 
 	// 発見: ユーザー定義"関数" と 組み込み"関数" は monkeyのオブジェクトの世界だと全く別物！
 	/*
@@ -200,4 +201,38 @@ func (b *Boolean) HashKey() HashKey {
 		v = 1
 	}
 	return HashKey{Type: b.Type(), Value: v}
+}
+
+// HashPair がわざわざ必要なのなんでなん？ ← Keyを記録したいから
+// 後からREPLでMonkeyのハッシュを表示するとき、ハッシュに格納されている値だけでなく、そのキーも表示したいんだ。
+type HashPair struct {
+	Key   Object
+	Value Object
+}
+
+type Hash struct {
+	Pairs map[HashKey]HashPair // map[HashKey]Object ではだめな理由は？
+}
+
+func (h *Hash) Type() Type {
+	return HashObj
+}
+
+func (h *Hash) Inspect() string {
+	// {"name": "Bob",
+	//  "age": 25,
+	//  "points": {"a": 100, "b: 200},
+	// }
+	var out strings.Builder
+
+	var pairs []string
+	for _, hashPair := range h.Pairs {
+		pairs = append(pairs, fmt.Sprintf("%s: %s", hashPair.Key.Inspect(), hashPair.Value.Inspect()))
+	}
+
+	out.WriteString("{")
+	out.WriteString(strings.Join(pairs, ", "))
+	out.WriteString("}")
+
+	return out.String()
 }
