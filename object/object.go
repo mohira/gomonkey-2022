@@ -182,6 +182,10 @@ type HashKey struct {
 	Value uint64
 }
 
+type Hashable interface {
+	HashKey() HashKey
+}
+
 func (s *String) HashKey() HashKey {
 	h := fnv.New64a()
 	_, _ = h.Write([]byte(s.Value))
