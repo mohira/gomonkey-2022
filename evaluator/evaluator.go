@@ -123,31 +123,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	case *ast.HashLiteral:
 		// MEMO: 変数名がややこしいね！
 		// MEMO: 関数に切り出してもいいと思うよ！
-		hash := &object.Hash{Pairs: make(map[object.HashKey]object.HashPair)}
-
-		for keyExpression, valueExpression := range n.Pairs {
-			key := Eval(keyExpression, env)
-			if isError(key) {
-				return key
-			}
-
-			value := Eval(valueExpression, env)
-			if isError(value) {
-				return value
-			}
-
-			// key は Hashable じゃないとダメ
-			hashableObj, ok := key.(object.Hashable)
-			if !ok {
-				return newError("unhashable type: %s", key.Type())
-			}
-
-			hashKey := hashableObj.HashKey()
-
-			hash.Pairs[hashKey] = object.HashPair{Key: key, Value: value}
-		}
-
-		return hash
+		return evalHashLiteral(n, env)
 
 	case *ast.IndexExpression:
 		left := Eval(n.Left, env)
@@ -167,10 +143,37 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return &object.String{Value: n.Value}
 	case *ast.Boolean:
 		return nativeBoolToBooleanObject(n.Value)
-
 	}
 
 	return nil
+}
+
+func evalHashLiteral(hashLiteral *ast.HashLiteral, env *object.Environment) object.Object {
+	pairs := make(map[object.HashKey]object.HashPair)
+
+	for keyNode, valueNode := range hashLiteral.Pairs {
+		key := Eval(keyNode, env)
+		if isError(key) {
+			return key
+		}
+
+		// keyがおかしいなら、valueを評価する前に処理したほうが良いよね
+		hashableObj, ok := key.(object.Hashable)
+		if !ok {
+			return newError("unhashable type: %s", key.Type())
+		}
+
+		value := Eval(valueNode, env)
+		if isError(value) {
+			return value
+		}
+
+		hashed := hashableObj.HashKey()
+
+		pairs[hashed] = object.HashPair{Key: key, Value: value}
+	}
+
+	return &object.Hash{Pairs: pairs}
 }
 
 func evalIndexExpression(left, index object.Object) object.Object {
