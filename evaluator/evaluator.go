@@ -119,6 +119,36 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 
 		return &object.Array{Elements: elements}
+
+	case *ast.HashLiteral:
+		// MEMO: 変数名がややこしいね！
+		// MEMO: 関数に切り出してもいいと思うよ！
+		hash := &object.Hash{Pairs: make(map[object.HashKey]object.HashPair)}
+
+		for keyExpression, valueExpression := range n.Pairs {
+			key := Eval(keyExpression, env)
+			if isError(key) {
+				return key
+			}
+
+			value := Eval(valueExpression, env)
+			if isError(value) {
+				return value
+			}
+
+			// key は Hashable じゃないとダメ
+			hashableObj, ok := key.(object.Hashable)
+			if !ok {
+				return newError("TODO: hashableじゃないよ")
+			}
+
+			hashKey := hashableObj.HashKey()
+
+			hash.Pairs[hashKey] = object.HashPair{Key: key, Value: value}
+		}
+
+		return hash
+
 	case *ast.IndexExpression:
 		left := Eval(n.Left, env)
 		if isError(left) {
