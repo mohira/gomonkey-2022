@@ -459,6 +459,11 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) obje
 
 	}
 
+	// blockStatement が 空 だと、object.Objectのゼロ値が入ってさあ大変！
+	if result == nil {
+		return NULL
+	}
+
 	return result
 }
 
