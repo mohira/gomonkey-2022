@@ -180,6 +180,19 @@ func evalIndexExpression(left, index object.Object) object.Object {
 	switch {
 	case left.Type() == object.ArrayObj && index.Type() == object.IntegerObj:
 		return evalArrayIndexExpression(left, index)
+	case left.Type() == object.HashObj:
+		hashableObj, ok := index.(object.Hashable)
+		if !ok {
+			return newError("unhashable type: %s", index.Type())
+		}
+
+		hash := left.(*object.Hash)
+
+		pair, ok := hash.Pairs[hashableObj.HashKey()]
+		if !ok {
+			return NULL // KeyErrorじゃないんだ...😢
+		}
+		return pair.Value
 	default:
 		// ここで捌いたほうが、汎用のエラーメッセージになって、とても良いと思います！
 		// つまり、case *ast.IndexExpression -> evalIndexExpression() -> evalArrayIndexExpression()
