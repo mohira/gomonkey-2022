@@ -181,24 +181,28 @@ func evalIndexExpression(left, index object.Object) object.Object {
 	case left.Type() == object.ArrayObj && index.Type() == object.IntegerObj:
 		return evalArrayIndexExpression(left, index)
 	case left.Type() == object.HashObj:
-		hashableObj, ok := index.(object.Hashable)
-		if !ok {
-			return newError("unhashable type: %s", index.Type())
-		}
-
-		hash := left.(*object.Hash)
-
-		pair, ok := hash.Pairs[hashableObj.HashKey()]
-		if !ok {
-			return NULL // KeyErrorじゃないんだ...😢
-		}
-		return pair.Value
+		return evalHashIndexExpression(left, index)
 	default:
 		// ここで捌いたほうが、汎用のエラーメッセージになって、とても良いと思います！
 		// つまり、case *ast.IndexExpression -> evalIndexExpression() -> evalArrayIndexExpression()
 		// という流れの良さがここでわかったと思います。
 		return newError("index operator not supported: %s", left.Type())
 	}
+}
+
+func evalHashIndexExpression(left object.Object, index object.Object) object.Object {
+	hash := left.(*object.Hash)
+
+	hashableObj, ok := index.(object.Hashable)
+	if !ok {
+		return newError("unhashable type: %s", index.Type())
+	}
+
+	pair, ok := hash.Pairs[hashableObj.HashKey()]
+	if !ok {
+		return NULL // KeyErrorじゃないんだ...😢
+	}
+	return pair.Value
 }
 
 func evalArrayIndexExpression(array, index object.Object) object.Object {
