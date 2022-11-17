@@ -311,6 +311,9 @@ func TestErrorHandling(t *testing.T) {
 		{"{[1,2,3]: 4}", "unhashable type: ARRAY"},
 		{"{fn(){}: 4}", "unhashable type: FUNCTION"},
 		{"{len: 4}", "unhashable type: BUILTIN"},
+
+		//
+		{`{"name": "Monkey"}[fn(x) { x }];`, "unhashable type: FUNCTION"},
 	}
 
 	for _, tt := range tests {
@@ -716,4 +719,33 @@ func TestHashLiterals(t *testing.T) {
 		testIntegerObject(t, pair.Value, expectedValue)
 	}
 
+}
+
+func TestHashIndexExpressions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected any
+	}{
+		{`{"foo": 5}["foo"]`, 5},
+		{`{"foo": 5}["bar"]`, nil},
+		{`let key = "foo"; {"foo": 5}[key]`, 5},
+		{`{}["foo"]`, nil},
+		{`{4: 5}[4]`, 5},
+		{`{true: 5}[true]`, 5},
+		{`{false: 5}[false]`, 5},
+
+		// MEMO: 添字が Unhashable の場合はどうするの？
+		// {`{false: 5}[fn(){}]`, 5},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+
+		intValue, ok := tt.expected.(int)
+		if ok {
+			testIntegerObject(t, evaluated, int64(intValue))
+		} else {
+			testNullObject(t, evaluated)
+		}
+	}
 }
