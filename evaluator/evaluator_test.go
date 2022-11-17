@@ -306,6 +306,11 @@ func TestErrorHandling(t *testing.T) {
 
 		// ["foo" + 1]
 		{`["foo" + 1]`, "type mismatch: STRING + INTEGER"},
+
+		// ハッシュ可能でないオブジェクトは、ハッシュのキーにはできません！
+		{"{[1,2,3]: 4}", "unhashable type: ARRAY"},
+		{"{fn(){}: 4}", "unhashable type: FUNCTION"},
+		{"{len: 4}", "unhashable type: BUILTIN"},
 	}
 
 	for _, tt := range tests {

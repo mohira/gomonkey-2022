@@ -139,7 +139,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			// key は Hashable じゃないとダメ
 			hashableObj, ok := key.(object.Hashable)
 			if !ok {
-				return newError("TODO: hashableじゃないよ")
+				return newError("unhashable type: %s", key.Type())
 			}
 
 			hashKey := hashableObj.HashKey()
