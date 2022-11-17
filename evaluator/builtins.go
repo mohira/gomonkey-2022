@@ -1,6 +1,7 @@
 package evaluator
 
 import (
+	"fmt"
 	"gomonkey/object"
 )
 
@@ -112,6 +113,15 @@ var builtins = map[string]*object.Builtin{
 			// それが嫌だなーっておもったので、append関数にしたんだと思います(後付)
 
 			return &object.Array{Elements: newElements}
+		},
+	},
+	"puts": {
+		Fn: func(args ...object.Object) object.Object {
+			for _, arg := range args {
+				fmt.Println(arg.Inspect())
+			}
+
+			return NULL
 		},
 	},
 }
