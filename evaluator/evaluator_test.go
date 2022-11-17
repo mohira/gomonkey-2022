@@ -670,3 +670,45 @@ func TestArrayIndexExpressions(t *testing.T) {
 	}
 
 }
+
+func TestHashLiterals(t *testing.T) {
+	input := `let two = "two";
+	{
+		"one": 10 - 9,
+		two: 1 + 1,
+		"thr" + "ee": 6 / 2,
+		4: 4,
+		true: 5,
+		false: 6
+	}`
+
+	evaluated := testEval(input)
+
+	hashObj, ok := evaluated.(*object.Hash)
+	if !ok {
+		t.Fatalf("*object.Hashじゃないよ. got=%[1]T (%+[1]v)", evaluated)
+	}
+
+	expected := map[object.HashKey]int64{
+		(&object.String{Value: "one"}).HashKey():   1,
+		(&object.String{Value: "two"}).HashKey():   2,
+		(&object.String{Value: "three"}).HashKey(): 3,
+		(&object.Integer{Value: 4}).HashKey():      4,
+		evaluator.TRUE.HashKey():                   5,
+		evaluator.FALSE.HashKey():                  6,
+	}
+
+	if len(hashObj.Pairs) != 6 {
+		t.Fatalf("Hashの要素数がおかしいよ。want=6, got=%d", len(hashObj.Pairs))
+	}
+
+	for expectedKey, expectedValue := range expected {
+		pair, ok := hashObj.Pairs[expectedKey]
+		if !ok {
+			t.Errorf("その key に対応する 要素ないよ")
+		}
+
+		testIntegerObject(t, pair.Value, expectedValue)
+	}
+
+}
