@@ -52,6 +52,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return function // Evalした地点でErrorだったらもうErrorオブジェクトなので、newErrorは不要だよ！
 		}
 
+		if function == builtins["quote"] {
+			return &object.Quote{Node: n.Arguments[0]}
+		}
+
 		// 「引数のリスト」だけど「複数の式」って捉えるほうがかっちょいいね
 		args := evalExpressions(n.Arguments, env) // OBJECTのスライス
 

@@ -124,4 +124,9 @@ var builtins = map[string]*object.Builtin{
 			return NULL
 		},
 	},
+	"quote": {
+		Fn: func(args ...object.Object) object.Object {
+			return nil
+		},
+	},
 }
