@@ -49,6 +49,19 @@ func TestModify(t *testing.T) {
 			&ast.InfixExpression{Left: two(), Operator: "+", Right: one()},
 			&ast.InfixExpression{Left: two(), Operator: "+", Right: two()},
 		},
+
+		// 前置演算式
+		{
+			&ast.PrefixExpression{Operator: "-", Right: one()},
+			&ast.PrefixExpression{Operator: "-", Right: two()},
+		},
+
+		// 添字演算子式
+		{
+			// `1[1]` -> `2[2]` は評価エラーだけど、いまはノードの話です
+			&ast.IndexExpression{Left: one(), Index: one()},
+			&ast.IndexExpression{Left: two(), Index: two()},
+		},
 	}
 
 	for i, tt := range tests {
