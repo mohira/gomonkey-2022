@@ -33,6 +33,8 @@ const (
 		<function add at 0x1013d3250>
 	*/
 	ArrayObj = "ARRAY"
+
+	QuoteObj = "QUOTE"
 )
 
 type Object interface {
@@ -239,4 +241,16 @@ func (h *Hash) Inspect() string {
 	out.WriteString("}")
 
 	return out.String()
+}
+
+type Quote struct {
+	Node ast.Node
+}
+
+func (q *Quote) Type() Type {
+	return QuoteObj
+}
+
+func (q *Quote) Inspect() string {
+	return "QUOTE(" + q.Node.String() + ")"
 }
