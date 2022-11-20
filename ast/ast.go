@@ -452,7 +452,8 @@ func (hl *HashLiteral) String() string {
 
 	var pairs []string
 	for key, value := range hl.Pairs {
-		pairs = append(pairs, fmt.Sprintf("%s: %s", key, value))
+		// pairs = append(pairs, key.String()+":"+value.String())
+		pairs = append(pairs, fmt.Sprintf("%s: %s", key.String(), value.String()))
 	}
 
 	out.WriteString("{")

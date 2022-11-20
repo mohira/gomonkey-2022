@@ -156,5 +156,45 @@ func TestModify(t *testing.T) {
 		})
 
 	}
+}
 
+func TestModifyHashLiteral(t *testing.T) {
+	one := func() ast.Expression { return &ast.IntegerLiteral{Value: 1} }
+
+	turnOneIntoTwo := func(node ast.Node) ast.Node {
+		integer, ok := node.(*ast.IntegerLiteral)
+		if !ok {
+			return node
+		}
+
+		if integer.Value != 1 {
+			return node
+		}
+
+		integer.Value = 2
+		return integer
+	}
+
+	// {1: 1, 1: 1} -は Keyの重複に見えるが、ポインタなのでセーフ
+	hashLiteral := &ast.HashLiteral{
+		Pairs: map[ast.Expression]ast.Expression{
+			one(): one(),
+			one(): one(),
+		},
+	}
+
+	// Pairsが書き換わっていればいいので、 modified = ... みたいにしなくていい
+	ast.Modify(hashLiteral, turnOneIntoTwo)
+
+	for key, val := range hashLiteral.Pairs {
+		key, _ := key.(*ast.IntegerLiteral)
+		if key.Value != 2 {
+			t.Errorf("value is not %d, got=%d", 2, key.Value)
+		}
+
+		val, _ := val.(*ast.IntegerLiteral)
+		if val.Value != 2 {
+			t.Errorf("value is not %d, got=%d", 2, val.Value)
+		}
+	}
 }

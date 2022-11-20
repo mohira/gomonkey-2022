@@ -54,6 +54,15 @@ func Modify(node Node, modifier ModifyFunc) Node {
 			node.Elements[i], _ = Modify(node.Elements[i], modifier).(Expression)
 		}
 
+	case *HashLiteral:
+		newPairs := make(map[Expression]Expression)
+		for key, value := range node.Pairs {
+			newKey, _ := Modify(key, modifier).(Expression)
+			newValue, _ := Modify(value, modifier).(Expression)
+			newPairs[newKey] = newValue
+		}
+
+		node.Pairs = newPairs
 	}
 
 	return modifier(node)
