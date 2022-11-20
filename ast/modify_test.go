@@ -135,6 +135,12 @@ func TestModify(t *testing.T) {
 				},
 			},
 		},
+
+		// 配列リテラル
+		{
+			&ast.ArrayLiteral{Elements: []ast.Expression{one(), one()}},
+			&ast.ArrayLiteral{Elements: []ast.Expression{two(), two()}},
+		},
 	}
 
 	for i, tt := range tests {
