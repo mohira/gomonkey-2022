@@ -42,6 +42,12 @@ func Modify(node Node, modifier ModifyFunc) Node {
 
 	case *LetStatement:
 		node.Value, _ = Modify(node.Value, modifier).(Expression)
+
+	case *FunctionLiteral:
+		for i := range node.Parameters {
+			node.Parameters[i], _ = Modify(node.Parameters[i], modifier).(*Identifier)
+		}
+		node.Body, _ = Modify(node.Body, modifier).(*BlockStatement)
 	}
 
 	return modifier(node)
