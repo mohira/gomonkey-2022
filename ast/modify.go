@@ -9,6 +9,11 @@ func Modify(node Node, modifier ModifyFunc) Node {
 			// MEMO: エラー処理は！？
 			node.Statements[i], _ = Modify(statement, modifier).(Statement)
 		}
+
+	case *InfixExpression:
+		node.Left, _ = Modify(node.Left, modifier).(Expression)
+		node.Right, _ = Modify(node.Right, modifier).(Expression)
+
 	case *ExpressionStatement:
 		// MEMO: エラー処理は！？
 		node.Expression, _ = Modify(node.Expression, modifier).(Expression)
