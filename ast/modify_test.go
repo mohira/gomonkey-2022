@@ -62,6 +62,48 @@ func TestModify(t *testing.T) {
 			&ast.IndexExpression{Left: one(), Index: one()},
 			&ast.IndexExpression{Left: two(), Index: two()},
 		},
+
+		// if式
+
+		{
+			// if (1) {1} else {1}
+			&ast.IfExpression{
+				Condition: one(),
+				Consequence: &ast.BlockStatement{
+					Statements: []ast.Statement{&ast.ExpressionStatement{Expression: one()}},
+				},
+				Alternative: &ast.BlockStatement{
+					Statements: []ast.Statement{&ast.ExpressionStatement{Expression: one()}},
+				},
+			},
+			// if (2) {2} else {2}
+			&ast.IfExpression{
+				Condition: two(),
+				Consequence: &ast.BlockStatement{
+					Statements: []ast.Statement{&ast.ExpressionStatement{Expression: two()}},
+				},
+				Alternative: &ast.BlockStatement{
+					Statements: []ast.Statement{&ast.ExpressionStatement{Expression: two()}},
+				},
+			},
+		},
+		// elseがないif式はvalidだからテストする
+		{
+			// if (1) {1}
+			&ast.IfExpression{
+				Condition: one(),
+				Consequence: &ast.BlockStatement{
+					Statements: []ast.Statement{&ast.ExpressionStatement{Expression: one()}},
+				},
+			},
+			// if (2) {2}
+			&ast.IfExpression{
+				Condition: two(),
+				Consequence: &ast.BlockStatement{
+					Statements: []ast.Statement{&ast.ExpressionStatement{Expression: two()}},
+				},
+			},
+		},
 	}
 
 	for i, tt := range tests {

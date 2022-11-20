@@ -9,6 +9,9 @@ func Modify(node Node, modifier ModifyFunc) Node {
 			// MEMO: エラー処理は！？
 			node.Statements[i], _ = Modify(statement, modifier).(Statement)
 		}
+	case *ExpressionStatement:
+		// MEMO: エラー処理は！？
+		node.Expression, _ = Modify(node.Expression, modifier).(Expression)
 
 	case *InfixExpression:
 		node.Left, _ = Modify(node.Left, modifier).(Expression)
@@ -20,9 +23,19 @@ func Modify(node Node, modifier ModifyFunc) Node {
 	case *IndexExpression:
 		node.Index, _ = Modify(node.Index, modifier).(Expression)
 		node.Left, _ = Modify(node.Left, modifier).(Expression)
-	case *ExpressionStatement:
-		// MEMO: エラー処理は！？
-		node.Expression, _ = Modify(node.Expression, modifier).(Expression)
+
+	case *IfExpression:
+		node.Condition, _ = Modify(node.Condition, modifier).(Expression)
+		node.Consequence, _ = Modify(node.Consequence, modifier).(*BlockStatement)
+
+		if node.Alternative != nil {
+			node.Alternative, _ = Modify(node.Alternative, modifier).(*BlockStatement)
+		}
+
+	case *BlockStatement:
+		for i, statement := range node.Statements {
+			node.Statements[i], _ = Modify(statement, modifier).(Statement)
+		}
 	}
 
 	return modifier(node)
