@@ -1,8 +1,15 @@
 # 『Go言語でつくるインタプリタ』の写経と改造
 
+## 本家
+
+- [Writing An Interpreter In Go | Thorsten Ball](https://interpreterbook.com/)
+- [O'Reilly Japan - Go言語でつくるインタプリタ](https://www.oreilly.co.jp/books/9784873118222/)
+
 ## サンプルコードDLリンク
 
 https://interpreterbook.com/waiig_code_1.4.zip
+
+<!--- ちょっと恥ずかしいのでコメントにしておこう
 
 ## Lexerこれじゃん
 
@@ -11,7 +18,6 @@ https://interpreterbook.com/waiig_code_1.4.zip
 - スライドを雑に眺めただけなんだけど、monkeyと同じやり方。なので読めた気になる
 - 並行処理を使うとレキサーの設計がEasyになるって書いてあるけどほんまか？ww
 
-<!--- ちょっと恥ずかしいのでコメントにしておこう
 
 ## 2022/08/03(水) 字句解析何も見ないチャンレジ
 
