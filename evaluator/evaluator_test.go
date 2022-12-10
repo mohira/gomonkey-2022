@@ -796,6 +796,10 @@ func TestQuoteUnquote(t *testing.T) {
 		// 気にするべきは、unquote(X) というCallExpressionのときだけ
 		{`quote(fn(a, b) { return unquote(1 + 2); })`, `fn(a, b) { return 3; }`},
 		{`quote(fn(a, b) { return 1 + 2; })`, `fn(a, b) { return (1 + 2); }`},
+
+		// envを引き回しているので、識別子の評価もできちゃうわけよ！
+		{`let foobar = 8; quote(foobar)`, `foobar`},
+		{`let foobar = 8; quote(unquote(foobar))`, `8`},
 	}
 
 	for _, tt := range tests {
