@@ -790,6 +790,12 @@ func TestQuoteUnquote(t *testing.T) {
 		// quote(Infix{INT, +, CallExpression}) って構造
 		{`quote(8 + unquote(4 + 4))`, `(8 + 8)`},
 		{`quote(unquote(4 + 4) + 8)`, `(8 + 8)`},
+
+		// 再帰のパワーでなんとかなる
+		// quote関数の引数が難しそうなASTでも関係ない！
+		// 気にするべきは、unquote(X) というCallExpressionのときだけ
+		{`quote(fn(a, b) { return unquote(1 + 2); })`, `fn(a, b) { return 3; }`},
+		{`quote(fn(a, b) { return 1 + 2; })`, `fn(a, b) { return (1 + 2); }`},
 	}
 
 	for _, tt := range tests {
