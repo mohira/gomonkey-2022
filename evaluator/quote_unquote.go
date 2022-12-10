@@ -7,12 +7,13 @@ import (
 	"gomonkey/token"
 )
 
-func quote(node ast.Node) object.Object {
-	node = evalUnquoteCalls(node)
+func quote(node ast.Node, env *object.Environment) object.Object {
+	node = evalUnquoteCalls(node, env)
+
 	return &object.Quote{Node: node}
 }
 
-func evalUnquoteCalls(quoted ast.Node) ast.Node {
+func evalUnquoteCalls(quoted ast.Node, env *object.Environment) ast.Node {
 	// to俺: ast.Modifyをまず呼びだしているからな！
 	// 第2引数の 関数 はその後やで！
 	return ast.Modify(quoted, func(node ast.Node) ast.Node {
@@ -30,9 +31,7 @@ func evalUnquoteCalls(quoted ast.Node) ast.Node {
 			// unquoteの引数は絶対1個なので、これでおk
 			arg := callExpr.Arguments[0]
 
-			// TODO: これは後でなんとかしましょう！
-			嘘env := object.NewEnvironment()
-			evaluated := Eval(arg, 嘘env)
+			evaluated := Eval(arg, env)
 
 			// object.Object -> ast.Node に変える
 			// evaluatedの中身(INT前提)をつかまえて、IntegerLiteralに詰め直す
