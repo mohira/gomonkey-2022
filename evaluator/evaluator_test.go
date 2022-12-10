@@ -800,6 +800,10 @@ func TestQuoteUnquote(t *testing.T) {
 		// envを引き回しているので、識別子の評価もできちゃうわけよ！
 		{`let foobar = 8; quote(foobar)`, `foobar`},
 		{`let foobar = 8; quote(unquote(foobar))`, `8`},
+
+		// 真偽値の場合
+		{`quote(unquote(true))`, `true`},
+		{`quote(unquote(true == false))`, `false`},
 	}
 
 	for _, tt := range tests {
