@@ -786,23 +786,25 @@ func TestQuoteUnquote(t *testing.T) {
 		{`quote(unquote(4))`, `4`},
 		{`quote(unquote(4 + 4))`, `8`},
 		{`quote(8 + unquote(4 + 4))`, `(8 + 8)`},
-		{`quote(unquote(4 + 4), 8)`, `(8 + 8)`},
+		{`quote(unquote(4 + 4) + 8)`, `(8 + 8)`},
 	}
 
 	for _, tt := range tests {
-		evaluated := testEval(tt.input)
-		quote, ok := evaluated.(*object.Quote)
-		if !ok {
-			t.Fatalf("おかしいよ！ got=%[1]T(%+[1]v)", evaluated)
-		}
+		t.Run(tt.input, func(t *testing.T) {
+			evaluated := testEval(tt.input)
+			quote, ok := evaluated.(*object.Quote)
+			if !ok {
+				t.Fatalf("おかしいよ！ got=%[1]T(%+[1]v)", evaluated)
+			}
 
-		if quote.Node == nil {
-			t.Fatalf("quote.Node is nil")
-		}
+			if quote.Node == nil {
+				t.Fatalf("quote.Node is nil")
+			}
 
-		if quote.Node.String() != tt.expected {
-			t.Errorf("ちがうよ。got=%q, want=%q", quote.Node.String(), tt.expected)
-		}
+			if quote.Node.String() != tt.expected {
+				t.Errorf("ちがうよ。got=%q, want=%q", quote.Node.String(), tt.expected)
+			}
+		})
 	}
 
 }
