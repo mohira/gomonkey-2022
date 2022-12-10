@@ -17,33 +17,47 @@ func evalUnquoteCalls(quoted ast.Node, env *object.Environment) ast.Node {
 	// to俺: ast.Modifyをまず呼びだしているからな！
 	// 第2引数の 関数 はその後やで！
 	return ast.Modify(quoted, func(node ast.Node) ast.Node {
-		callExpr, ok := node.(*ast.CallExpression)
-		if !ok {
-			// CallExpressionじゃないなら何もしません
-			// ex: quote(1 + 2)
+		if !isUnquoteCall(node) {
 			return node
 		}
 
-		// CallExpressionが確定！
-		// もし、Functionが `unquote`なら、Modifyチャンス！
-		if callExpr.Function.TokenLiteral() == "unquote" {
-			// ex: unquote(1)だったら、ここだけ評価する
-			// unquoteの引数は絶対1個なので、これでおk
-			arg := callExpr.Arguments[0]
+		// CallExpressionが確定しているのでエラーチェックいらないでしょ？ と思うのでそうしてます。
+		callExpr := node.(*ast.CallExpression)
 
-			evaluated := Eval(arg, env)
-
-			// object.Object -> ast.Node に変える
-			// evaluatedの中身(INT前提)をつかまえて、IntegerLiteralに詰め直す
-			intObj, _ := evaluated.(*object.Integer)
-			intNode := &ast.IntegerLiteral{
-				Token: token.Token{Type: "INT", Literal: fmt.Sprintf("%d", intObj.Value)},
-				Value: intObj.Value,
-			}
-			return intNode
+		if len(callExpr.Arguments) != 1 {
+			// 他のとこでチェックかもしれんが、とりあえずここでチェックしておく。やや些末なので別にいいでしょって思ってる。
+			return node
 		}
 
-		return node
+		evaluated := Eval(callExpr.Arguments[0], env)
+
+		return convertObjectToASTNode(evaluated)
 
 	})
+}
+
+func isUnquoteCall(node ast.Node) bool {
+	callExpr, ok := node.(*ast.CallExpression)
+	if !ok {
+		return false
+	}
+
+	return callExpr.Function.TokenLiteral() == "unquote"
+}
+
+func convertObjectToASTNode(obj object.Object) ast.Node {
+	switch obj := obj.(type) {
+	case *object.Integer:
+		t := token.Token{
+			Type:    "INT",
+			Literal: fmt.Sprintf("%d", obj.Value),
+		}
+		return &ast.IntegerLiteral{
+			Token: t,
+			Value: obj.Value,
+		}
+
+	default:
+		return nil
+	}
 }
