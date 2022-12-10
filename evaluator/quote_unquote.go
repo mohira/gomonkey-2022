@@ -13,6 +13,8 @@ func quote(node ast.Node) object.Object {
 }
 
 func evalUnquoteCalls(quoted ast.Node) ast.Node {
+	// to俺: ast.Modifyをまず呼びだしているからな！
+	// 第2引数の 関数 はその後やで！
 	return ast.Modify(quoted, func(node ast.Node) ast.Node {
 		callExpr, ok := node.(*ast.CallExpression)
 		if !ok {
@@ -25,8 +27,10 @@ func evalUnquoteCalls(quoted ast.Node) ast.Node {
 		// もし、Functionが `unquote`なら、Modifyチャンス！
 		if callExpr.Function.TokenLiteral() == "unquote" {
 			// ex: unquote(1)だったら、ここだけ評価する
+			// unquoteの引数は絶対1個なので、これでおk
 			arg := callExpr.Arguments[0]
 
+			// TODO: これは後でなんとかしましょう！
 			嘘env := object.NewEnvironment()
 			evaluated := Eval(arg, 嘘env)
 

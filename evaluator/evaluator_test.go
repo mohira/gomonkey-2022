@@ -783,8 +783,11 @@ func TestQuoteUnquote(t *testing.T) {
 		input    string
 		expected string
 	}{
+		// quote(CallExpression) って構造
 		{`quote(unquote(4))`, `4`},
 		{`quote(unquote(4 + 4))`, `8`},
+
+		// quote(Infix{INT, +, CallExpression}) って構造
 		{`quote(8 + unquote(4 + 4))`, `(8 + 8)`},
 		{`quote(unquote(4 + 4) + 8)`, `(8 + 8)`},
 	}
