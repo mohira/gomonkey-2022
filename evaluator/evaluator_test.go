@@ -804,6 +804,12 @@ func TestQuoteUnquote(t *testing.T) {
 		// 真偽値の場合
 		{`quote(unquote(true))`, `true`},
 		{`quote(unquote(true == false))`, `false`},
+
+		// A.4.2.2 quoteの中のunquoteの中のquote
+		{`quote(unquote(quote(4 + 4)))`, `(4 + 4)`},
+		{`let quotedInfixExpression = quote(4 + 4);
+               quote(unquote(4 + 4) + unquote(quotedInfixExpression));`,
+			`(8 + (4 + 4))`},
 	}
 
 	for _, tt := range tests {
