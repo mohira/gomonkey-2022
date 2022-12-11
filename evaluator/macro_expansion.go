@@ -6,42 +6,51 @@ import (
 )
 
 func DefineMacros(program *ast.Program, env *object.Environment) {
-	var macro定義のインデックス集合 []int
+	var macroDefinitionIndexes []int
 
 	for idx, stmt := range program.Statements {
-		letStmt, ok := stmt.(*ast.LetStatement)
-		if !ok {
-			continue
+		if isMacroDefinition(stmt) {
+			// 1) 環境にマクロ定義を登録する
+			addMacro(stmt, env)
+
+			// ループ中にASTから消し去るのはご法度なので位置だけ記憶
+			macroDefinitionIndexes = append(macroDefinitionIndexes, idx)
 		}
-
-		macroLit, ok := letStmt.Value.(*ast.MacroLiteral)
-		if !ok {
-			continue
-		}
-
-		// マクロリテラルだったので
-		//	1) 環境に保存する
-		// TODO: シグネチャ怪しいけどテスト通してから直すので安心してください
-		registerMarco(env, letStmt.Name.Value, macroLit)
-
-		//	ループ中にASTから消し去るのはご法度なので位置だけ記憶
-		macro定義のインデックス集合 = append(macro定義のインデックス集合, idx)
 	}
 
 	// 2) indexを使ってマクロ定義をASTから消し去る
-	for i := len(macro定義のインデックス集合) - 1; i >= 0; i = i - 1 {
-		targetIndex := macro定義のインデックス集合[i]
-		program.Statements = append(program.Statements[:targetIndex], program.Statements[targetIndex+1:]...)
+	// memo: スライスを使った中抜きアルゴリズム
+	for i := len(macroDefinitionIndexes) - 1; i >= 0; i = i - 1 {
+		definitionIndex := macroDefinitionIndexes[i]
+		program.Statements = append(program.Statements[:definitionIndex], program.Statements[definitionIndex+1:]...)
 	}
 
 }
 
-func registerMarco(env *object.Environment, name string, macroLit *ast.MacroLiteral) {
+func isMacroDefinition(stmt ast.Statement) bool {
+	// マクロ定義 := Let文 かつ 右辺がマクロリテラル であること
+	letStmt, ok := stmt.(*ast.LetStatement)
+	if !ok {
+		return false
+	}
+
+	if _, ok := letStmt.Value.(*ast.MacroLiteral); !ok {
+		return false
+	}
+
+	return true
+}
+
+func addMacro(stmt ast.Statement, env *object.Environment) {
+	// エラー処理が冗長なので無視しています。ごめんな。
+	letStmt, _ := stmt.(*ast.LetStatement)
+	macroLit, _ := letStmt.Value.(*ast.MacroLiteral)
+
 	macroObj := &object.Macro{
 		Parameters: macroLit.Parameters,
 		Body:       macroLit.Body,
-		Env:        nil, // ??? あとで
+		Env:        env, // よくわからんし今のところ解説もないが、もらったenvをそのまま突っ込んでいます。
 	}
 
-	env.Set(name, macroObj)
+	env.Set(letStmt.Name.Value, macroObj)
 }
