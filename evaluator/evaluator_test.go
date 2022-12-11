@@ -843,7 +843,7 @@ let mymacro = macro(x, y) { x + y };
 	program := testParseProgram(input)
 
 	// マクロ定義をみつけて、そのマクロを環境に登録して、ASTから消し去る。なかなか色んな仕事をするやつ
-	evaluator.DefineMacros()
+	evaluator.DefineMacros(program, env)
 
 	if len(program.Statements) != 2 {
 		t.Fatalf("mymacroをASTから消し去るので、2文になってないといけませんね？ got=%d", len(program.Statements))
