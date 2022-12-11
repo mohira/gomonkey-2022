@@ -108,6 +108,8 @@ _ = 3;
 foo_bar = 4;
 
 if (5 < 10) { return true; } else { return false; };
+
+macro(x, y) { x + y; };
 `
 
 	tests := []struct {
@@ -190,6 +192,22 @@ if (5 < 10) { return true; } else { return false; };
 		{token.RBRACE, "}"},
 		{token.SEMICOLON, ";"},
 
+		// macro(x, y) { x + y; };
+		{token.MACRO, "macro"},
+		{token.LPAREN, "("},
+		{token.IDENT, "x"},
+		{token.COMMA, ","},
+		{token.IDENT, "y"},
+		{token.RPAREN, ")"},
+		{token.LBRACE, "{"},
+		{token.IDENT, "x"},
+		{token.PLUS, "+"},
+		{token.IDENT, "y"},
+		{token.SEMICOLON, ";"},
+		{token.RBRACE, "}"},
+		{token.SEMICOLON, ";"},
+
+		// EOF
 		{token.EOF, ""},
 	}
 
