@@ -506,8 +506,8 @@ func DefineMacros(program *ast.Program, env *object.Environment) {
 
 		// マクロリテラルだったので
 		//	1) 環境に保存する
-		//env.registerMarco(macroLit)
-		_ = macroLit
+		// TODO: シグネチャ怪しいけどテスト通してから直すので安心してください
+		registerMarco(env, letStmt.Name.Value, macroLit)
 
 		//	ループ中にASTから消し去るのはご法度なので位置だけ記憶
 		macro定義のインデックス集合 = append(macro定義のインデックス集合, idx)
@@ -519,4 +519,14 @@ func DefineMacros(program *ast.Program, env *object.Environment) {
 		program.Statements = append(program.Statements[:targetIndex], program.Statements[targetIndex+1:]...)
 	}
 
+}
+
+func registerMarco(env *object.Environment, name string, macroLit *ast.MacroLiteral) {
+	macroObj := &object.Macro{
+		Parameters: macroLit.Parameters,
+		Body:       macroLit.Body,
+		Env:        nil, // ??? あとで
+	}
+
+	env.Set(name, macroObj)
 }
