@@ -964,3 +964,45 @@ func TestParsingHashLiteralsWithExpression(t *testing.T) {
 		testFunc(value)
 	}
 }
+
+func TestMacroLiteralParsing(t *testing.T) {
+	input := `macro(x, y) { x + y; }`
+
+	l := lexer.New(input)
+	p := parser.New(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("おかしいぞ")
+	}
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("おかしいぞ")
+	}
+
+	macroLiteral, ok := exprStmt.Expression.(*ast.MacroLiteral)
+	if !ok {
+		t.Fatalf("おかしいぞ")
+	}
+
+	// macro(x, y) { x + y; }
+	if len(macroLiteral.Parameters) != 2 {
+		t.Fatalf("おかしいぞ")
+	}
+
+	testLiteralExpression(t, macroLiteral.Parameters[0], "x")
+	testLiteralExpression(t, macroLiteral.Parameters[1], "y")
+
+	if len(macroLiteral.Body.Statements) != 1 {
+		t.Fatalf("macroLiteral.Body.Statements が 1 じゃないよ。 got =%d", len(macroLiteral.Body.Statements))
+	}
+
+	bodyStmt, ok := macroLiteral.Body.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("おかしいぞ")
+	}
+
+	testInfixExpression(t, bodyStmt.Expression, "x", "+", "y")
+}
