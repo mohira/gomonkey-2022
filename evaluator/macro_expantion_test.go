@@ -67,3 +67,43 @@ func testParseProgram(input string) *ast.Program {
 	p := parser.New(l)
 	return p.ParseProgram()
 }
+
+func TestExpandMacros(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{
+			`
+				let infixExpression = macro() { quote(1 + 2); };
+
+				infixExpression();
+				`,
+			`(1 + 2)`,
+		},
+		{
+			`
+				let reverse = macro(a, b) { quote(unquote(b) - unquote(a)); };
+
+				reverse(2 + 2, 10 - 5);
+				`,
+			`(10 - 5) - (2 + 2)`, // `10-5` と `2+2` が評価されていない(quoteされているから)ってのも見落とすべからず！
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			expected := testParseProgram(tt.expected)
+			program := testParseProgram(tt.input)
+
+			env := object.NewEnvironment()
+			evaluator.DefineMacros(program, env)
+
+			expandedMacros := evaluator.ExpandMacros(program, env)
+
+			if expandedMacros.String() != expected.String() {
+				t.Errorf("not equal, want=%q, got=%q", expected.String(), expandedMacros.String())
+			}
+		})
+	}
+}
