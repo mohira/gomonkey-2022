@@ -100,9 +100,14 @@ func ExpandMacros(program *ast.Program, env *object.Environment) ast.Node {
 
 	// 「マクロ呼び出しを展開した結果のノード」を 「マクロ呼び出しのノード部分」 にすげ替える
 
+	expr, ok := quoteObj.Node.(ast.Expression)
+	if !ok {
+		panic("ぱにっくだ！！！！")
+	}
+
 	newExprStmt := &ast.ExpressionStatement{
 		Token:      token.Token{},
-		Expression: quoteObj.Node.(*ast.InfixExpression),
+		Expression: expr,
 	}
 
 	program.Statements[0] = newExprStmt
