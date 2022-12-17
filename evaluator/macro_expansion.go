@@ -97,7 +97,22 @@ func ExpandMacros(program *ast.Program, env *object.Environment) ast.Node {
 	//		env.Set(param.Value, args[i])
 	//	}
 
-	obj = Eval(macroObj.Body, env)
+	// CallExpr.Args(実引数) を Quoteで包む ← うっかり評価しちゃだめだぞ！
+	var quotedArgs []*object.Quote
+	for _, arg := range callExpr.Arguments {
+		quotedArgs = append(quotedArgs, &object.Quote{Node: arg})
+	}
+
+	// エラーチェック: 実引数の数 と 仮引数の数 が 不一致だったらダメだぞ！
+
+	// "拡張したEnv" に quotedArgs たちを登録する
+	macroEnv := object.NewEnclosedEnvironment(macroObj.Env)
+
+	for i, param := range macroObj.Parameters {
+		macroEnv.Set(param.Value, quotedArgs[i])
+	}
+
+	obj = Eval(macroObj.Body, macroEnv)
 
 	// マクロは object.Quote を返さないとダメだよルールなので、チェックします
 	quoteObj, ok := obj.(*object.Quote)
