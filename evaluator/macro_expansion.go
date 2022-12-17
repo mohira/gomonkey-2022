@@ -87,6 +87,16 @@ func ExpandMacros(program *ast.Program, env *object.Environment) ast.Node {
 		panic("ぱにっくだ！！！！")
 	}
 
+	// Evalする前に、Marcoオブジェクト内のスコープの中にある引数(実際には、仮引数aと仮引数b)を処理する
+	// 最終的には a: Quote(2, +, 2) , b: Quote(10-5) というかたちでenvに登録されればいい
+	// 参考としては、CallExpressionのEvalを使うと良い
+	// 	CallExpr.Args(実引数) を Quoteで包む ← うっかり評価しちゃだめだぞ！
+	//  (エラーチェック: 実引数の数 と 仮引数の数 が一致しているか？)
+	// 仮引数(ast.Identifier)それぞれの名前(.Value) で、 Quote(実引数1) をenvに登録する
+	// 	for i, param := range fn.Parameters {
+	//		env.Set(param.Value, args[i])
+	//	}
+
 	obj = Eval(macroObj.Body, env)
 
 	// マクロは object.Quote を返さないとダメだよルールなので、チェックします
