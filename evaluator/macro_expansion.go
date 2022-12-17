@@ -54,3 +54,7 @@ func addMacro(stmt ast.Statement, env *object.Environment) {
 
 	env.Set(letStmt.Name.Value, macroObj)
 }
+
+func ExpandMacros(program *ast.Program, env *object.Environment) ast.Node {
+	return nil
+}

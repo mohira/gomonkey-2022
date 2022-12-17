@@ -75,9 +75,9 @@ func TestExpandMacros(t *testing.T) {
 	}{
 		{
 			`
-				let infixExpression = macro() { quote(1 + 2); };
+				let macroA = macro() { quote(1 + 2); };
 
-				infixExpression();
+				macroA();
 				`,
 			`(1 + 2)`,
 		},
