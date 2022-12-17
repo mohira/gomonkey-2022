@@ -94,6 +94,23 @@ func TestExpandMacros(t *testing.T) {
 		// マクロ定義でない式文が複数ある ← ループ処理しない解けない(いまは 1文 で決め打ちしている！)
 		// 再帰探索系: CallExprがBlockStatementにあるやつ → if (true) {  reverseMacro(1+2, 3*4); }; ← ifExpressionがCallExprでないので、スルーしちゃう！
 
+		// unless(10 > 5, puts("nope, not greater"), puts("yep, greater"));
+		{
+			`
+					let unless = macro(condition, consequence, alternative) {
+						quote(
+							if (! (unquote(condition)) ) {
+								unquote(consequence);
+							} else {
+								unquote(alternative);
+							}
+						);
+					}
+
+					unless(10 > 5, puts("not greater"), puts("yep greater"));
+                 `,
+			`if (!(10 > 5)) { puts("not greater") } else { puts("yep greater") }`,
+		},
 	}
 
 	for _, tt := range tests {
