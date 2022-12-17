@@ -56,7 +56,83 @@ func addMacro(stmt ast.Statement, env *object.Environment) {
 	env.Set(letStmt.Name.Value, macroObj)
 }
 
-func ExpandMacros(program *ast.Program, env *object.Environment) ast.Node {
+func ExpandMacros(program ast.Node, env *object.Environment) ast.Node {
+	modifier := func(node ast.Node) ast.Node {
+		// CallExprでない時点で「マクロ呼び出し」なわけがない
+		callExpr, ok := node.(*ast.CallExpression)
+		if !ok {
+			return node // 「このノードは変更しないよ」ってこと
+		}
+
+		// マクロ呼び出し なのかをチェック
+		macroObj, ok := isMacroCall(callExpr, env)
+		if !ok {
+			return node
+		}
+
+		// 実引数 を "評価しないまま" にしたいので、それぞれを *object.Quote で包む
+		quotedArgs := quoteArgs(callExpr)
+
+		// マクロ展開時の環境を作る
+		// quotedArgs たちが登録された環境をつくります
+		macroEnv := extendMarcoEnv(macroObj, quotedArgs)
+
+		// マクロオブジェクトの評価
+		evaluated := Eval(macroObj.Body, macroEnv)
+
+		quote, ok := evaluated.(*object.Quote)
+		if !ok {
+			panic("マクロ呼び出しの結果は Quoteオブジェクト(ASTノードを内包している) じゃないとダメなルールです！ これはルールです。")
+		}
+
+		return quote.Node
+	}
+
+	return ast.Modify(program, modifier)
+}
+
+func extendMarcoEnv(macroObj *object.Macro, quotedArgs []*object.Quote) *object.Environment {
+	macroEnv := object.NewEnclosedEnvironment(macroObj.Env)
+
+	for i, param := range macroObj.Parameters {
+		macroEnv.Set(param.Value, quotedArgs[i])
+	}
+
+	return macroEnv
+}
+
+func quoteArgs(callExpr *ast.CallExpression) []*object.Quote {
+	// 実引数 を "評価しないまま" にしたいので、それぞれを *object.Quote で包む
+	var quotedArgs []*object.Quote
+
+	for _, arg := range callExpr.Arguments {
+		quotedArgs = append(quotedArgs, &object.Quote{Node: arg})
+	}
+
+	return quotedArgs
+}
+
+func isMacroCall(callExpr *ast.CallExpression, env *object.Environment) (*object.Macro, bool) {
+	identifier, ok := callExpr.Function.(*ast.Identifier)
+	if !ok {
+		return nil, false
+	}
+
+	// 呼び出し式 の 識別子 が環境に登録されているかチェック
+	obj, ok := env.Get(identifier.Value)
+	if !ok {
+		return nil, false
+	}
+
+	macroObj, ok := obj.(*object.Macro)
+	if !ok {
+		return nil, false
+	}
+
+	return macroObj, true
+}
+
+func 俺たちでつくったの一応残しておく_ExpandMacros(program *ast.Program, env *object.Environment) ast.Node {
 	// program.Statementsから「マクロ呼び出し」を見つけて、そのマクロ呼び出しを 適用して 置き換える。
 	// マクロ呼び出し := CallExpr かつ  CallExpr.Function の識別子の.Value が envに登録されているやつ
 
