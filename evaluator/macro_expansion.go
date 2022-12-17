@@ -57,11 +57,12 @@ func addMacro(stmt ast.Statement, env *object.Environment) {
 }
 
 func ExpandMacros(program *ast.Program, env *object.Environment) ast.Node {
-	// program.Statementsから「マクロ呼び出し」を見つける
+	// program.Statementsから「マクロ呼び出し」を見つけて、そのマクロ呼び出しを 適用して 置き換える。
 	// マクロ呼び出し := CallExpr かつ  CallExpr.Function の識別子の.Value が envに登録されているやつ
 
 	// TODO: forは後回しにする。1Statementのテストケースだけだから！
 	stmt := program.Statements[0]
+
 	exprStmt, ok := stmt.(*ast.ExpressionStatement)
 	if !ok {
 		panic("ぱにっくだ！！！！")

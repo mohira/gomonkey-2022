@@ -89,6 +89,11 @@ func TestExpandMacros(t *testing.T) {
 				`,
 			`(10 - 5) - (2 + 2)`, // `10-5` と `2+2` が評価されていない(quoteされているから)ってのも見落とすべからず！
 		},
+
+		// テストケースを追加するとしたら...
+		// マクロ定義でない式文が複数ある ← ループ処理しない解けない(いまは 1文 で決め打ちしている！)
+		// 再帰探索系: CallExprがBlockStatementにあるやつ → if (true) {  reverseMacro(1+2, 3*4); }; ← ifExpressionがCallExprでないので、スルーしちゃう！
+
 	}
 
 	for _, tt := range tests {
