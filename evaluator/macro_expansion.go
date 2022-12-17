@@ -3,6 +3,7 @@ package evaluator
 import (
 	"gomonkey/ast"
 	"gomonkey/object"
+	"gomonkey/token"
 )
 
 func DefineMacros(program *ast.Program, env *object.Environment) {
@@ -97,5 +98,14 @@ func ExpandMacros(program *ast.Program, env *object.Environment) ast.Node {
 	// *object.Quote &{(1 + 2)}
 	// fmt.Printf("%[1]T %[1]v\n", obj)
 
-	return quoteObj.Node
+	// 「マクロ呼び出しを展開した結果のノード」を 「マクロ呼び出しのノード部分」 にすげ替える
+
+	newExprStmt := &ast.ExpressionStatement{
+		Token:      token.Token{},
+		Expression: quoteObj.Node.(*ast.InfixExpression),
+	}
+
+	program.Statements[0] = newExprStmt
+
+	return program
 }
