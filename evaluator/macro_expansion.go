@@ -87,25 +87,18 @@ func ExpandMacros(program *ast.Program, env *object.Environment) ast.Node {
 		panic("ぱにっくだ！！！！")
 	}
 
-	// Evalする前に、Marcoオブジェクト内のスコープの中にある引数(実際には、仮引数aと仮引数b)を処理する
-	// 最終的には a: Quote(2, +, 2) , b: Quote(10-5) というかたちでenvに登録されればいい
+	// ## 最終的には a: Quote(2, +, 2) , b: Quote(10-5) というかたちでenvに登録されればいい
 	// 参考としては、CallExpressionのEvalを使うと良い
-	// 	CallExpr.Args(実引数) を Quoteで包む ← うっかり評価しちゃだめだぞ！
-	//  (エラーチェック: 実引数の数 と 仮引数の数 が一致しているか？)
-	// 仮引数(ast.Identifier)それぞれの名前(.Value) で、 Quote(実引数1) をenvに登録する
-	// 	for i, param := range fn.Parameters {
-	//		env.Set(param.Value, args[i])
-	//	}
 
-	// CallExpr.Args(実引数) を Quoteで包む ← うっかり評価しちゃだめだぞ！
+	// 1. CallExpr.Args(実引数) を Quoteで包む ← うっかり評価しちゃだめだぞ！
 	var quotedArgs []*object.Quote
 	for _, arg := range callExpr.Arguments {
 		quotedArgs = append(quotedArgs, &object.Quote{Node: arg})
 	}
 
-	// エラーチェック: 実引数の数 と 仮引数の数 が 不一致だったらダメだぞ！
+	// 2. エラーチェック: 実引数の数 と 仮引数の数 が 不一致だったらダメだぞ！(本編とは関係なので書いてない)
 
-	// "拡張したEnv" に quotedArgs たちを登録する
+	// 3. "拡張したEnv" に quotedArgs たちを登録する
 	macroEnv := object.NewEnclosedEnvironment(macroObj.Env)
 
 	for i, param := range macroObj.Parameters {
