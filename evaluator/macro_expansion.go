@@ -56,5 +56,46 @@ func addMacro(stmt ast.Statement, env *object.Environment) {
 }
 
 func ExpandMacros(program *ast.Program, env *object.Environment) ast.Node {
-	return nil
+	// program.Statementsから「マクロ呼び出し」を見つける
+	// マクロ呼び出し := CallExpr かつ  CallExpr.Function の識別子の.Value が envに登録されているやつ
+
+	// TODO: forは後回しにする。1Statementのテストケースだけだから！
+	stmt := program.Statements[0]
+	exprStmt, ok := stmt.(*ast.ExpressionStatement)
+	if !ok {
+		panic("ぱにっくだ！！！！")
+	}
+
+	callExpr, ok := exprStmt.Expression.(*ast.CallExpression)
+	if !ok {
+		panic("ぱにっくだ！！！！")
+	}
+
+	// envから名前探し
+	obj, ok := env.Get(callExpr.Function.TokenLiteral())
+	if !ok {
+		panic("ぱにっくだ！！！！")
+	}
+
+	// *object.Macro &{[] quote((1 + 2)) 0x14000052a10}
+	//fmt.Printf("%[1]T %[1]v\n", obj)
+
+	macroObj, ok := obj.(*object.Macro)
+	if !ok {
+		// チェックしなくても良いかも？
+		panic("ぱにっくだ！！！！")
+	}
+
+	obj = Eval(macroObj.Body, env)
+
+	// マクロは object.Quote を返さないとダメだよルールなので、チェックします
+	quoteObj, ok := obj.(*object.Quote)
+	if !ok {
+		panic("ぱにっくだ！！！！")
+	}
+
+	// *object.Quote &{(1 + 2)}
+	// fmt.Printf("%[1]T %[1]v\n", obj)
+
+	return quoteObj.Node
 }
