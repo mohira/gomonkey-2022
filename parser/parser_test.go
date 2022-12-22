@@ -266,6 +266,11 @@ func TestParsingInfixExpressions(t *testing.T) {
 
 		// BooleanLiteral系
 		{"true == true", true, "==", true},
+
+		// 代入式
+		// 合法だけど評価器的にはエラー
+		// 想定してるのは `x = 1` とか `hash["key"] = value` とか。
+		{"3 = 4", 3, "=", 4},
 	}
 
 	for _, tt := range infixTests {
