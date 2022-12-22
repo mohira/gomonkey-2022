@@ -162,28 +162,37 @@ func evalHashLiteral(hashLiteral *ast.HashLiteral, env *object.Environment) obje
 	pairs := make(map[object.HashKey]object.HashPair)
 
 	for keyNode, valueNode := range hashLiteral.Pairs {
-		key := Eval(keyNode, env)
-		if isError(key) {
-			return key
+		err := setHashPair(pairs, keyNode, valueNode, env)
+		if isError(err) {
+			return err
 		}
-
-		// keyがおかしいなら、valueを評価する前に処理したほうが良いよね
-		hashableObj, ok := key.(object.Hashable)
-		if !ok {
-			return newError("unhashable type: %s", key.Type())
-		}
-
-		value := Eval(valueNode, env)
-		if isError(value) {
-			return value
-		}
-
-		hashed := hashableObj.HashKey()
-
-		pairs[hashed] = object.HashPair{Key: key, Value: value}
 	}
 
 	return &object.Hash{Pairs: pairs}
+}
+
+func setHashPair(pairs map[object.HashKey]object.HashPair, keyNode, valueNode ast.Node, env *object.Environment) object.Object {
+	key := Eval(keyNode, env)
+	if isError(key) {
+		return key
+	}
+
+	// keyがおかしいなら、valueを評価する前に処理したほうが良いよね
+	hashableObj, ok := key.(object.Hashable)
+	if !ok {
+		return newError("unhashable type: %s", key.Type())
+	}
+
+	value := Eval(valueNode, env)
+	if isError(value) {
+		return value
+	}
+
+	hashed := hashableObj.HashKey()
+
+	pairs[hashed] = object.HashPair{Key: key, Value: value}
+
+	return value
 }
 
 func evalIndexExpression(left, index object.Object) object.Object {
@@ -365,8 +374,23 @@ func evalAssignExpression(leftExpr, rightExpr ast.Expression, env *object.Enviro
 
 		storedEnv.Set(name, right)
 		return right
+	case *ast.IndexExpression:
+		assignSubject := Eval(left.Left, env)
+		if isError(assignSubject) {
+			return assignSubject
+		}
+
+		hashObj, ok := assignSubject.(*object.Hash)
+		if !ok {
+			return newError("updating %s is not supported", assignSubject.Type())
+		}
+
+		right := setHashPair(hashObj.Pairs, left.Index, rightExpr, env)
+
+		return right
 	default:
 		return newError("illegal assignment subject: %T", leftExpr)
+
 	}
 }
 

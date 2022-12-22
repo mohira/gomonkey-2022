@@ -319,6 +319,7 @@ func TestErrorHandling(t *testing.T) {
 		{`foobar = 1;`, "identifier not found: foobar"},
 		{`1 = "foobar";`, "illegal assignment subject: *ast.IntegerLiteral"},
 		{`["foobar"] = 1;`, "illegal assignment subject: *ast.ArrayLiteral"},
+		{`let arr = []; arr[0] = 1;`, "updating ARRAY is not supported"},
 	}
 
 	for _, tt := range tests {
@@ -844,6 +845,7 @@ func TestAssignExpressions(t *testing.T) {
 	}{
 		{"let a = 5; a = a + 2; a;", 7},
 		{"let a = 5; (fn(){ a = a + 2; })(); a;", 7},
+		{`let a = {}; a["key"] = 5; a["key"];`, 5},
 	}
 
 	for _, tt := range tests {
