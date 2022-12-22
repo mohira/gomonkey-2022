@@ -97,6 +97,11 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalPrefixExpression(n.Operator, right)
 
 	case *ast.InfixExpression:
+		// 代入式の場合 n.Left は評価したくないのでここで分岐
+		if n.Operator == "=" {
+			return evalAssignExpression(n.Left, n.Right, env)
+		}
+
 		left := Eval(n.Left, env)
 		if isError(left) {
 			return left
@@ -341,6 +346,27 @@ func evalInfixExpression(operator string, left, right object.Object) object.Obje
 		return newError("type mismatch: %s %s %s", left.Type(), operator, right.Type())
 	default:
 		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
+	}
+}
+
+func evalAssignExpression(leftExpr, rightExpr ast.Expression, env *object.Environment) object.Object {
+	switch left := leftExpr.(type) {
+	case *ast.Identifier:
+		name := left.Value
+		storedEnv := env.GetStoredEnv(name)
+		if storedEnv == nil {
+			return newError("identifier not found: %s", name)
+		}
+
+		right := Eval(rightExpr, env)
+		if isError(right) {
+			return right
+		}
+
+		storedEnv.Set(name, right)
+		return right
+	default:
+		return newError("illegal assignment subject: %T", leftExpr)
 	}
 }
 

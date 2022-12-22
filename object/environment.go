@@ -36,3 +36,17 @@ func (e *Environment) Set(name string, val Object) Object {
 
 	return val
 }
+
+func (e *Environment) GetStoredEnv(name string) *Environment {
+	_, ok := e.store[name]
+
+	if ok {
+		return e
+	}
+
+	if e.outer != nil {
+		return e.outer.GetStoredEnv(name)
+	}
+
+	return nil
+}

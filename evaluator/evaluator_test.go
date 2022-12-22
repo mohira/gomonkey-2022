@@ -314,6 +314,11 @@ func TestErrorHandling(t *testing.T) {
 
 		//
 		{`{"name": "Monkey"}[fn(x) { x }];`, "unhashable type: FUNCTION"},
+
+		// 代入式
+		{`foobar = 1;`, "identifier not found: foobar"},
+		{`1 = "foobar";`, "illegal assignment subject: *ast.IntegerLiteral"},
+		{`["foobar"] = 1;`, "illegal assignment subject: *ast.ArrayLiteral"},
 	}
 
 	for _, tt := range tests {
@@ -830,4 +835,22 @@ func TestQuoteUnquote(t *testing.T) {
 		})
 	}
 
+}
+
+func TestAssignExpressions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{"let a = 5; a = a + 2; a;", 7},
+		{"let a = 5; (fn(){ a = a + 2; })(); a;", 7},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			evaluated := testEval(tt.input)
+
+			testIntegerObject(t, evaluated, tt.expected)
+		})
+	}
 }
