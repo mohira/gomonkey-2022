@@ -111,6 +111,39 @@ func TestExpandMacros(t *testing.T) {
                  `,
 			`if (!(10 > 5)) { puts("not greater") } else { puts("yep greater") }`,
 		},
+		{
+			`
+				let for = macro(init, cond, update, body) {
+					quote((fn(){
+				 		unquote(init);
+						let loop = fn() {
+							if (unquote(cond)) {
+								unquote(body);
+								unquote(update);
+								loop();
+							}
+						};
+						loop();
+					})())
+				};
+				for(if(true){ let i = 0; }, i < 10, i = i + 1, puts(i))
+			`,
+			`
+				(fn(){
+					if(true){
+						let i = 0;
+					}
+					let loop = fn() {
+						if(i < 10) {
+							puts(i);
+							i = i + 1;
+							loop();
+						};
+					};
+					loop();
+				})()
+			`,
+		},
 	}
 
 	for _, tt := range tests {

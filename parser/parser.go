@@ -24,6 +24,9 @@ var precedences = map[token.Type]int{
 	token.EQ:     EQUALS,
 	token.NOT_EQ: EQUALS,
 
+	// 代入式の場合どの値が正しいのかは知らない。適当に決めた
+	token.ASSIGN: EQUALS,
+
 	token.LT: LESSGREATER,
 	token.GT: LESSGREATER,
 
@@ -137,6 +140,9 @@ func New(l *lexer.Lexer) *Parser {
 	// myArray[0]
 	// `[` を 中置演算式におけるOperatorだと思うってこと！
 	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
+
+	// 代入式
+	p.registerInfix(token.ASSIGN, p.parseInfixExpression)
 
 	return &p
 }
