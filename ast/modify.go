@@ -63,6 +63,12 @@ func Modify(node Node, modifier ModifyFunc) Node {
 		}
 
 		node.Pairs = newPairs
+	case *CallExpression:
+		node.Function, _ = Modify(node.Function, modifier).(Expression)
+
+		for i := range node.Arguments {
+			node.Arguments[i], _ = Modify(node.Arguments[i], modifier).(Expression)
+		}
 	}
 
 	return modifier(node)
